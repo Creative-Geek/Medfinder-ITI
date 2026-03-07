@@ -1,1 +1,7 @@
-// Product detail controller: fetch by id, image gallery, add-to-cart, reviews
+// Product detail controller
+angular.module("medfinderApp").controller("ProductController", [
+  "$scope",
+  function ($scope) {
+    $scope.pageTitle = "تفاصيل المنتج";
+  },
+]);

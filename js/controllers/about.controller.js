@@ -1,1 +1,7 @@
-// About page controller: static content, team info
+// About page controller
+angular.module("medfinderApp").controller("AboutController", [
+  "$scope",
+  function ($scope) {
+    $scope.pageTitle = "عن Medfinder";
+  },
+]);

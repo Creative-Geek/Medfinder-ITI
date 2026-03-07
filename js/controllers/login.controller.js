@@ -1,1 +1,7 @@
-// Login/Signup controller: form toggle, validation, auth calls, redirect on success
+// Login/Signup controller
+angular.module("medfinderApp").controller("LoginController", [
+  "$scope",
+  function ($scope) {
+    $scope.pageTitle = "تسجيل الدخول";
+  },
+]);

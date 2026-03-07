@@ -1,0 +1,310 @@
+/* ==========================================================================
+   COMPONENTS -- Buttons, cards, badges, modals, form elements
+   ========================================================================== */
+
+/* -- Buttons -- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: var(--font-size-body);
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.btn--primary:hover {
+  background-color: #0470d1;
+}
+
+.btn--accent {
+  background-color: var(--color-accent);
+  color: var(--color-white);
+}
+
+.btn--accent:hover {
+  background-color: #e88d12;
+}
+
+.btn--secondary {
+  background-color: var(--color-bg-card);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn--secondary:hover {
+  background-color: var(--color-border);
+}
+
+.btn--danger {
+  background-color: var(--color-danger);
+  color: var(--color-white);
+}
+
+.btn--danger:hover {
+  background-color: #c0392b;
+}
+
+.btn--sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: var(--font-size-small);
+}
+
+.btn--lg {
+  padding: var(--space-md) var(--space-xl);
+  font-size: 18px;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* -- Product Card -- */
+.product-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+  overflow: hidden;
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.product-card.out-of-stock {
+  opacity: 0.6;
+}
+
+.product-card__image {
+  position: relative;
+  aspect-ratio: 1;
+  background-color: var(--color-bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.product-card__image img {
+  width: 80%;
+  height: 80%;
+  object-fit: contain;
+}
+
+.product-card__wishlist {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast);
+}
+
+.product-card__wishlist:hover {
+  transform: scale(1.1);
+}
+
+.product-card__info {
+  padding: var(--space-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.product-card__name {
+  font-weight: 500;
+  font-size: var(--font-size-body);
+  color: var(--color-dark);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-card__manufacturer {
+  font-size: var(--font-size-small);
+  color: var(--color-text-muted);
+}
+
+.product-card__price {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-primary);
+  margin-top: auto;
+}
+
+.product-card__add-to-cart {
+  width: 100%;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-weight: 500;
+  transition: background-color var(--transition-fast);
+}
+
+.product-card__add-to-cart:hover:not(:disabled) {
+  background-color: #0470d1;
+}
+
+.product-card__add-to-cart:disabled {
+  background-color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* -- Quantity Stepper -- */
+.quantity-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.quantity-stepper__btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-card);
+  transition: background-color var(--transition-fast);
+}
+
+.quantity-stepper__btn:hover:not(:disabled) {
+  background-color: var(--color-border);
+}
+
+.quantity-stepper__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quantity-stepper__value {
+  width: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* -- Modal -- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal-dialog {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  max-width: 420px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-dialog__title {
+  margin-bottom: var(--space-sm);
+}
+
+.modal-dialog__message {
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+.modal-dialog__actions {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+}
+
+/* -- Badges -- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-sm);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.badge--primary {
+  background-color: rgba(5, 131, 242, 0.1);
+  color: var(--color-primary);
+}
+
+.badge--accent {
+  background-color: rgba(249, 157, 28, 0.1);
+  color: var(--color-accent);
+}
+
+.badge--success {
+  background-color: rgba(39, 174, 96, 0.1);
+  color: var(--color-success);
+}
+
+.badge--danger {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--color-danger);
+}
+
+/* -- Form inputs -- */
+.form-input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-body);
+  transition: border-color var(--transition-fast);
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(5, 131, 242, 0.1);
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  font-size: var(--font-size-small);
+  margin-bottom: var(--space-xs);
+  color: var(--color-dark);
+}
+
+.form-group {
+  margin-bottom: var(--space-md);
+}

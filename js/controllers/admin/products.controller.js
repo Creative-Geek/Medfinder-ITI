@@ -1,1 +1,7 @@
-// Admin products controller: CRUD table, add/edit/delete products
+// Admin products CRUD controller
+angular.module("medfinderApp").controller("AdminProductsController", [
+  "$scope",
+  function ($scope) {
+    $scope.pageTitle = "إدارة المنتجات";
+  },
+]);

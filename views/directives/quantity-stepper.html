@@ -1,0 +1,21 @@
+<!-- Quantity stepper template -->
+<!-- Used via: <quantity-stepper qty="item.qty" max="item.stock" on-change="updateQty(qty)"></quantity-stepper> -->
+<div class="quantity-stepper">
+  <button
+    class="quantity-stepper__btn"
+    ng-click="decrement()"
+    ng-disabled="qty <= min"
+    aria-label="Decrease quantity"
+  >
+    <i data-lucide="minus"></i>
+  </button>
+  <span class="quantity-stepper__value">{{ qty }}</span>
+  <button
+    class="quantity-stepper__btn"
+    ng-click="increment()"
+    ng-disabled="qty >= max"
+    aria-label="Increase quantity"
+  >
+    <i data-lucide="plus"></i>
+  </button>
+</div>

@@ -1,1 +1,333 @@
-<!-- Home page: hero carousel, category nav, product rows by category, brand logos strip -->
+<!-- Home Page View -->
+<div class="home-page">
+  <!-- ===================== HERO CAROUSEL ===================== -->
+  <section class="uk-container py-4">
+    <div
+      class="carousel-container relative overflow-hidden rounded-xl bg-gray-100"
+    >
+      <!-- Slides: translateX-based sliding -->
+      <div
+        class="carousel-track flex transition-transform duration-500 ease-in-out"
+        ng-style="{ 'transform': 'translateX(' + (carousel.current * 100) + '%)' }"
+      >
+        <div
+          ng-repeat="slide in carousel.slides track by $index"
+          class="carousel-slide w-full shrink-0"
+        >
+          <img
+            ng-src="{{ slide.image }}"
+            alt="{{ slide.alt }}"
+            class="w-full h-auto block"
+          />
+        </div>
+      </div>
+
+      <!-- Arrows -->
+      <button
+        class="absolute top-1/2 right-4 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-md flex items-center justify-center transition-all hover:scale-110"
+        ng-click="carousel.prev()"
+      >
+        <i data-lucide="chevron-right" class="h-5 w-5 text-gray-700"></i>
+      </button>
+      <button
+        class="absolute top-1/2 left-4 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-md flex items-center justify-center transition-all hover:scale-110"
+        ng-click="carousel.next()"
+      >
+        <i data-lucide="chevron-left" class="h-5 w-5 text-gray-700"></i>
+      </button>
+
+      <!-- Dot Indicators -->
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        <button
+          ng-repeat="slide in carousel.slides track by $index"
+          class="w-2.5 h-2.5 rounded-full transition-all duration-300"
+          ng-class="{
+            'bg-accent w-6': $index === carousel.current,
+            'bg-white/60 hover:bg-white/80': $index !== carousel.current
+          }"
+          ng-click="carousel.goTo($index)"
+        ></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUICK ACTION CARDS ===================== -->
+  <section class="uk-container py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Prescription Upload -->
+      <div
+        class="uk-card uk-card-body flex items-center gap-4 p-6 group hover:shadow-md transition-shadow cursor-pointer"
+      >
+        <div
+          class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors"
+        >
+          <i data-lucide="file-text" class="h-8 w-8 text-primary"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">ارفع الروشتة</h3>
+          <p class="text-sm text-muted-foreground mb-3">
+            ارفع صورة الروشتة وسنساعدك في العثور على المنتجات
+          </p>
+          <button
+            class="uk-btn uk-btn-default uk-btn-sm text-primary border-primary hover:bg-primary hover:text-white transition-colors"
+          >
+            <i data-lucide="upload" class="h-3.5 w-3.5 ml-1"></i>
+            ارفع صورة
+          </button>
+        </div>
+      </div>
+
+      <!-- Wishlist / Favorites -->
+      <div
+        class="uk-card uk-card-body flex items-center gap-4 p-6 group hover:shadow-md transition-shadow cursor-pointer"
+      >
+        <div
+          class="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors"
+        >
+          <i data-lucide="heart" class="h-8 w-8 text-accent"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-bold text-lg mb-1">احفظ منتجاتك المفضلة</h3>
+          <p class="text-sm text-muted-foreground mb-3">
+            أضف المنتجات للمفضلة للرجوع إليها لاحقا
+          </p>
+          <button
+            class="uk-btn uk-btn-default uk-btn-sm text-accent border-accent hover:bg-accent hover:text-white transition-colors"
+          >
+            <i data-lucide="bookmark" class="h-3.5 w-3.5 ml-1"></i>
+            عرض المفضلة
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SHELF 1: MOST POPULAR ===================== -->
+  <section class="uk-container py-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-dark">الأكثر طلبا</h2>
+      <a
+        href="#!/shop"
+        class="text-sm text-primary font-medium hover:underline flex items-center gap-1 no-underline"
+      >
+        عرض الكل
+        <i data-lucide="arrow-left" class="h-4 w-4"></i>
+      </a>
+    </div>
+
+    <!-- Loading state -->
+    <div ng-if="shelves.popular.loading" class="flex gap-4 overflow-hidden">
+      <div
+        ng-repeat="i in [1,2,3,4,5,6]"
+        class="shrink-0 w-48 h-72 bg-gray-100 rounded-xl animate-pulse"
+      ></div>
+    </div>
+
+    <!-- Products with scroll chevrons -->
+    <div ng-if="!shelves.popular.loading" class="relative shelf-scroll-wrapper">
+      <button
+        class="shelf-chevron shelf-chevron-right"
+        ng-click="scrollShelf($event, 'right')"
+      >
+        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+      </button>
+      <div
+        class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth shelf-track"
+      >
+        <div
+          ng-repeat="product in shelves.popular.items track by product.id"
+          class="shrink-0 w-48"
+        >
+          <product-card
+            product="product"
+            on-add-to-cart="addToCart(product)"
+            on-toggle-wishlist="toggleWishlist(product)"
+          ></product-card>
+        </div>
+      </div>
+      <button
+        class="shelf-chevron shelf-chevron-left"
+        ng-click="scrollShelf($event, 'left')"
+      >
+        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===================== SHELF 2: VITAMINS ===================== -->
+  <section class="uk-container py-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-dark">الفيتامينات و المكملات</h2>
+      <a
+        ng-href="#!/shop?category=الفيتامينات و المكملات الغذائية"
+        class="text-sm text-primary font-medium hover:underline flex items-center gap-1 no-underline"
+      >
+        عرض الكل
+        <i data-lucide="arrow-left" class="h-4 w-4"></i>
+      </a>
+    </div>
+
+    <div ng-if="shelves.vitamins.loading" class="flex gap-4 overflow-hidden">
+      <div
+        ng-repeat="i in [1,2,3,4,5,6]"
+        class="shrink-0 w-48 h-72 bg-gray-100 rounded-xl animate-pulse"
+      ></div>
+    </div>
+
+    <div
+      ng-if="!shelves.vitamins.loading"
+      class="relative shelf-scroll-wrapper"
+    >
+      <button
+        class="shelf-chevron shelf-chevron-right"
+        ng-click="scrollShelf($event, 'right')"
+      >
+        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+      </button>
+      <div
+        class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth shelf-track"
+      >
+        <div
+          ng-repeat="product in shelves.vitamins.items track by product.id"
+          class="shrink-0 w-48"
+        >
+          <product-card
+            product="product"
+            on-add-to-cart="addToCart(product)"
+            on-toggle-wishlist="toggleWishlist(product)"
+          ></product-card>
+        </div>
+      </div>
+      <button
+        class="shelf-chevron shelf-chevron-left"
+        ng-click="scrollShelf($event, 'left')"
+      >
+        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===================== CATEGORY SHORTCUTS GRID ===================== -->
+  <section class="uk-container py-10">
+    <h2 class="text-xl font-bold text-dark text-center mb-8">
+      تسوق حسب احتياجك
+    </h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+      <a
+        ng-repeat="cat in categoryShortcuts track by cat.category"
+        ng-href="#!/shop?category={{ cat.category }}"
+        class="uk-card uk-card-body text-center p-4 group hover:shadow-md transition-all hover:-translate-y-0.5 no-underline text-foreground cursor-pointer"
+      >
+        <div
+          class="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors"
+        >
+          <i
+            ng-attr-data-lucide="{{ cat.icon }}"
+            class="h-6 w-6 text-primary"
+          ></i>
+        </div>
+        <p class="text-sm font-medium">{{ cat.label }}</p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ===================== SHELF 3: SUGAR SUBSTITUTES ===================== -->
+  <section class="uk-container py-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-dark">بديل للسكر</h2>
+      <a
+        ng-href="#!/shop?category=بديل للسكر"
+        class="text-sm text-primary font-medium hover:underline flex items-center gap-1 no-underline"
+      >
+        عرض الكل
+        <i data-lucide="arrow-left" class="h-4 w-4"></i>
+      </a>
+    </div>
+
+    <div ng-if="shelves.sugar.loading" class="flex gap-4 overflow-hidden">
+      <div
+        ng-repeat="i in [1,2,3,4,5,6]"
+        class="shrink-0 w-48 h-72 bg-gray-100 rounded-xl animate-pulse"
+      ></div>
+    </div>
+
+    <div ng-if="!shelves.sugar.loading" class="relative shelf-scroll-wrapper">
+      <button
+        class="shelf-chevron shelf-chevron-right"
+        ng-click="scrollShelf($event, 'right')"
+      >
+        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+      </button>
+      <div
+        class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth shelf-track"
+      >
+        <div
+          ng-repeat="product in shelves.sugar.items track by product.id"
+          class="shrink-0 w-48"
+        >
+          <product-card
+            product="product"
+            on-add-to-cart="addToCart(product)"
+            on-toggle-wishlist="toggleWishlist(product)"
+          ></product-card>
+        </div>
+      </div>
+      <button
+        class="shelf-chevron shelf-chevron-left"
+        ng-click="scrollShelf($event, 'left')"
+      >
+        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===================== BRAND STRIP ===================== -->
+  <section class="uk-container py-10">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-bold text-dark">تصفح الماركات</h2>
+      <a
+        href="#!/shop"
+        class="text-sm text-primary font-medium hover:underline flex items-center gap-1 no-underline"
+      >
+        عرض الكل
+        <i data-lucide="arrow-left" class="h-4 w-4"></i>
+      </a>
+    </div>
+
+    <div class="relative shelf-scroll-wrapper">
+      <button
+        class="shelf-chevron shelf-chevron-right"
+        ng-click="scrollShelf($event, 'right')"
+      >
+        <i data-lucide="chevron-right" class="h-5 w-5"></i>
+      </button>
+      <div
+        class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide scroll-smooth shelf-track"
+      >
+        <a
+          ng-repeat="brand in brands track by brand.name"
+          ng-href="#!/shop?brand={{ brand.name }}"
+          class="shrink-0 uk-card uk-card-body flex items-center justify-center px-8 py-5 hover:shadow-md transition-all hover:-translate-y-0.5 no-underline min-w-[140px]"
+        >
+          <img
+            ng-if="brand.logo"
+            ng-src="{{ brand.logo }}"
+            alt="{{ brand.name }}"
+            class="h-8 max-w-[100px] object-contain"
+          />
+          <span
+            ng-if="!brand.logo"
+            class="text-sm font-bold text-gray-700 whitespace-nowrap"
+            >{{ brand.name }}</span
+          >
+        </a>
+      </div>
+      <button
+        class="shelf-chevron shelf-chevron-left"
+        ng-click="scrollShelf($event, 'left')"
+      >
+        <i data-lucide="chevron-left" class="h-5 w-5"></i>
+      </button>
+    </div>
+  </section>
+</div>

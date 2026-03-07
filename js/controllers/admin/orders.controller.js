@@ -1,1 +1,7 @@
-// Admin orders controller: all orders list, filter by user, status updates, invoice export
+// Admin orders controller
+angular.module("medfinderApp").controller("AdminOrdersController", [
+  "$scope",
+  function ($scope) {
+    $scope.pageTitle = "إدارة الطلبات";
+  },
+]);

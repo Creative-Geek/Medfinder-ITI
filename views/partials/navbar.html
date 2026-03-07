@@ -1,1 +1,82 @@
-<!-- Navbar: logo, search bar, nav links, cart icon with count, account dropdown -->
+<!-- Medfinder Navbar: Header + Category Bar -->
+<header class="sticky top-0 z-50 bg-white border-b border-gray-100 shadow-sm">
+  <!-- Main Header Row -->
+  <div class="uk-container py-3">
+    <div class="flex items-center gap-4">
+      <!-- Logo (right side in RTL) -->
+      <a href="#!/" class="shrink-0 flex items-center gap-2">
+        <img src="assets/logos/logo.svg" alt="Medfinder" class="h-9 w-9" />
+        <span class="text-xl font-bold text-dark hidden sm:inline"
+          >Medfinder</span
+        >
+      </a>
+
+      <!-- Search Bar (center, dominant) -->
+      <div class="flex-1 mx-auto relative">
+        <input
+          type="text"
+          placeholder="ما الذي تبحث عنه؟"
+          class="uk-input w-full pr-4 pl-10 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 font-cairo text-sm"
+          ng-model="$root.searchQuery"
+          ng-keydown="$event.keyCode === 13 && $root.doSearch()"
+        />
+        <i
+          data-lucide="search"
+          class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+        ></i>
+      </div>
+
+      <!-- Action Icons (left side in RTL) -->
+      <div class="flex items-center gap-1 shrink-0">
+        <!-- Wishlist -->
+        <a
+          href="#!/"
+          class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary no-underline"
+        >
+          <i data-lucide="heart" class="h-5 w-5"></i>
+          <span class="text-xs hidden md:inline">المفضلة</span>
+        </a>
+
+        <!-- Cart -->
+        <a
+          href="#!/cart"
+          class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary no-underline relative"
+        >
+          <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+          <span class="text-xs hidden md:inline">العربة</span>
+          <span
+            ng-if="$root.cartCount > 0"
+            class="absolute -top-1 -left-1 bg-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold"
+            >{{ $root.cartCount }}</span
+          >
+        </a>
+
+        <!-- Account -->
+        <a
+          ng-href="{{ $root.isLoggedIn ? '#!/orders' : '#!/login' }}"
+          class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary no-underline"
+        >
+          <i data-lucide="user" class="h-5 w-5"></i>
+          <span class="text-xs hidden md:inline">حسابي</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Navigation Bar -->
+  <nav class="border-t border-gray-50 bg-white/95 backdrop-blur-sm">
+    <div class="uk-container">
+      <ul
+        class="flex items-center justify-center gap-0 overflow-x-auto scrollbar-hide py-0"
+      >
+        <li ng-repeat="cat in $root.navCategories" class="shrink-0">
+          <a
+            ng-href="#!/shop?type={{ cat.value }}"
+            class="block px-4 py-2.5 text-sm font-medium text-gray-600 hover:text-primary border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap no-underline"
+            >{{ cat.label }}</a
+          >
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>

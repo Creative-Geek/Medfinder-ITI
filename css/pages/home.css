@@ -1,0 +1,118 @@
+/* ==========================================================================
+   HOME PAGE -- Hero carousel, shelves, category grid, brand strip
+   ========================================================================== */
+
+/* -- Hero Carousel (slide animation via translateX) -- */
+
+.carousel-slide img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* -- Scrollbar hide for horizontal shelves -- */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* -- Product shelf smooth scroll snap -- */
+.scroll-smooth {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* -- Category shortcut cards hover effect -- */
+.home-page .uk-card:not(.product-card) {
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.home-page .uk-card:not(.product-card):hover {
+  border-color: rgba(5, 131, 242, 0.15);
+}
+
+/* -- Brand strip card sizing -- */
+.home-page .brand-card {
+  min-width: 140px;
+}
+
+/* -- Loading skeleton animation -- */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* -- Quick action cards illustration area -- */
+.quick-action-card .illustration {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* RTL gap handled by Tailwind flex/gap utilities */
+
+/* -- Shelf scroll chevron buttons -- */
+.shelf-scroll-wrapper {
+  position: relative;
+}
+
+.shelf-chevron {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #555;
+}
+
+.shelf-chevron:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  color: #0583f2;
+}
+
+.shelf-chevron-right {
+  right: -16px;
+}
+
+.shelf-chevron-left {
+  left: -16px;
+}
+
+/* Show chevrons on desktop only */
+@media (min-width: 768px) {
+  .shelf-chevron {
+    display: flex;
+  }
+
+  .shelf-scroll-wrapper {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}

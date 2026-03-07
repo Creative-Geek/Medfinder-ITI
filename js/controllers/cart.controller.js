@@ -1,1 +1,7 @@
-// Cart/Checkout controller: cart items, qty controls, totals, checkout form submission
+// Cart/Checkout controller
+angular.module("medfinderApp").controller("CartController", [
+  "$scope",
+  function ($scope) {
+    $scope.pageTitle = "عربة التسوق";
+  },
+]);
