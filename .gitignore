@@ -2,3 +2,4 @@
 .agents
 byteStore.reference
 .augmentignore
+*.psd
