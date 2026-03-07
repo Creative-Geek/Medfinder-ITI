@@ -33,7 +33,7 @@ Public product catalog. RLS enabled. 149 rows seeded.
 
 ### profiles
 
-User profiles, auto-created on signup via `handle_new_user` trigger.
+Real user profiles, auto-created on signup via `handle_new_user` trigger. Used for account/order tracking, not seeded demo reviews.
 
 | Column     | Type        | Nullable | Default | Notes                   |
 | ---------- | ----------- | -------- | ------- | ----------------------- |
@@ -67,16 +67,16 @@ User profiles, auto-created on signup via `handle_new_user` trigger.
 
 ### reviews
 
-One review per user per product (unique constraint on product_id + user_id).
+Seeded demo reviews shown on products. Not linked to real users or `profiles`.
 
-| Column     | Type        | Nullable | Default        | Notes             |
-| ---------- | ----------- | -------- | -------------- | ----------------- |
-| id         | integer     | no       | auto-increment | PK                |
-| product_id | integer     | no       |                | FK -> products.id |
-| user_id    | uuid        | no       |                | FK -> profiles.id |
-| rating     | integer     | no       |                | CHECK 1-5         |
-| comment    | text        | yes      |                |                   |
-| created_at | timestamptz | no       | now()          |                   |
+| Column        | Type        | Nullable | Default        | Notes              |
+| ------------- | ----------- | -------- | -------------- | ------------------ |
+| id            | integer     | no       | auto-increment | PK                 |
+| product_id    | integer     | no       |                | FK -> products.id  |
+| reviewer_name | text        | no       |                | Demo reviewer name |
+| rating        | integer     | no       |                | CHECK 1-5          |
+| review_text   | text        | yes      |                |                    |
+| created_at    | timestamptz | no       | now()          |                    |
 
 ### wishlist
 
@@ -144,12 +144,9 @@ One entry per user per product (unique constraint on user_id + product_id). Casc
 
 ### reviews
 
-| Policy                                     | Command | Roles         | Rule                 |
-| ------------------------------------------ | ------- | ------------- | -------------------- |
-| Reviews are publicly readable              | SELECT  | public        | true                 |
-| Authenticated users can insert own reviews | INSERT  | authenticated | auth.uid() = user_id |
-| Users can update own reviews               | UPDATE  | authenticated | auth.uid() = user_id |
-| Users can delete own reviews               | DELETE  | authenticated | auth.uid() = user_id |
+| Policy              | Command | Roles  | Rule |
+| ------------------- | ------- | ------ | ---- |
+| Public read reviews | SELECT  | public | true |
 
 ### wishlist
 
@@ -189,8 +186,6 @@ One entry per user per product (unique constraint on user_id + product_id). Casc
 | order_items   | idx_order_items_order_id        | btree          | order_id            |
 | order_items   | idx_order_items_product_id      | btree          | product_id          |
 | reviews       | idx_reviews_product_id          | btree          | product_id          |
-| reviews       | idx_reviews_user_id             | btree          | user_id             |
-| reviews       | reviews_product_id_user_id_key  | btree (unique) | product_id, user_id |
 | wishlist      | idx_wishlist_user_id            | btree          | user_id             |
 | wishlist      | idx_wishlist_product_id         | btree          | product_id          |
 | wishlist      | wishlist_user_id_product_id_key | btree (unique) | user_id, product_id |
@@ -209,7 +204,6 @@ One entry per user per product (unique constraint on user_id + product_id). Casc
 ```
 auth.users 1--1 profiles
 profiles   1--* orders
-profiles   1--* reviews
 profiles   1--* wishlist
 orders     1--* order_items
 products   1--* order_items

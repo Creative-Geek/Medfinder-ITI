@@ -1,5 +1,212 @@
 <!-- Shop page: product grid with filter panel -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<div class="shop-page">
+  <div class="uk-container py-6">
+    <!-- Page header with title + sort -->
+    <div class="shop-header">
+      <div class="shop-header__title">
+        <h1 class="text-xl font-bold text-dark">{{ getPageTitle() }}</h1>
+        <span ng-if="!loading" class="text-sm text-muted-foreground">
+          ({{ totalCount }} منتج)
+        </span>
+      </div>
+      <div class="shop-header__actions">
+        <!-- Clear filters button -->
+        <button
+          ng-if="hasActiveFilters()"
+          ng-click="clearAllFilters()"
+          class="btn btn--secondary btn--sm"
+        >
+          <i data-lucide="x" class="h-3.5 w-3.5"></i>
+          مسح الفلاتر
+        </button>
+        <!-- Sort dropdown -->
+        <div class="shop-sort">
+          <label class="text-sm text-muted-foreground ml-2">ترتيب:</label>
+          <select
+            ng-model="sortBy"
+            ng-change="changeSort()"
+            class="form-input shop-sort__select"
+          >
+            <option value="name_ar.asc">الاسم (أ - ي)</option>
+            <option value="price.asc">السعر: الأقل أولا</option>
+            <option value="price.desc">السعر: الأعلى أولا</option>
+            <option value="created_at.desc">الأحدث</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main two-column layout -->
+    <div class="shop-layout">
+      <!-- ============ PRODUCT GRID (left in RTL) ============ -->
+      <div class="shop-grid-area">
+        <!-- Loading skeleton (overlays product grid) -->
+        <div
+          class="shop-product-grid shop-skeleton-layer"
+          ng-class="{ 'shop-skeleton-layer--visible': loading }"
+        >
+          <div
+            ng-repeat="i in [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]"
+            class="skeleton-card"
+          >
+            <div class="skeleton-card__image animate-pulse"></div>
+            <div class="skeleton-card__body">
+              <div
+                class="skeleton-line skeleton-line--long animate-pulse"
+              ></div>
+              <div
+                class="skeleton-line skeleton-line--short animate-pulse"
+              ></div>
+              <div
+                class="skeleton-line skeleton-line--medium animate-pulse"
+              ></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Grid (always in DOM, animated via CSS class) -->
+        <div
+          class="shop-product-grid"
+          ng-class="{
+            'shop-grid--exiting': loading,
+            'shop-grid--entering': !loading && products.length > 0
+          }"
+          ng-show="products.length > 0 || loading"
+        >
+          <div
+            ng-repeat="product in products track by product.id"
+            class="shop-card-entrance"
+            ng-style="{ 'animation-delay': loading ? '0ms' : (($index * 40) + 'ms') }"
+          >
+            <product-card
+              product="product"
+              on-add-to-cart="addToCart(product)"
+              on-toggle-wishlist="toggleWishlist(product)"
+            ></product-card>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div ng-if="!loading && products.length === 0" class="shop-empty">
+          <i
+            data-lucide="package-open"
+            class="h-16 w-16 text-gray-300 mb-4"
+          ></i>
+          <h3 class="text-lg font-bold text-dark mb-2">لا توجد منتجات</h3>
+          <p class="text-sm text-muted-foreground mb-4">
+            لم نجد منتجات تطابق الفلاتر المحددة
+          </p>
+          <button ng-click="clearAllFilters()" class="btn btn--primary btn--sm">
+            عرض جميع المنتجات
+          </button>
+        </div>
+
+        <!-- Pagination -->
+        <div ng-if="!loading && totalPages > 1" class="shop-pagination">
+          <button
+            class="shop-pagination__btn"
+            ng-disabled="currentPage === 1"
+            ng-click="goToPage(currentPage - 1)"
+          >
+            <i data-lucide="chevron-right" class="h-4 w-4"></i>
+          </button>
+          <button
+            ng-repeat="page in getPages()"
+            class="shop-pagination__btn"
+            ng-class="{ 'shop-pagination__btn--active': page === currentPage }"
+            ng-click="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+          <button
+            class="shop-pagination__btn"
+            ng-disabled="currentPage === totalPages"
+            ng-click="goToPage(currentPage + 1)"
+          >
+            <i data-lucide="chevron-left" class="h-4 w-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ FILTER SIDEBAR (right in RTL) ============ -->
+      <aside class="shop-sidebar">
+        <!-- Sections (Type -> Category tree) -->
+        <div class="shop-filter-block">
+          <h3 class="shop-filter-block__title">الأقسام</h3>
+
+          <ul class="shop-type-list">
+            <li
+              ng-repeat="node in categoryTree"
+              class="shop-type-item"
+              ng-class="{ 'shop-type-item--active': activeType === node.type }"
+            >
+              <!-- Type row -->
+              <a href="" class="shop-type-link" ng-click="selectType(node)">
+                <i
+                  data-lucide="chevron-left"
+                  class="h-4 w-4 shop-type-chevron"
+                  ng-class="{ 'shop-type-chevron--open': node.open }"
+                ></i>
+                <span>{{ node.label }}</span>
+              </a>
+
+              <!-- Subcategories (animated slide) -->
+              <div
+                class="shop-subcat-wrapper"
+                ng-class="{ 'shop-subcat-wrapper--open': node.open }"
+              >
+                <ul class="shop-subcat-list">
+                  <li
+                    class="shop-subcat-item"
+                    ng-class="{ 'shop-subcat-item--active': !activeCategory && activeType === node.type }"
+                  >
+                    <a
+                      href=""
+                      class="shop-subcat-link"
+                      ng-click="selectAllForType(node)"
+                    >
+                      كل {{ node.label }}
+                    </a>
+                  </li>
+                  <li
+                    ng-repeat="cat in node.categories"
+                    class="shop-subcat-item"
+                    ng-class="{ 'shop-subcat-item--active': activeCategory === cat.name }"
+                  >
+                    <a
+                      href=""
+                      class="shop-subcat-link"
+                      ng-click="selectCategory(cat)"
+                    >
+                      {{ cat.name }}
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Brands -->
+        <div class="shop-filter-block" ng-if="brandList.length > 0">
+          <h3 class="shop-filter-block__title">الماركات</h3>
+
+          <ul class="shop-brand-list">
+            <li ng-repeat="brand in brandList" class="shop-brand-item">
+              <label class="shop-brand-label">
+                <input
+                  type="checkbox"
+                  ng-checked="activeBrands[brand.name]"
+                  ng-click="toggleBrand(brand.name)"
+                  class="shop-brand-checkbox"
+                />
+                <span class="shop-brand-name">{{ brand.name }}</span>
+                <span class="shop-brand-count">({{ brand.count }})</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
 </div>

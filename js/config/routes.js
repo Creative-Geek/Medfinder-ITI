@@ -20,6 +20,7 @@ angular.module("medfinderApp").config([
         templateUrl: "views/shop.html",
         controller: "ShopController",
         access: "guest",
+        reloadOnSearch: false,
       })
       .when("/product/:id", {
         templateUrl: "views/product.html",

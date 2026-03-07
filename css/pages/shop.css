@@ -1,3 +1,435 @@
 /* ==========================================================================
    SHOP PAGE -- Product grid, filter sidebar, pagination
    ========================================================================== */
+
+/* -- Page header -- */
+.shop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.shop-header__title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.shop-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* -- Sort -- */
+.shop-sort {
+  display: flex;
+  align-items: center;
+}
+
+.shop-sort__select {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  min-width: 160px;
+}
+
+/* -- Two-column layout -- */
+.shop-layout {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* -- Grid area (relative for skeleton overlay) -- */
+.shop-grid-area {
+  position: relative;
+  min-height: 700px;
+}
+
+/* -- Product grid -- */
+.shop-product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* -- Skeleton overlay layer -- */
+.shop-skeleton-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.shop-skeleton-layer--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* -- Product grid exit/entrance transitions -- */
+.shop-grid--exiting {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.shop-grid--entering {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* -- Product card cascading slide-up entrance -- */
+@keyframes cardSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Only animate entrance when grid is in entering state */
+.shop-grid--entering .shop-card-entrance {
+  opacity: 0;
+  animation: cardSlideUp 0.35s ease-out forwards;
+}
+
+/* When exiting, skip entrance animation and just let the grid fade handle it */
+.shop-grid--exiting .shop-card-entrance {
+  opacity: 1;
+  animation: none;
+}
+
+/* -- Skeleton loading -- */
+.skeleton-card {
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.skeleton-card__image {
+  height: 180px;
+  background: var(--color-bg-card);
+}
+
+.skeleton-card__body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: 4px;
+  background: var(--color-bg-card);
+}
+
+.skeleton-line--long {
+  width: 90%;
+}
+
+.skeleton-line--short {
+  width: 40%;
+}
+
+.skeleton-line--medium {
+  width: 60%;
+}
+
+/* -- Empty state -- */
+.shop-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+/* -- Pagination -- */
+.shop-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 32px;
+  padding-top: 24px;
+}
+
+.shop-pagination__btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.shop-pagination__btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.shop-pagination__btn--active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
+}
+
+.shop-pagination__btn--active:hover {
+  background: #0470d1;
+  color: var(--color-white) !important;
+  border-color: #0470d1 !important;
+}
+
+.shop-pagination__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========== SIDEBAR ========== */
+.shop-sidebar {
+  position: sticky;
+  top: 120px;
+}
+
+/* -- Filter block -- */
+.shop-filter-block {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.shop-filter-block__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-dark);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--color-bg-card);
+}
+
+/* -- Type list -- */
+.shop-type-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.shop-type-item {
+  margin-bottom: 2px;
+}
+
+.shop-type-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.shop-type-link:hover {
+  background: var(--color-bg-card);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.shop-type-item--active > .shop-type-link {
+  color: var(--color-primary);
+  background: rgba(5, 131, 242, 0.06);
+}
+
+/* -- Chevron rotation -- */
+.shop-type-chevron {
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.shop-type-chevron--open {
+  transform: rotate(-90deg);
+}
+
+/* -- Subcategory animated wrapper -- */
+.shop-subcat-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shop-subcat-wrapper--open {
+  max-height: 600px; /* large enough for any category list */
+}
+
+/* -- Subcategory list -- */
+.shop-subcat-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 8px 0;
+}
+
+.shop-subcat-item {
+  border-right: 3px solid transparent;
+}
+
+.shop-subcat-link {
+  display: block;
+  padding: 6px 24px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.shop-subcat-link:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.shop-subcat-item--active {
+  border-right-color: var(--color-accent);
+  background: rgba(249, 157, 28, 0.04);
+}
+
+.shop-subcat-item--active .shop-subcat-link {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* -- Brand list -- */
+.shop-brand-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.shop-brand-item {
+  margin-bottom: 2px;
+}
+
+.shop-brand-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background var(--transition-fast);
+}
+
+.shop-brand-label:hover {
+  background: var(--color-bg-card);
+}
+
+.shop-brand-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.shop-brand-name {
+  flex: 1;
+  color: var(--color-text);
+}
+
+.shop-brand-count {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+/* Scrollbar styling for brand list */
+.shop-brand-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.shop-brand-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shop-brand-list::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 1200px) {
+  .shop-product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .shop-layout {
+    grid-template-columns: 1fr 220px;
+    gap: 20px;
+  }
+
+  .shop-product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .shop-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-sidebar {
+    position: static;
+    order: -1;
+  }
+
+  .shop-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .shop-filter-block {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shop-product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .shop-pagination__btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
+}
