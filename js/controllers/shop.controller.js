@@ -20,6 +20,7 @@ angular.module("medfinderApp").controller("ShopController", [
     $scope.activeType = null;
     $scope.activeCategory = null;
     $scope.activeBrands = {};
+    $scope.inStockOnly = false;
     $scope.searchQuery = "";
     $scope.sortBy = "name_ar.asc";
 
@@ -141,6 +142,9 @@ angular.module("medfinderApp").controller("ShopController", [
       if (params.brand) {
         $scope.activeBrands[params.brand] = true;
       }
+      if (params.inStock === "1") {
+        $scope.inStockOnly = true;
+      }
       if (params.page) {
         $scope.currentPage = parseInt(params.page, 10) || 1;
       }
@@ -218,6 +222,13 @@ angular.module("medfinderApp").controller("ShopController", [
       loadProducts();
     };
 
+    $scope.toggleInStockOnly = function () {
+      $scope.currentPage = 1;
+      updateUrl();
+      loadProducts();
+      loadBrands();
+    };
+
     $scope.changeSort = function () {
       $scope.currentPage = 1;
       loadProducts();
@@ -227,6 +238,7 @@ angular.module("medfinderApp").controller("ShopController", [
       $scope.activeType = null;
       $scope.activeCategory = null;
       $scope.activeBrands = {};
+      $scope.inStockOnly = false;
       $scope.searchQuery = "";
       $scope.sortBy = "name_ar.asc";
       $scope.currentPage = 1;
@@ -242,6 +254,7 @@ angular.module("medfinderApp").controller("ShopController", [
       return (
         $scope.activeType ||
         $scope.activeCategory ||
+        $scope.inStockOnly ||
         $scope.searchQuery ||
         Object.keys($scope.activeBrands).length > 0
       );
@@ -275,6 +288,7 @@ angular.module("medfinderApp").controller("ShopController", [
       if ($scope.searchQuery) params.search = $scope.searchQuery;
       if ($scope.activeType) params.type = $scope.activeType;
       if ($scope.activeCategory) params.category = $scope.activeCategory;
+      if ($scope.inStockOnly) params.inStock = "1";
       var brandKeys = Object.keys($scope.activeBrands);
       if (brandKeys.length === 1) params.brand = brandKeys[0];
       if ($scope.currentPage > 1) params.page = $scope.currentPage;
@@ -299,6 +313,10 @@ angular.module("medfinderApp").controller("ShopController", [
       if ($scope.activeCategory) {
         url +=
           "&category=cs.{" + encodeURIComponent($scope.activeCategory) + "}";
+      }
+
+      if ($scope.inStockOnly) {
+        url += "&stock=gt.0";
       }
 
       // Brand filter (multi-select with OR)
@@ -380,6 +398,9 @@ angular.module("medfinderApp").controller("ShopController", [
         url +=
           "&category=cs.{" + encodeURIComponent($scope.activeCategory) + "}";
       }
+      if ($scope.inStockOnly) {
+        url += "&stock=gt.0";
+      }
 
       url += "&brand=not.is.null";
 
@@ -430,6 +451,7 @@ angular.module("medfinderApp").controller("ShopController", [
       $scope.activeType = null;
       $scope.activeCategory = null;
       $scope.activeBrands = {};
+      $scope.inStockOnly = false;
       $scope.searchQuery = "";
       $scope.currentPage = 1;
       $scope.categoryTree.forEach(function (n) {

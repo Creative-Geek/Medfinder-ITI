@@ -60,6 +60,16 @@ angular.module("medfinderApp").factory("ProductService", [
       remove: function (id) {
         return $http.delete(base + "?id=eq." + id);
       },
+
+      // Get reviews for a product
+      getReviews: function (productId) {
+        return $http.get(
+          SUPABASE.REST_URL +
+            "/reviews?product_id=eq." +
+            productId +
+            "&select=*&order=created_at.desc",
+        );
+      },
     };
   },
 ]);

@@ -25,6 +25,9 @@ angular.module("medfinderApp").controller("ProductController", [
     $scope.quantity = 0; // 0 means "not in cart yet"
     $scope.addedFeedback = false;
     $scope.wishlisted = false;
+    $scope.reviews = [];
+    $scope.avgRating = 0;
+    $scope.reviewsLoading = true;
 
     // -- Reinitialize Lucide icons after Angular renders --
     function refreshIcons() {
@@ -60,6 +63,23 @@ angular.module("medfinderApp").controller("ProductController", [
         WishlistService.load().then(function () {
           $scope.wishlisted = WishlistService.isWishlisted(product.id);
         });
+
+        // Load reviews for this product
+        ProductService.getReviews(product.id)
+          .then(function (res) {
+            $scope.reviews = res.data || [];
+            if ($scope.reviews.length > 0) {
+              var sum = $scope.reviews.reduce(function (s, r) {
+                return s + r.rating;
+              }, 0);
+              $scope.avgRating = (sum / $scope.reviews.length).toFixed(1);
+            }
+            $scope.reviewsLoading = false;
+            refreshIcons();
+          })
+          .catch(function () {
+            $scope.reviewsLoading = false;
+          });
       })
       .catch(function () {
         $scope.error = true;
@@ -151,6 +171,23 @@ angular.module("medfinderApp").controller("ProductController", [
     // -- Navigate back to shop --
     $scope.goToShop = function () {
       $location.path("/shop");
+    };
+
+    // -- Generate star array for rating display --
+    $scope.getStars = function (rating) {
+      var stars = [];
+      var full = Math.floor(rating);
+      var half = rating % 1 >= 0.5 ? 1 : 0;
+      var empty = 5 - full - half;
+      for (var i = 0; i < full; i++) stars.push("full");
+      if (half) stars.push("half");
+      for (var j = 0; j < empty; j++) stars.push("empty");
+      return stars;
+    };
+
+    // -- Get reviewer initial for avatar --
+    $scope.getInitial = function (name) {
+      return name ? name.charAt(0).toUpperCase() : "?";
     };
 
     // -- Content sections config (controls rendering order) --

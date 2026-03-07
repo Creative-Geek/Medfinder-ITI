@@ -231,5 +231,102 @@
         </ul>
       </div>
     </div>
+
+    <!-- ============ REVIEWS SECTION ============ -->
+    <div
+      ng-if="!reviewsLoading && reviews.length > 0"
+      class="product-reviews product-section-entrance"
+    >
+      <h2 class="product-reviews__heading">
+        <i data-lucide="message-square" class="h-5 w-5"></i>
+        اراء العملاء
+      </h2>
+
+      <!-- Average rating summary -->
+      <div class="product-reviews__summary">
+        <span class="product-reviews__avg">{{ avgRating }}</span>
+        <div>
+          <div class="product-reviews__stars">
+            <span
+              ng-repeat="s in getStars(avgRating) track by $index"
+              class="product-reviews__star"
+            >
+              <i
+                ng-if="s === 'full'"
+                data-lucide="star"
+                class="h-4 w-4 star--filled"
+              ></i>
+              <i
+                ng-if="s === 'half'"
+                data-lucide="star-half"
+                class="h-4 w-4 star--filled"
+              ></i>
+              <i
+                ng-if="s === 'empty'"
+                data-lucide="star"
+                class="h-4 w-4 star--empty"
+              ></i>
+            </span>
+          </div>
+          <p class="product-reviews__count">
+            بناء على {{ reviews.length }} تقييم
+          </p>
+        </div>
+      </div>
+
+      <!-- Review cards grid -->
+      <div class="product-reviews__grid">
+        <div
+          ng-repeat="review in reviews track by review.id"
+          class="product-review-card"
+        >
+          <div class="product-review-card__header">
+            <div class="product-review-card__author">
+              <span class="product-review-card__avatar"
+                >{{ getInitial(review.reviewer_name) }}</span
+              >
+              <span class="product-review-card__name"
+                >{{ review.reviewer_name }}</span
+              >
+            </div>
+            <div class="product-reviews__stars product-reviews__stars--sm">
+              <span
+                ng-repeat="s in getStars(review.rating) track by $index"
+                class="product-reviews__star"
+              >
+                <i
+                  ng-if="s === 'full'"
+                  data-lucide="star"
+                  class="h-3.5 w-3.5 star--filled"
+                ></i>
+                <i
+                  ng-if="s === 'half'"
+                  data-lucide="star-half"
+                  class="h-3.5 w-3.5 star--filled"
+                ></i>
+                <i
+                  ng-if="s === 'empty'"
+                  data-lucide="star"
+                  class="h-3.5 w-3.5 star--empty"
+                ></i>
+              </span>
+            </div>
+          </div>
+          <p class="product-review-card__text">{{ review.review_text }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- No reviews state -->
+    <div
+      ng-if="!reviewsLoading && reviews.length === 0"
+      class="product-reviews product-section-entrance"
+    >
+      <h2 class="product-reviews__heading">
+        <i data-lucide="message-square" class="h-5 w-5"></i>
+        اراء العملاء
+      </h2>
+      <p class="product-reviews__empty">لا توجد تقييمات لهذا المنتج بعد.</p>
+    </div>
   </div>
 </div>

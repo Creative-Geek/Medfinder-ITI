@@ -187,6 +187,21 @@
           </ul>
         </div>
 
+        <!-- Stock availability -->
+        <div class="shop-filter-block">
+          <h3 class="shop-filter-block__title">التوفر</h3>
+
+          <label class="shop-brand-label">
+            <input
+              type="checkbox"
+              ng-model="inStockOnly"
+              ng-change="toggleInStockOnly()"
+              class="shop-brand-checkbox"
+            />
+            <span class="shop-brand-name">المتوفر فقط</span>
+          </label>
+        </div>
+
         <!-- Brands -->
         <div class="shop-filter-block" ng-if="brandList.length > 0">
           <h3 class="shop-filter-block__title">الماركات</h3>
