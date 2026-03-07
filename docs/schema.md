@@ -78,6 +78,17 @@ One review per user per product (unique constraint on product_id + user_id).
 | comment    | text        | yes      |                |                   |
 | created_at | timestamptz | no       | now()          |                   |
 
+### wishlist
+
+One entry per user per product (unique constraint on user_id + product_id). Cascade deletes on both FKs.
+
+| Column     | Type        | Nullable | Default        | Notes             |
+| ---------- | ----------- | -------- | -------------- | ----------------- |
+| id         | integer     | no       | auto-increment | PK                |
+| user_id    | uuid        | no       |                | FK -> profiles.id |
+| product_id | integer     | no       |                | FK -> products.id |
+| created_at | timestamptz | no       | now()          |                   |
+
 ### chat_sessions
 
 | Column     | Type        | Nullable | Default           | Notes               |
@@ -140,6 +151,14 @@ One review per user per product (unique constraint on product_id + user_id).
 | Users can update own reviews               | UPDATE  | authenticated | auth.uid() = user_id |
 | Users can delete own reviews               | DELETE  | authenticated | auth.uid() = user_id |
 
+### wishlist
+
+| Policy                             | Command | Roles         | Rule                 |
+| ---------------------------------- | ------- | ------------- | -------------------- |
+| Users can view own wishlist        | SELECT  | authenticated | auth.uid() = user_id |
+| Users can add to own wishlist      | INSERT  | authenticated | auth.uid() = user_id |
+| Users can remove from own wishlist | DELETE  | authenticated | auth.uid() = user_id |
+
 ### chat_sessions
 
 | Policy                             | Command | Roles         | Rule                 |
@@ -157,23 +176,26 @@ One review per user per product (unique constraint on product_id + user_id).
 
 ## Indexes
 
-| Table         | Index                          | Type           | Column(s)           |
-| ------------- | ------------------------------ | -------------- | ------------------- |
-| products      | idx_products_brand             | btree          | brand               |
-| products      | idx_products_category          | GIN            | category            |
-| products      | idx_products_name_ar           | btree          | name_ar             |
-| products      | idx_products_name_en           | btree          | lower(name_en)      |
-| products      | idx_products_type              | btree          | type                |
-| orders        | idx_orders_user_id             | btree          | user_id             |
-| orders        | idx_orders_status              | btree          | status              |
-| orders        | idx_orders_created_at          | btree          | created_at DESC     |
-| order_items   | idx_order_items_order_id       | btree          | order_id            |
-| order_items   | idx_order_items_product_id     | btree          | product_id          |
-| reviews       | idx_reviews_product_id         | btree          | product_id          |
-| reviews       | idx_reviews_user_id            | btree          | user_id             |
-| reviews       | reviews_product_id_user_id_key | btree (unique) | product_id, user_id |
-| chat_sessions | idx_chat_sessions_user_id      | btree          | user_id             |
-| chat_messages | idx_chat_messages_session_id   | btree          | session_id          |
+| Table         | Index                           | Type           | Column(s)           |
+| ------------- | ------------------------------- | -------------- | ------------------- |
+| products      | idx_products_brand              | btree          | brand               |
+| products      | idx_products_category           | GIN            | category            |
+| products      | idx_products_name_ar            | btree          | name_ar             |
+| products      | idx_products_name_en            | btree          | lower(name_en)      |
+| products      | idx_products_type               | btree          | type                |
+| orders        | idx_orders_user_id              | btree          | user_id             |
+| orders        | idx_orders_status               | btree          | status              |
+| orders        | idx_orders_created_at           | btree          | created_at DESC     |
+| order_items   | idx_order_items_order_id        | btree          | order_id            |
+| order_items   | idx_order_items_product_id      | btree          | product_id          |
+| reviews       | idx_reviews_product_id          | btree          | product_id          |
+| reviews       | idx_reviews_user_id             | btree          | user_id             |
+| reviews       | reviews_product_id_user_id_key  | btree (unique) | product_id, user_id |
+| wishlist      | idx_wishlist_user_id            | btree          | user_id             |
+| wishlist      | idx_wishlist_product_id         | btree          | product_id          |
+| wishlist      | wishlist_user_id_product_id_key | btree (unique) | user_id, product_id |
+| chat_sessions | idx_chat_sessions_user_id       | btree          | user_id             |
+| chat_messages | idx_chat_messages_session_id    | btree          | session_id          |
 
 ## Functions
 
@@ -188,9 +210,11 @@ One review per user per product (unique constraint on product_id + user_id).
 auth.users 1--1 profiles
 profiles   1--* orders
 profiles   1--* reviews
+profiles   1--* wishlist
 orders     1--* order_items
 products   1--* order_items
 products   1--* reviews
+products   1--* wishlist
 auth.users 1--* chat_sessions
 chat_sessions 1--* chat_messages
 ```
