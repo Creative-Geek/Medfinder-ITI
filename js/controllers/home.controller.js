@@ -16,6 +16,9 @@ angular.module("medfinderApp").controller("HomeController", [
         { image: "assets/images/5.webp", alt: "Doliprane" },
         { image: "assets/images/2.webp", alt: "Bisolvon" },
         { image: "assets/images/4.webp", alt: "Nasacort" },
+        { image: "assets/images/6.webp", alt: "Centrum Multivitamin" },
+        { image: "assets/images/7.webp", alt: "PediaSure" },
+        { image: "assets/images/8.webp", alt: "Doliprane" },
       ],
       next: function () {
         this.current = (this.current + 1) % this.slides.length;
