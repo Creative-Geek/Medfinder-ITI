@@ -142,11 +142,12 @@
             >
               <!-- Type row -->
               <a href="" class="shop-type-link" ng-click="selectType(node)">
-                <i
-                  data-lucide="chevron-left"
-                  class="h-4 w-4 shop-type-chevron"
+                <span
+                  class="shop-type-chevron"
                   ng-class="{ 'shop-type-chevron--open': node.open }"
-                ></i>
+                >
+                  <i data-lucide="chevron-left" class="h-4 w-4"></i>
+                </span>
                 <span>{{ node.label }}</span>
               </a>
 

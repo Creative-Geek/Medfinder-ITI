@@ -31,5 +31,16 @@ app.run([
         window.location.hash = "#!/";
       }
     });
+
+    // Navigation categories (used by navbar, always available)
+    $rootScope.navCategories = [
+      { label: "الأدوية", value: "الأدوية" },
+      { label: "الحماية من الفيروسات", value: "الحماية من الفيروسات" },
+      { label: "منتجات المرأة", value: "منتجات المرأة" },
+      { label: "الأم و الطفل", value: "الأم و الطفل" },
+      { label: "العناية بالبشرة و الشعر", value: "العناية بالبشرة و الشعر" },
+      { label: "العناية بالاسنان", value: "العناية بالاسنان" },
+      { label: "منتجات الرجال", value: "منتجات الرجال" },
+    ];
   },
 ]);

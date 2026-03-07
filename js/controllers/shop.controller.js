@@ -394,6 +394,21 @@ angular.module("medfinderApp").controller("ShopController", [
       }, 100);
     }
 
+    // ── React to URL query param changes (reloadOnSearch: false) ──
+    $scope.$on("$routeUpdate", function () {
+      // Reset state and re-read params
+      $scope.activeType = null;
+      $scope.activeCategory = null;
+      $scope.activeBrands = {};
+      $scope.currentPage = 1;
+      $scope.categoryTree.forEach(function (n) {
+        n.open = false;
+      });
+      initFromParams();
+      loadProducts();
+      loadBrands();
+    });
+
     // ── Initial load ──
     loadProducts();
     loadBrands();

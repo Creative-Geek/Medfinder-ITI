@@ -86,17 +86,6 @@ angular.module("medfinderApp").controller("HomeController", [
       { name: "Listerine", logo: "assets/brands/listerine.png" },
     ];
 
-    // ── Navigation categories (injected into $root for navbar) ──
-    $scope.$root.navCategories = [
-      { label: "الأدوية", value: "الأدوية" },
-      { label: "الحماية من الفيروسات", value: "الحمايه من الفيروسات" },
-      { label: "منتجات المرأة", value: "منتجات المرأة" },
-      { label: "الأم و الطفل", value: "الأم و الطفل" },
-      { label: "العناية بالبشرة و الشعر", value: "العناية بالبشرة و الشعر" },
-      { label: "العناية بالاسنان", value: "العناية بالاسنان" },
-      { label: "منتجات الرجال", value: "منتجات الرجال" },
-    ];
-
     // ── Product Shelves ──
     var selectFields =
       "id,name_ar,name_en,price,brand,volume,amount,image_url,stock,category";

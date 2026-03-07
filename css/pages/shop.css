@@ -269,6 +269,9 @@
 
 /* -- Chevron rotation -- */
 .shop-type-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: transform var(--transition-fast);
   flex-shrink: 0;
 }

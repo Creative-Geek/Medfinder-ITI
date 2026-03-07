@@ -1,5 +1,219 @@
 <!-- Product detail page -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<div class="uk-container py-6">
+  <!-- ============ LOADING SKELETON ============ -->
+  <div ng-if="loading" class="product-skeleton">
+    <div style="display: flex; gap: 8px; margin-bottom: 24px">
+      <div class="skeleton-block" style="width: 60px; height: 16px"></div>
+      <div class="skeleton-block" style="width: 80px; height: 16px"></div>
+      <div class="skeleton-block" style="width: 120px; height: 16px"></div>
+    </div>
+    <div class="skeleton-hero">
+      <div class="skeleton-info">
+        <div class="skeleton-block skeleton-title"></div>
+        <div class="skeleton-block" style="width: 60%; height: 20px"></div>
+        <div class="skeleton-block skeleton-price"></div>
+        <div class="skeleton-block skeleton-button"></div>
+      </div>
+      <div class="skeleton-block skeleton-gallery"></div>
+    </div>
+    <div
+      style="display: flex; flex-direction: column; gap: 16px; margin-top: 24px"
+    >
+      <div class="skeleton-block skeleton-section"></div>
+      <div class="skeleton-block skeleton-section"></div>
+    </div>
+  </div>
+
+  <!-- ============ ERROR STATE ============ -->
+  <div ng-if="error && !loading" class="product-error">
+    <i data-lucide="package-x" class="h-16 w-16 product-error__icon"></i>
+    <h2 class="text-lg font-bold text-dark mb-2">لم يتم العثور على المنتج</h2>
+    <p class="text-sm text-muted-foreground mb-4">
+      قد يكون المنتج غير متاح حاليا او تم حذفه
+    </p>
+    <button ng-click="goToShop()" class="btn btn--primary">
+      <i data-lucide="arrow-right" class="h-4 w-4"></i>
+      تصفح المنتجات
+    </button>
+  </div>
+
+  <!-- ============ PRODUCT CONTENT ============ -->
+  <div ng-if="product && !loading" class="product-entrance">
+    <!-- Breadcrumb -->
+    <nav class="product-breadcrumb">
+      <span ng-repeat="crumb in breadcrumb track by $index">
+        <a
+          ng-if="crumb.href"
+          ng-href="{{ crumb.href }}"
+          class="product-breadcrumb__link"
+          >{{ crumb.label }}</a
+        >
+        <span ng-if="!crumb.href" class="product-breadcrumb__current"
+          >{{ crumb.label }}</span
+        >
+        <span ng-if="!$last" class="product-breadcrumb__separator"
+          >&rsaquo;</span
+        >
+      </span>
+    </nav>
+
+    <!-- Hero: info + gallery -->
+    <div class="product-hero">
+      <!-- Info column (right in RTL, first in DOM) -->
+      <div class="product-info">
+        <div class="product-info__header">
+          <h1 class="product-info__name">{{ product.name_ar }}</h1>
+          <button
+            class="product-info__wishlist-btn"
+            ng-click="toggleWishlist()"
+            title="اضف للمفضلة"
+          >
+            <i data-lucide="heart" class="h-5 w-5"></i>
+          </button>
+        </div>
+
+        <!-- Manufacturer -->
+        <p ng-if="product.manufacturer" class="product-info__manufacturer">
+          {{ product.manufacturer }}
+        </p>
+
+        <!-- Volume / Amount -->
+        <p
+          ng-if="product.volume || product.amount"
+          class="product-info__manufacturer"
+        >
+          <span ng-if="product.volume">{{ product.volume }}</span>
+          <span ng-if="product.volume && product.amount"> | </span>
+          <span ng-if="product.amount">{{ product.amount }}</span>
+        </p>
+
+        <!-- Price -->
+        <div class="product-info__price">
+          {{ product.price }}
+          <span class="product-info__price-currency">جنيه</span>
+        </div>
+
+        <!-- Stock status -->
+        <div
+          class="product-info__stock"
+          ng-class="{
+            'product-info__stock--in': isInStock(),
+            'product-info__stock--out': !isInStock()
+          }"
+        >
+          <i ng-if="isInStock()" data-lucide="check-circle" class="h-4 w-4"></i>
+          <i ng-if="!isInStock()" data-lucide="x-circle" class="h-4 w-4"></i>
+          <span ng-if="isInStock()">متوفر</span>
+          <span ng-if="!isInStock()">غير متوفر</span>
+        </div>
+
+        <!-- Cart actions: Add button OR Quantity stepper -->
+        <div class="product-cart-actions" ng-if="isInStock()">
+          <!-- "Add to Cart" button (shown when not in cart) -->
+          <button
+            ng-if="!isInCart()"
+            class="product-add-to-cart"
+            ng-class="{ 'product-add-to-cart--added': addedFeedback }"
+            ng-click="addToCart()"
+          >
+            <i data-lucide="shopping-cart" class="h-5 w-5"></i>
+            اضف الى العربة
+          </button>
+
+          <!-- Quantity stepper (shown when in cart) -->
+          <div
+            ng-if="isInCart()"
+            class="product-qty-stepper product-qty-entrance"
+          >
+            <button
+              class="product-qty-stepper__btn"
+              ng-click="incrementQty()"
+              ng-disabled="quantity >= product.stock"
+            >
+              +
+            </button>
+            <div class="product-qty-stepper__value">{{ quantity }}</div>
+            <button
+              class="product-qty-stepper__btn product-qty-stepper__btn--minus"
+              ng-click="decrementQty()"
+            >
+              -
+            </button>
+          </div>
+        </div>
+
+        <!-- Out of stock button -->
+        <button ng-if="!isInStock()" class="product-add-to-cart" disabled>
+          غير متوفر حاليا
+        </button>
+      </div>
+
+      <!-- Gallery column (left in RTL, second in DOM) -->
+      <div class="product-gallery">
+        <!-- Main image -->
+        <div class="product-gallery__main">
+          <img
+            ng-src="{{ selectedImage }}"
+            alt="{{ product.name_ar }}"
+            ng-class="{ 'product-image--changing': imageChanging }"
+          />
+        </div>
+
+        <!-- Thumbnails (only if more than 1 image) -->
+        <div
+          class="product-gallery__thumbs"
+          ng-if="product.images && product.images.length > 1"
+        >
+          <button
+            ng-repeat="img in product.images track by $index"
+            class="product-gallery__thumb"
+            ng-class="{ 'product-gallery__thumb--active': selectedImage === img }"
+            ng-click="selectImage(img)"
+          >
+            <img ng-src="{{ img }}" alt="صورة {{ $index + 1 }}" />
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active ingredients (badges) -->
+    <div
+      ng-if="product.active_ingredient && product.active_ingredient.length > 0"
+      class="product-ingredients-block product-section-entrance"
+    >
+      <h3 class="text-sm font-bold text-dark mb-2">المادة الفعالة</h3>
+      <div class="product-ingredients">
+        <span
+          ng-repeat="ingredient in product.active_ingredient track by $index"
+          class="badge badge--primary"
+        >
+          {{ ingredient }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr class="product-divider" />
+
+    <!-- Content sections -->
+    <div class="product-sections">
+      <div
+        ng-repeat="section in getSections() track by section.key"
+        class="product-section product-section-entrance"
+        ng-style="{ 'animation-delay': (($index * 80) + 'ms') }"
+      >
+        <h2 class="product-section__title">{{ section.title }}</h2>
+
+        <!-- Text content (description) -->
+        <p ng-if="section.type === 'text'" class="product-section__text">
+          {{ section.content }}
+        </p>
+
+        <!-- List content -->
+        <ul ng-if="section.type === 'list'" class="product-section__list">
+          <li ng-repeat="item in section.items track by $index">{{ item }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </div>
