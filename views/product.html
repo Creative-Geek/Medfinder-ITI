@@ -87,19 +87,29 @@
           </button>
         </div>
 
-        <!-- Manufacturer -->
-        <p ng-if="product.manufacturer" class="product-info__manufacturer">
-          {{ product.manufacturer }}
+        <!-- Product meta: manufacturer, volume, amount in one line -->
+        <p
+          ng-if="product.manufacturer || product.volume || product.amount"
+          class="product-info__meta"
+        >
+          <span ng-if="product.manufacturer">{{ product.manufacturer }}</span>
+          <span
+            ng-if="product.manufacturer && (product.volume || product.amount)"
+            class="product-info__meta-sep"
+            >&middot;</span
+          >
+          <span ng-if="product.volume">{{ product.volume }}</span>
+          <span
+            ng-if="product.volume && product.amount"
+            class="product-info__meta-sep"
+            >&middot;</span
+          >
+          <span ng-if="product.amount">{{ product.amount }}</span>
         </p>
 
-        <!-- Volume / Amount -->
-        <p
-          ng-if="product.volume || product.amount"
-          class="product-info__manufacturer"
-        >
-          <span ng-if="product.volume">{{ product.volume }}</span>
-          <span ng-if="product.volume && product.amount"> | </span>
-          <span ng-if="product.amount">{{ product.amount }}</span>
+        <!-- Long description (inline, next to image) -->
+        <p ng-if="product.long_description" class="product-info__long-desc">
+          {{ product.long_description }}
         </p>
 
         <!-- Price -->
@@ -118,7 +128,9 @@
         >
           <i ng-if="isInStock()" data-lucide="check-circle" class="h-4 w-4"></i>
           <i ng-if="!isInStock()" data-lucide="x-circle" class="h-4 w-4"></i>
-          <span ng-if="isInStock()">متوفر</span>
+          <span ng-if="isInStock()"
+            >متوفر &mdash; {{ product.stock }} في المخزن</span
+          >
           <span ng-if="!isInStock()">غير متوفر</span>
         </div>
 

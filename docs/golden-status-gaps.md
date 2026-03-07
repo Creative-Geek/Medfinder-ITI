@@ -7,27 +7,28 @@
 
 ## What's Working
 
-| Area            | Status                                                                                                     |
-| --------------- | ---------------------------------------------------------------------------------------------------------- |
-| Home page       | Full -- hero, shelves, category grid, brand strip                                                          |
-| Shop page       | Grid + filter panel + sort + query params                                                                  |
-| Product detail  | Breadcrumb, images, info panel, tabbed sections                                                            |
-| Login / Signup  | Split layout, Supabase auth, auto-login, role session                                                      |
-| Navbar + footer | RTL header, category bar, account dropdown, footer                                                         |
-| Product card    | Full -- add-to-cart transforms to stepper, wishlist heart                                                  |
-| Cart / Checkout | Full -- 3-step flow, stock validation, `decrement_stock` RPC                                               |
-| Storage         | Full -- entire project (auth + cart) moved to `localStorage`                                               |
-| Services        | `AuthService`, `CartService`, `ApiService`, `ProductService`, `OrderService`, `UserService` all registered |
+| Area            | Status                                                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Home page       | Full -- hero, shelves, category grid, brand strip                                                                             |
+| Shop page       | Grid + filter panel + sort + query params                                                                                     |
+| Product detail  | Breadcrumb, images, info panel, tabbed sections                                                                               |
+| Login / Signup  | Split layout, Supabase auth, auto-login, role session                                                                         |
+| Navbar + footer | RTL header, category bar, account dropdown, footer                                                                            |
+| Product card    | Full -- add-to-cart transforms to stepper, wishlist heart                                                                     |
+| Cart / Checkout | Full -- 3-step flow, stock validation, `decrement_stock` RPC                                                                  |
+| Storage         | Full -- entire project (auth + cart) moved to `localStorage`                                                                  |
+| Services        | `AuthService`, `CartService`, `ApiService`, `ProductService`, `OrderService`, `UserService`, `WishlistService` all registered |
+| Search          | Full -- navbar live results + full shop page search with highlighting                                                         |
+| Wishlist        | Full -- persistent heart toggle on cards/details + dedicated wishlist page                                                    |
 
 ---
 
 ## Known Bugs & Missing Features
 
-### A. Search (broken)
+### A. Search (Complete)
 
-- The navbar search bar exists but doesn't do anything.
-- **Expected**: typing a query and pressing Enter (or clicking the icon) should navigate to `/shop?search=<query>` and the shop controller should filter results by name/brand match.
-- byteStore reference has a working search -- port the pattern.
+- Implemented live dropdown with debounced filtering and text highlighting.
+- Full page search integrated with shop filters using Supabase `ilike`.
 
 ### B. Cart Page (stub)
 
@@ -43,11 +44,11 @@
 - Success state: confirmation with order ID.
 - byteStore `checkout.html` (15 KB) is a solid reference.
 
-### D. Wishlist (not functional)
+### D. Wishlist (Complete)
 
-- Heart icon on product card toggles visually but state isn't persisted.
-- **Need**: either persist to Supabase `wishlist` table (if it exists) or at minimum persist in `sessionStorage`.
-- Low priority -- can defer if time is tight.
+- Server-side persistence via Supabase `wishlists` table.
+- Optimistic UI updates in `WishlistService`.
+- Dedicated `#!/wishlist` page with product grid and empty state.
 
 ### E. Product Card -- Add-to-Cart Button UX
 
@@ -116,17 +117,17 @@ All 4 admin controllers are stubs too. byteStore has a single-page `admin.html` 
 | Priority | Item                                                 | Effort  | Notes                                                                                                             |
 | -------- | ---------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
 | 1        | [x] **B+C. Cart + Checkout page**                    | High    | Done. Ported from byteStore patterns.                                                                             |
-| 2        | [x] **A. Search**                                    | Medium  | Done. Navbar -> shop with server-side ilike filter.                                                               |
+| 2        | [x] **A. Search**                                    | Medium  | Done. Navbar live suggestions + shop search.                                                                      |
 | 3        | [x] **E. Product card add-to-cart UX**               | Low     | Done. Directive uses `<quantity-stepper>`.                                                                        |
-| 4        | **F. Stock display in product detail**               | Low     | Single template addition.                                                                                         |
+| 4        | [x] **F. Stock display in product detail**           | Low     | Done. Shows actual stock count.                                                                                   |
 | 5        | **I. Dashboard link visibility**                     | Trivial | One `ng-if`.                                                                                                      |
 | 6        | **J. Profile dropdown chevron**                      | Trivial | One icon addition.                                                                                                |
 | 7        | [x] **K. Qty vs stock validation**                   | Medium  | Done. UI cap + fresh stock check at checkout.                                                                     |
 | 8        | **H. Admin dashboard**                               | High    | 4 views + 4 controllers. Biggest chunk.                                                                           |
-| 9        | **D. Wishlist**                                      | Low-Med | Can defer.                                                                                                        |
+| 9        | [x] **D. Wishlist**                                  | Low-Med | Done. DB persistence + Wishlist page.                                                                             |
 | 10       | **G. About Us page**                                 | Low     | Static content, do last.                                                                                          |
 | 11       | [x] **L. Stale cart handling**                       | Medium  | Done. Re-validates at checkout time.                                                                              |
-| 12       | **M. Product description rewrite**                   | Medium  | Generate better product descriptions.                                                                             |
+| 12       | [x] **M. Product description rewrite**               | Medium  | Done. `long_description` column wired as "عن المنتج" section.                                                     |
 | 13       | **N. Page Transition Animation (fade)**              | Low     | Add fade-in/fade-out animation to page transitions (byteStore reference).                                         |
 | 14       | **O. Product reviews**                               | Low     | Add reviews section to product detail page.                                                                       |
 | 15       | **P. Cart items should link to product detail page** | Low     | Cart items should link to product detail page.                                                                    |

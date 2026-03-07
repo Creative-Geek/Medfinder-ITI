@@ -181,9 +181,18 @@
   line-height: 1.4;
 }
 
-.product-info__manufacturer {
+.product-info__meta {
   font-size: 14px;
   color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.product-info__meta-sep {
+  opacity: 0.4;
+  font-weight: 700;
 }
 
 .product-info__price {
@@ -211,6 +220,13 @@
 
 .product-info__stock--out {
   color: var(--color-danger);
+}
+
+.product-info__long-desc {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--color-text);
+  margin-top: var(--space-sm);
 }
 
 /* -- Cart actions container -- */
