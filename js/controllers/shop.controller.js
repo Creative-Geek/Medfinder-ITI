@@ -20,6 +20,7 @@ angular.module("medfinderApp").controller("ShopController", [
     $scope.activeType = null;
     $scope.activeCategory = null;
     $scope.activeBrands = {};
+    $scope.searchQuery = "";
     $scope.sortBy = "name_ar.asc";
 
     // ── Type -> Category tree (from actual DB data) ──
@@ -113,6 +114,9 @@ angular.module("medfinderApp").controller("ShopController", [
     // ── Init from query params ──
     function initFromParams() {
       var params = $location.search();
+      if (params.search) {
+        $scope.searchQuery = params.search;
+      }
       if (params.type) {
         $scope.activeType = params.type;
         // Open the matching tree node
@@ -146,9 +150,19 @@ angular.module("medfinderApp").controller("ShopController", [
 
     // ── Build page title ──
     $scope.getPageTitle = function () {
+      if ($scope.searchQuery)
+        return 'نتائج البحث: "' + $scope.searchQuery + '"';
       if ($scope.activeCategory) return $scope.activeCategory;
       if ($scope.activeType) return "كل " + $scope.activeType;
       return "جميع المنتجات";
+    };
+
+    // ── Search from within shop page ──
+    $scope.clearSearch = function () {
+      $scope.searchQuery = "";
+      $scope.currentPage = 1;
+      updateUrl();
+      loadProducts();
     };
 
     // ── Filter actions ──
@@ -213,6 +227,7 @@ angular.module("medfinderApp").controller("ShopController", [
       $scope.activeType = null;
       $scope.activeCategory = null;
       $scope.activeBrands = {};
+      $scope.searchQuery = "";
       $scope.sortBy = "name_ar.asc";
       $scope.currentPage = 1;
       $scope.categoryTree.forEach(function (n) {
@@ -227,6 +242,7 @@ angular.module("medfinderApp").controller("ShopController", [
       return (
         $scope.activeType ||
         $scope.activeCategory ||
+        $scope.searchQuery ||
         Object.keys($scope.activeBrands).length > 0
       );
     };
@@ -256,6 +272,7 @@ angular.module("medfinderApp").controller("ShopController", [
     // ── Update URL without reloading ──
     function updateUrl() {
       var params = {};
+      if ($scope.searchQuery) params.search = $scope.searchQuery;
       if ($scope.activeType) params.type = $scope.activeType;
       if ($scope.activeCategory) params.category = $scope.activeCategory;
       var brandKeys = Object.keys($scope.activeBrands);
@@ -299,6 +316,19 @@ angular.module("medfinderApp").controller("ShopController", [
               .join(",") +
             ")";
         }
+      }
+
+      // Search filter (name_ar, name_en, or brand match)
+      if ($scope.searchQuery) {
+        var q = encodeURIComponent("%" + $scope.searchQuery + "%");
+        url +=
+          "&or=(name_ar.ilike." +
+          q +
+          ",name_en.ilike." +
+          q +
+          ",brand.ilike." +
+          q +
+          ")";
       }
 
       // Sort
@@ -400,6 +430,7 @@ angular.module("medfinderApp").controller("ShopController", [
       $scope.activeType = null;
       $scope.activeCategory = null;
       $scope.activeBrands = {};
+      $scope.searchQuery = "";
       $scope.currentPage = 1;
       $scope.categoryTree.forEach(function (n) {
         n.open = false;

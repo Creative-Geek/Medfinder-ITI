@@ -216,7 +216,10 @@
             ng-click="placeOrder()"
             ng-disabled="loading"
           >
-            <span ng-if="!loading">
+            <span
+              ng-if="!loading"
+              class="flex items-center justify-center gap-2"
+            >
               <i data-lucide="lock" class="h-4 w-4"></i>
               تأكيد الطلب
             </span>

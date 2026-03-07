@@ -12,18 +12,61 @@
       </a>
 
       <!-- Search Bar (center, dominant) -->
-      <div class="flex-1 mx-auto relative">
+      <div class="flex-1 mx-auto relative navbar-search-wrapper">
         <input
           type="text"
           placeholder="ما الذي تبحث عنه؟"
           class="uk-input w-full pr-4 pl-10 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 font-cairo text-sm"
           ng-model="$root.searchQuery"
-          ng-keydown="$event.keyCode === 13 && $root.doSearch()"
+          ng-change="$root.onSearchInput()"
+          ng-keydown="$event.keyCode === 13 && $root.doSearch(); $event.keyCode === 27 && $root.closeSearchDropdown()"
+          ng-focus="$root.onSearchInput()"
+          autocomplete="off"
         />
         <i
           data-lucide="search"
           class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
         ></i>
+
+        <!-- Live Search Dropdown -->
+        <div ng-if="$root.searchDropdownOpen" class="navbar-search-dropdown">
+          <!-- Results -->
+          <a
+            ng-repeat="item in $root.searchResults track by item.id"
+            ng-click="$root.goToProduct(item.id)"
+            class="navbar-sd-item"
+          >
+            <div class="navbar-sd-img">
+              <img ng-src="{{ item.image_url }}" alt="{{ item.name_ar }}" />
+            </div>
+            <div class="navbar-sd-info">
+              <div
+                class="navbar-sd-name"
+                ng-bind-html="item.name_ar | highlight:$root.searchQuery"
+              ></div>
+              <div class="navbar-sd-meta">
+                {{ item.brand || '' }}
+                <span ng-if="item.brand"> · </span>
+                {{ item.price }} جنيه
+              </div>
+            </div>
+          </a>
+
+          <!-- No results -->
+          <div ng-if="$root.searchResults.length === 0" class="navbar-sd-empty">
+            لا توجد نتائج لـ "{{ $root.searchQuery }}"
+          </div>
+
+          <!-- See all results -->
+          <a
+            ng-if="$root.searchResults.length > 0"
+            ng-click="$root.doSearch()"
+            class="navbar-sd-all"
+          >
+            <i data-lucide="search" class="h-3.5 w-3.5"></i>
+            عرض جميع النتائج لـ "{{ $root.searchQuery }}"
+          </a>
+        </div>
       </div>
 
       <!-- Action Icons (left side in RTL) -->
