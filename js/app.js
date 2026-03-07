@@ -86,6 +86,13 @@ app.run([
       }
     });
 
+    // Reset page scroll after SPA navigation so new views start at the top
+    $rootScope.$on("$routeChangeSuccess", function () {
+      setTimeout(function () {
+        window.scrollTo(0, 0);
+      }, 0);
+    });
+
     // -- Global search (called from navbar search bar) --
     $rootScope.searchQuery = "";
     $rootScope.searchResults = [];

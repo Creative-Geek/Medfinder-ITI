@@ -10,6 +10,21 @@
   padding: 0 var(--space-md);
 }
 
+/* -- App shell -- */
+.app-shell__navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.app-shell__main {
+  flex: 1 0 auto;
+}
+
+.app-shell__footer {
+  margin-top: auto;
+}
+
 /* -- Main content area -- */
 .main-content {
   min-height: calc(100vh - 200px); /* account for navbar + footer */

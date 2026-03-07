@@ -114,24 +114,24 @@ All 4 admin controllers are stubs too. byteStore has a single-page `admin.html` 
 > The golden path: **Search -> Cart -> Checkout -> Order Confirmation**
 > Then polish, then admin.
 
-| Priority | Item                                                 | Effort  | Notes                                                                                                             |
-| -------- | ---------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
-| 1        | [x] **B+C. Cart + Checkout page**                    | High    | Done. Ported from byteStore patterns.                                                                             |
-| 2        | [x] **A. Search**                                    | Medium  | Done. Navbar live suggestions + shop search.                                                                      |
-| 3        | [x] **E. Product card add-to-cart UX**               | Low     | Done. Directive uses `<quantity-stepper>`.                                                                        |
-| 4        | [x] **F. Stock display in product detail**           | Low     | Done. Shows actual stock count.                                                                                   |
-| 5        | **I. Dashboard link visibility**                     | Trivial | One `ng-if`.                                                                                                      |
-| 6        | **J. Profile dropdown chevron**                      | Trivial | One icon addition.                                                                                                |
-| 7        | [x] **K. Qty vs stock validation**                   | Medium  | Done. UI cap + fresh stock check at checkout.                                                                     |
-| 8        | **H. Admin dashboard**                               | High    | 4 views + 4 controllers. Biggest chunk.                                                                           |
-| 9        | [x] **D. Wishlist**                                  | Low-Med | Done. DB persistence + Wishlist page.                                                                             |
-| 10       | **G. About Us page**                                 | Low     | Static content, do last.                                                                                          |
-| 11       | [x] **L. Stale cart handling**                       | Medium  | Done. Re-validates at checkout time.                                                                              |
-| 12       | [x] **M. Product description rewrite**               | Medium  | Done. `long_description` column wired as "عن المنتج" section.                                                     |
-| 13       | **N. Page Transition Animation (fade)**              | Low     | Add fade-in/fade-out animation to page transitions (byteStore reference).                                         |
-| 14       | **O. Product reviews**                               | Low     | Add reviews section to product detail page.                                                                       |
-| 15       | **P. Cart items should link to product detail page** | Low     | Cart items should link to product detail page.                                                                    |
-| 16       | **Q. Navbar is not sticky**                          | Low     | Navbar should be sticky, footer should be edited to always be at the bottom of the page even if the page is empty |
+| Priority | Item                                                 | Effort  | Notes                                                                                               |
+| -------- | ---------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------- |
+| 1        | [x] **B+C. Cart + Checkout page**                    | High    | Done. Ported from byteStore patterns.                                                               |
+| 2        | [x] **A. Search**                                    | Medium  | Done. Navbar live suggestions + shop search.                                                        |
+| 3        | [x] **E. Product card add-to-cart UX**               | Low     | Done. Directive uses `<quantity-stepper>`.                                                          |
+| 4        | [x] **F. Stock display in product detail**           | Low     | Done. Shows actual stock count.                                                                     |
+| 5        | **I. Dashboard link visibility**                     | Trivial | One `ng-if`.                                                                                        |
+| 6        | **J. Profile dropdown chevron**                      | Trivial | One icon addition.                                                                                  |
+| 7        | [x] **K. Qty vs stock validation**                   | Medium  | Done. UI cap + fresh stock check at checkout.                                                       |
+| 8        | **H. Admin dashboard**                               | High    | 4 views + 4 controllers. Biggest chunk.                                                             |
+| 9        | [x] **D. Wishlist**                                  | Low-Med | Done. DB persistence + Wishlist page.                                                               |
+| 10       | **G. About Us page**                                 | Low     | Static content, do last.                                                                            |
+| 11       | [x] **L. Stale cart handling**                       | Medium  | Done. Re-validates at checkout time.                                                                |
+| 12       | [x] **M. Product description rewrite**               | Medium  | Done. `long_description` column wired as "عن المنتج" section.                                       |
+| 13       | **N. Page Transition Animation (fade)**              | Low     | Add fade-in/fade-out animation to page transitions (byteStore reference).                           |
+| 14       | **O. Product reviews**                               | Low     | Add reviews section to product detail page.                                                         |
+| 15       | **P. Cart items should link to product detail page** | Low     | Cart items should link to product detail page.                                                      |
+| 16       | [x] **Q. Navbar is not sticky**                      | Low     | Done. App shell uses sticky navbar host + flex layout so footer stays at the bottom on short pages. |
 
 ---
 

@@ -97,19 +97,25 @@
   </head>
 
   <body
-    class="font-cairo bg-page-bg text-foreground min-h-screen"
+    class="font-cairo bg-page-bg text-foreground min-h-screen flex flex-col"
     ng-app="medfinderApp"
   >
     <!-- Navbar (shared partial) -->
-    <div ng-include="'views/partials/navbar.html'"></div>
+    <div
+      ng-include="'views/partials/navbar.html'"
+      class="app-shell__navbar"
+    ></div>
 
     <!-- Main SPA content -->
-    <main>
+    <main class="app-shell__main">
       <div ng-view></div>
     </main>
 
     <!-- Footer (shared partial) -->
-    <div ng-include="'views/partials/footer.html'"></div>
+    <div
+      ng-include="'views/partials/footer.html'"
+      class="app-shell__footer"
+    ></div>
 
     <!-- Franken UI JS -->
     <script
