@@ -43,36 +43,61 @@ angular.module("medfinderApp").controller("HomeController", [
 
     // ── Category shortcuts grid ──
     $scope.categoryShortcuts = [
-      { label: "مسكنات", category: "مسكنات", icon: "pill" },
-      { label: "الكحة", category: "الكحة", icon: "stethoscope" },
-      { label: "الحماية من الشمس", category: "الحماية من الشمس", icon: "sun" },
-      { label: "غسول الوجه", category: "غسول الوجه", icon: "droplets" },
+      { label: "مسكنات", category: "مسكنات", icon: "pill", theme: "blue" },
+      {
+        label: "الكحة",
+        category: "الكحة",
+        icon: "stethoscope",
+        theme: "indigo",
+      },
+      {
+        label: "الحماية من الشمس",
+        category: "الحماية من الشمس",
+        icon: "sun",
+        theme: "amber",
+      },
+      {
+        label: "غسول الوجه",
+        category: "غسول الوجه",
+        icon: "droplets",
+        theme: "cyan",
+      },
       {
         label: "الحموضة وسوء الهضم",
         category: "الحموضة وسوء الهضم",
         icon: "flame",
+        theme: "orange",
       },
       {
         label: "تقوية المناعة",
         category: "تقوية المناعة",
         icon: "shield-plus",
+        theme: "emerald",
       },
       {
         label: "البرد و السعال",
         category: "البرد و السعال",
         icon: "thermometer",
+        theme: "sky",
       },
       {
         label: "الحفاضات و الكريمات",
         category: "الحفاضات و الكريمات",
         icon: "baby",
+        theme: "fuchsia",
       },
       {
         label: "مستلزمات الحلاقة",
         category: "مستلزمات الحلاقة",
         icon: "scissors",
+        theme: "violet",
       },
-      { label: "معجون الأسنان", category: "معجون الأسنان", icon: "sparkles" },
+      {
+        label: "معجون الأسنان",
+        category: "معجون الأسنان",
+        icon: "sparkles",
+        theme: "teal",
+      },
     ];
 
     // ── Brands (from actual DB data, ordered by product count) ──

@@ -32,8 +32,79 @@
   transition: all 0.2s ease;
 }
 
-.home-page .uk-card:not(.product-card):hover {
+.home-page .uk-card:not(.product-card):not(.cat-theme-card):hover {
   border-color: rgba(5, 131, 242, 0.15);
+}
+
+/* -- Category Themes -- */
+.cat-theme-blue {
+  --cat-light: #eff6ff;
+  --cat-color: #3b82f6;
+  --cat-hover: #dbeafe;
+}
+.cat-theme-cyan {
+  --cat-light: #ecfeff;
+  --cat-color: #06b6d4;
+  --cat-hover: #cffafe;
+}
+.cat-theme-amber {
+  --cat-light: #fffbeb;
+  --cat-color: #f59e0b;
+  --cat-hover: #fef3c7;
+}
+.cat-theme-teal {
+  --cat-light: #f0fdfa;
+  --cat-color: #14b8a6;
+  --cat-hover: #ccfbf1;
+}
+.cat-theme-orange {
+  --cat-light: #fff7ed;
+  --cat-color: #f97316;
+  --cat-hover: #ffedd5;
+}
+.cat-theme-emerald {
+  --cat-light: #ecfdf5;
+  --cat-color: #10b981;
+  --cat-hover: #d1fae5;
+}
+.cat-theme-indigo {
+  --cat-light: #eef2ff;
+  --cat-color: #6366f1;
+  --cat-hover: #e0e7ff;
+}
+.cat-theme-sky {
+  --cat-light: #e0f2fe;
+  --cat-color: #0ea5e9;
+  --cat-hover: #bae6fd;
+}
+.cat-theme-fuchsia {
+  --cat-light: #fdf4ff;
+  --cat-color: #d946ef;
+  --cat-hover: #fae8ff;
+}
+.cat-theme-violet {
+  --cat-light: #f5f3ff;
+  --cat-color: #8b5cf6;
+  --cat-hover: #ede9fe;
+}
+.cat-theme-rose {
+  --cat-light: #fff1f2;
+  --cat-color: #f43f5e;
+  --cat-hover: #ffe4e6;
+}
+
+.cat-theme-card:hover {
+  border-color: var(--cat-hover);
+}
+
+.cat-icon-wrapper {
+  background-color: var(--cat-light);
+  color: var(--cat-color);
+  transition: all 0.2s ease;
+}
+
+.cat-theme-card:hover .cat-icon-wrapper {
+  background-color: var(--cat-hover);
 }
 
 /* -- Brand strip card sizing -- */

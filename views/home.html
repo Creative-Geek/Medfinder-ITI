@@ -215,15 +215,12 @@
       <a
         ng-repeat="cat in categoryShortcuts track by cat.category"
         ng-href="#!/shop?category={{ cat.category }}"
-        class="uk-card uk-card-body text-center p-4 group hover:shadow-md transition-all hover:-translate-y-0.5 no-underline text-foreground cursor-pointer"
+        class="uk-card uk-card-body text-center p-4 group hover:shadow-md transition-all hover:-translate-y-0.5 no-underline text-foreground cursor-pointer cat-theme-card cat-theme-{{ cat.theme }}"
       >
         <div
-          class="w-12 h-12 mx-auto mb-3 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors"
+          class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center cat-icon-wrapper"
         >
-          <i
-            ng-attr-data-lucide="{{ cat.icon }}"
-            class="h-6 w-6 text-primary"
-          ></i>
+          <i ng-attr-data-lucide="{{ cat.icon }}" class="h-6 w-6"></i>
         </div>
         <p class="text-sm font-medium">{{ cat.label }}</p>
       </a>

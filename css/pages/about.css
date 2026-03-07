@@ -1,0 +1,352 @@
+/* ==========================================================================
+   ABOUT PAGE
+   ========================================================================== */
+
+.about-page {
+  padding-bottom: 48px;
+}
+
+.about-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 64px 0 40px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(5, 131, 242, 0.12),
+      transparent 34%
+    ),
+    linear-gradient(180deg, #f8fbff 0%, #fdfdff 100%);
+}
+
+.about-hero .uk-container,
+.about-story,
+.about-cta__box {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 28px;
+  align-items: center;
+}
+
+.about-kicker,
+.about-section__eyebrow {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--color-primary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.about-brand-lockup {
+  display: inline-grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 24px;
+  padding: 0;
+}
+
+.about-brand-lockup__logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #eef6ff 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(5, 131, 242, 0.08),
+    0 10px 24px rgba(5, 131, 242, 0.08);
+}
+
+.about-brand-lockup__logo,
+.about-hero__showcase-logo {
+  display: block;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.about-brand-lockup__logo {
+  width: 31px;
+  max-width: 31px;
+}
+
+.about-brand-lockup__text {
+  text-align: right;
+  line-height: 1.35;
+}
+
+.about-brand-lockup__text strong,
+.about-hero__brand-copy strong {
+  display: block;
+  color: var(--color-dark);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.about-brand-lockup__text span,
+.about-hero__brand-copy span {
+  display: block;
+  color: var(--color-text-muted);
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.about-hero__title,
+.about-section__title {
+  margin: 0 0 16px;
+  color: var(--color-dark);
+  line-height: 1.35;
+}
+
+.about-hero__title {
+  max-width: 720px;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.about-hero__text,
+.about-section__text,
+.about-info-card p,
+.about-step-card p,
+.about-category-card span {
+  color: var(--color-text-muted);
+  line-height: 1.9;
+  font-size: 15px;
+}
+
+.about-hero__actions,
+.about-cta__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.about-hero__panel,
+.about-highlight-card,
+.about-info-card,
+.about-step-card,
+.about-category-card,
+.about-cta__box {
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(31, 31, 31, 0.05);
+}
+
+.about-hero__panel,
+.about-highlight-card,
+.about-cta__box {
+  padding: 24px;
+}
+
+.about-hero__brand-showcase {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding: 24px 20px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top, rgba(5, 131, 242, 0.1), transparent 58%),
+    linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+  overflow: hidden;
+}
+
+.about-hero__brand-showcase::after {
+  content: "";
+  position: absolute;
+  inset: auto -60px -90px auto;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: rgba(249, 157, 28, 0.08);
+}
+
+.about-hero__showcase-logo {
+  position: relative;
+  z-index: 1;
+  width: 94px;
+  max-width: 94px;
+  filter: drop-shadow(0 18px 30px rgba(5, 131, 242, 0.14));
+}
+
+.about-hero__brand-copy {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.about-metric-grid,
+.about-card-grid,
+.about-steps,
+.about-category-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.about-metric-grid,
+.about-category-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.about-metric-card {
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--color-bg-card);
+}
+
+.about-metric-card strong,
+.about-step-card__number {
+  display: block;
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+.about-metric-card strong {
+  margin-bottom: 6px;
+  font-size: 1.8rem;
+}
+
+.about-metric-card span {
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.about-section {
+  padding: 28px 0;
+}
+
+.about-section--soft {
+  background: linear-gradient(180deg, rgba(5, 131, 242, 0.03), transparent);
+}
+
+.about-section--compact {
+  padding-top: 8px;
+}
+
+.about-section__head {
+  max-width: 720px;
+  margin-bottom: 24px;
+}
+
+.about-highlight-card h3,
+.about-info-card h3,
+.about-step-card h3,
+.about-category-card strong {
+  margin: 0 0 10px;
+  color: var(--color-dark);
+}
+
+.about-check-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+
+.about-check-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--color-text);
+}
+
+.about-check-list i,
+.about-info-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary);
+}
+
+.about-card-grid,
+.about-steps {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.about-info-card,
+.about-step-card,
+.about-category-card {
+  padding: 22px;
+}
+
+.about-info-card__icon {
+  width: 52px;
+  height: 52px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+  background: rgba(5, 131, 242, 0.08);
+}
+
+.about-step-card__number {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.about-category-card {
+  text-decoration: none;
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.about-category-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(5, 131, 242, 0.28);
+  text-decoration: none;
+  box-shadow: 0 18px 40px rgba(5, 131, 242, 0.12);
+}
+
+.about-cta {
+  padding-top: 12px;
+}
+
+@media (max-width: 1024px) {
+  .about-card-grid,
+  .about-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-hero {
+    padding-top: 44px;
+  }
+
+  .about-brand-lockup {
+    width: auto;
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .about-hero .uk-container,
+  .about-story,
+  .about-cta__box,
+  .about-metric-grid,
+  .about-category-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about-hero__panel,
+  .about-highlight-card,
+  .about-info-card,
+  .about-step-card,
+  .about-category-card,
+  .about-cta__box {
+    border-radius: 20px;
+  }
+
+  .about-hero__showcase-logo {
+    width: 78px;
+    max-width: 78px;
+  }
+}
