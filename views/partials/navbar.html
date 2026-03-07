@@ -74,10 +74,15 @@
         <!-- Wishlist -->
         <a
           href="#!/wishlist"
-          class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary no-underline"
+          class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary no-underline relative"
         >
           <i data-lucide="heart" class="h-5 w-5"></i>
           <span class="text-xs hidden md:inline">المفضلة</span>
+          <span
+            ng-if="$root.wishlistCount > 0"
+            class="absolute -top-1 -left-1 bg-accent text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold"
+            >{{ $root.wishlistCount }}</span
+          >
         </a>
 
         <!-- Cart -->

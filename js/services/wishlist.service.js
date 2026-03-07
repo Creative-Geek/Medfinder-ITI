@@ -3,9 +3,10 @@
 angular.module("medfinderApp").factory("WishlistService", [
   "$http",
   "$q",
+  "$rootScope",
   "SUPABASE",
   "AuthService",
-  function ($http, $q, SUPABASE, AuthService) {
+  function ($http, $q, $rootScope, SUPABASE, AuthService) {
     var REST = SUPABASE.REST_URL;
 
     // Local cache: map of product_id -> true
@@ -37,11 +38,13 @@ angular.module("medfinderApp").factory("WishlistService", [
             _cache[row.product_id] = true;
           });
           _loading = null;
+          syncCount();
           return _cache;
         })
         .catch(function () {
           _cache = {};
           _loading = null;
+          syncCount();
           return _cache;
         });
 
@@ -62,6 +65,7 @@ angular.module("medfinderApp").factory("WishlistService", [
       // Optimistic update
       if (!_cache) _cache = {};
       _cache[productId] = true;
+      syncCount();
 
       return $http
         .post(REST + "/wishlists", {
@@ -72,6 +76,7 @@ angular.module("medfinderApp").factory("WishlistService", [
           // Revert on failure (unless it's a duplicate 409)
           if (err.status !== 409) {
             delete _cache[productId];
+            syncCount();
           }
           return $q.reject(err);
         });
@@ -84,6 +89,7 @@ angular.module("medfinderApp").factory("WishlistService", [
 
       // Optimistic update
       if (_cache) delete _cache[productId];
+      syncCount();
 
       return $http
         .delete(
@@ -97,6 +103,7 @@ angular.module("medfinderApp").factory("WishlistService", [
           // Revert on failure
           if (!_cache) _cache = {};
           _cache[productId] = true;
+          syncCount();
           return $q.reject(err);
         });
     }
@@ -110,10 +117,22 @@ angular.module("medfinderApp").factory("WishlistService", [
       }
     }
 
+    // Get count of wishlisted items
+    function getCount() {
+      if (!_cache) return 0;
+      return Object.keys(_cache).length;
+    }
+
+    // Broadcast count to rootScope
+    function syncCount() {
+      $rootScope.wishlistCount = getCount();
+    }
+
     // Clear cache (e.g. on logout)
     function clearCache() {
       _cache = null;
       _loading = null;
+      $rootScope.wishlistCount = 0;
     }
 
     return {
@@ -122,6 +141,7 @@ angular.module("medfinderApp").factory("WishlistService", [
       add: add,
       remove: remove,
       toggle: toggle,
+      getCount: getCount,
       clearCache: clearCache,
     };
   },
