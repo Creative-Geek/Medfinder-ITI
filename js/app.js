@@ -58,7 +58,9 @@ app.run([
     // Logout action (called from navbar dropdown)
     $rootScope.logout = function () {
       var AuthService = $injector.get("AuthService");
+      var WishlistService = $injector.get("WishlistService");
       AuthService.logout();
+      WishlistService.clearCache();
       syncAuthState();
       window.location.hash = "#!/login";
     };

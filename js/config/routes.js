@@ -39,6 +39,11 @@ angular.module("medfinderApp").config([
         controller: "CartController",
         access: "user",
       })
+      .when("/wishlist", {
+        templateUrl: "views/wishlist.html",
+        controller: "WishlistController",
+        access: "user",
+      })
       .when("/orders", {
         templateUrl: "views/orders.html",
         controller: "OrdersController",

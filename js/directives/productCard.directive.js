@@ -1,13 +1,13 @@
 // Product card directive -- reused on Home, Shop, and search results
 angular.module("medfinderApp").directive("productCard", [
   "CartService",
-  function (CartService) {
+  "WishlistService",
+  function (CartService, WishlistService) {
     return {
       restrict: "E",
       scope: {
         product: "=",
         onAddToCart: "&",
-        onToggleWishlist: "&",
       },
       templateUrl: "views/directives/product-card.html",
       link: function (scope) {
@@ -25,6 +25,28 @@ angular.module("medfinderApp").directive("productCard", [
 
         // Init cart state
         syncCartState();
+
+        // -- Wishlist state --
+        scope.wishlisted = false;
+
+        function syncWishlistState() {
+          if (!scope.product) return;
+          WishlistService.load().then(function () {
+            scope.wishlisted = WishlistService.isWishlisted(scope.product.id);
+          });
+        }
+
+        syncWishlistState();
+
+        scope.isWishlisted = function () {
+          return scope.wishlisted;
+        };
+
+        scope.handleToggleWishlist = function () {
+          if (!scope.product) return;
+          scope.wishlisted = !scope.wishlisted;
+          WishlistService.toggle(scope.product.id);
+        };
 
         scope.isOutOfStock = function () {
           return scope.product && scope.product.stock <= 0;

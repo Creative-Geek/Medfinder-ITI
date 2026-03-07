@@ -21,13 +21,25 @@
     </a>
     <button
       class="absolute top-2 left-2 w-8 h-8 rounded-full bg-white/90 shadow-sm flex items-center justify-center hover:bg-white hover:scale-110 transition-all z-10"
-      ng-click="onToggleWishlist({ product: product })"
+      ng-click="$event.preventDefault(); $event.stopPropagation(); handleToggleWishlist()"
       aria-label="Toggle wishlist"
     >
-      <i
-        data-lucide="heart"
-        class="h-4 w-4 text-gray-400 hover:text-red-500"
-      ></i>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        ng-attr-fill="{{ isWishlisted() ? '#ef4444' : 'none' }}"
+        ng-attr-stroke="{{ isWishlisted() ? '#ef4444' : '#9ca3af' }}"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        style="transition: all 0.2s"
+      >
+        <path
+          d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+        />
+      </svg>
     </button>
   </div>
 

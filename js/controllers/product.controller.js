@@ -6,6 +6,7 @@ angular.module("medfinderApp").controller("ProductController", [
   "$timeout",
   "ProductService",
   "CartService",
+  "WishlistService",
   function (
     $scope,
     $routeParams,
@@ -13,6 +14,7 @@ angular.module("medfinderApp").controller("ProductController", [
     $timeout,
     ProductService,
     CartService,
+    WishlistService,
   ) {
     // -- State --
     $scope.loading = true;
@@ -22,6 +24,7 @@ angular.module("medfinderApp").controller("ProductController", [
     $scope.imageChanging = false; // for crossfade animation
     $scope.quantity = 0; // 0 means "not in cart yet"
     $scope.addedFeedback = false;
+    $scope.wishlisted = false;
 
     // -- Reinitialize Lucide icons after Angular renders --
     function refreshIcons() {
@@ -52,6 +55,11 @@ angular.module("medfinderApp").controller("ProductController", [
         buildBreadcrumb(product);
         $scope.loading = false;
         refreshIcons();
+
+        // Load wishlist state for this product
+        WishlistService.load().then(function () {
+          $scope.wishlisted = WishlistService.isWishlisted(product.id);
+        });
       })
       .catch(function () {
         $scope.error = true;
@@ -131,6 +139,13 @@ angular.module("medfinderApp").controller("ProductController", [
     // -- Check if product is in stock --
     $scope.isInStock = function () {
       return $scope.product && $scope.product.stock > 0;
+    };
+
+    // -- Toggle wishlist on product detail page --
+    $scope.toggleWishlist = function () {
+      if (!$scope.product) return;
+      $scope.wishlisted = !$scope.wishlisted;
+      WishlistService.toggle($scope.product.id);
     };
 
     // -- Navigate back to shop --
