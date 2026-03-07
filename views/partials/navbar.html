@@ -52,13 +52,47 @@
         </a>
 
         <!-- Account -->
+        <!-- Guest: direct link to login -->
         <a
-          ng-href="{{ $root.isLoggedIn ? '#!/orders' : '#!/login' }}"
+          ng-if="!$root.isLoggedIn"
+          href="#!/login"
           class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary no-underline"
         >
           <i data-lucide="user" class="h-5 w-5"></i>
           <span class="text-xs hidden md:inline">حسابي</span>
         </a>
+
+        <!-- Logged in: dropdown -->
+        <div ng-if="$root.isLoggedIn" class="account-dropdown">
+          <button
+            class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary account-dropdown__trigger"
+          >
+            <i data-lucide="user" class="h-5 w-5"></i>
+            <span class="text-xs hidden md:inline">حسابي</span>
+          </button>
+          <div class="account-dropdown__menu">
+            <!-- User email -->
+            <div class="account-dropdown__email">
+              <i data-lucide="mail"></i>
+              <span>{{ $root.currentUser.email }}</span>
+            </div>
+            <div class="account-dropdown__divider"></div>
+            <!-- Profile / Orders -->
+            <a href="#!/orders" class="account-dropdown__item">
+              <i data-lucide="package"></i>
+              <span>طلباتي</span>
+            </a>
+            <div class="account-dropdown__divider"></div>
+            <!-- Logout -->
+            <button
+              ng-click="$root.logout()"
+              class="account-dropdown__item account-dropdown__item--danger"
+            >
+              <i data-lucide="log-out"></i>
+              <span>تسجيل الخروج</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

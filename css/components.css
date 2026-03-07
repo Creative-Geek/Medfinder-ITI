@@ -308,3 +308,105 @@
 .form-group {
   margin-bottom: var(--space-md);
 }
+
+/* -- Account Dropdown (navbar) -- */
+.account-dropdown {
+  position: relative;
+}
+
+.account-dropdown__trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-family);
+}
+
+.account-dropdown__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  background: var(--color-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    visibility var(--transition-fast);
+}
+
+/* Open on hover or when any child is focused */
+.account-dropdown:hover .account-dropdown__menu,
+.account-dropdown:focus-within .account-dropdown__menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.account-dropdown__email {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+}
+
+.account-dropdown__email span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: ltr;
+}
+
+.account-dropdown__email i,
+.account-dropdown__item i {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.account-dropdown__divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0;
+}
+
+.account-dropdown__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-size: 14px;
+  font-family: var(--font-family);
+  font-weight: 500;
+  color: var(--color-dark);
+  text-decoration: none;
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.account-dropdown__item:hover {
+  background: var(--color-bg-card);
+  color: var(--color-primary);
+}
+
+.account-dropdown__item--danger {
+  color: var(--color-danger);
+}
+
+.account-dropdown__item--danger:hover {
+  background: rgba(231, 76, 60, 0.06);
+  color: var(--color-danger);
+}
