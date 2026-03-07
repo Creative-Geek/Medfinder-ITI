@@ -115,7 +115,13 @@
           <button
             class="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg hover:bg-gray-50 transition-colors text-gray-600 hover:text-primary account-dropdown__trigger"
           >
-            <i data-lucide="user" class="h-5 w-5"></i>
+            <span class="account-dropdown__trigger-icons">
+              <i data-lucide="user" class="h-5 w-5"></i>
+              <i
+                data-lucide="chevron-down"
+                class="h-3.5 w-3.5 account-dropdown__chevron"
+              ></i>
+            </span>
             <span class="text-xs hidden md:inline">حسابي</span>
           </button>
           <div class="account-dropdown__menu">

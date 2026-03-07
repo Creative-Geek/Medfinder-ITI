@@ -30,17 +30,23 @@
       <div class="cart-items">
         <div ng-repeat="item in cartItems track by item.id" class="cart-item">
           <!-- Product image -->
-          <div class="cart-item__image">
+          <a
+            ng-href="#!/product/{{ item.id }}"
+            class="cart-item__image cart-item__product-link"
+          >
             <img ng-src="{{ item.image_url }}" alt="{{ item.name_ar }}" />
-          </div>
+          </a>
 
           <!-- Product info -->
-          <div class="cart-item__info">
+          <a
+            ng-href="#!/product/{{ item.id }}"
+            class="cart-item__info cart-item__product-link"
+          >
             <div class="cart-item__name">{{ item.name_ar }}</div>
             <div ng-if="item.brand" class="cart-item__brand">
               {{ item.brand }}
             </div>
-          </div>
+          </a>
 
           <!-- Qty stepper -->
           <quantity-stepper
@@ -237,7 +243,11 @@
             ng-repeat="item in cartItems track by item.id"
             class="checkout-summary-item"
           >
-            <span class="checkout-summary-item__name">{{ item.name_ar }}</span>
+            <a
+              ng-href="#!/product/{{ item.id }}"
+              class="checkout-summary-item__name cart-item__product-link"
+              >{{ item.name_ar }}</a
+            >
             <span class="checkout-summary-item__qty">x{{ item.qty }}</span>
             <span class="checkout-summary-item__total"
               >{{ lineTotal(item) }} جنيه</span

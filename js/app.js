@@ -23,7 +23,86 @@ app.run([
   "$rootScope",
   "$injector",
   function ($rootScope, $injector) {
+    var ADMIN_EMAIL = "ahmedtaha1234@gmail.com";
+
+    var VIEW_EXIT_DURATION = 180;
+    var VIEW_ENTER_DURATION = 220;
+    var activeViewTransitionId = 0;
+    var activeViewTransitionStartedAt = 0;
+    var hasRenderedInitialView = false;
+    var viewEnterTimer = null;
+    var viewCleanupTimer = null;
+
+    function getViewStageEl() {
+      return document.querySelector(".app-shell__view-stage");
+    }
+
+    function clearViewTransitionTimers() {
+      clearTimeout(viewEnterTimer);
+      clearTimeout(viewCleanupTimer);
+      viewEnterTimer = null;
+      viewCleanupTimer = null;
+    }
+
+    function setViewTransitionState(state) {
+      var stageEl = getViewStageEl();
+      if (!stageEl) return;
+
+      stageEl.classList.remove(
+        "app-shell__view-stage--leaving",
+        "app-shell__view-stage--entering",
+      );
+
+      if (state) {
+        stageEl.classList.add("app-shell__view-stage--" + state);
+      }
+    }
+
+    function beginViewTransition() {
+      activeViewTransitionId += 1;
+      activeViewTransitionStartedAt = Date.now();
+      clearViewTransitionTimers();
+
+      if (!hasRenderedInitialView) {
+        return activeViewTransitionId;
+      }
+
+      setViewTransitionState("leaving");
+      return activeViewTransitionId;
+    }
+
+    function enterViewTransition(transitionId) {
+      if (transitionId !== activeViewTransitionId) return;
+
+      setViewTransitionState("entering");
+      viewCleanupTimer = setTimeout(function () {
+        if (transitionId !== activeViewTransitionId) return;
+        setViewTransitionState(null);
+      }, VIEW_ENTER_DURATION);
+    }
+
     $rootScope.$on("$viewContentLoaded", function () {
+      var transitionId = activeViewTransitionId;
+      var remainingExitTime = 0;
+
+      if (hasRenderedInitialView) {
+        remainingExitTime = Math.max(
+          VIEW_EXIT_DURATION - (Date.now() - activeViewTransitionStartedAt),
+          0,
+        );
+      }
+
+      clearViewTransitionTimers();
+      viewEnterTimer = setTimeout(function () {
+        window.scrollTo(0, 0);
+        window.requestAnimationFrame(function () {
+          window.requestAnimationFrame(function () {
+            enterViewTransition(transitionId);
+            hasRenderedInitialView = true;
+          });
+        });
+      }, remainingExitTime);
+
       if (typeof lucide !== "undefined") {
         setTimeout(function () {
           lucide.createIcons();
@@ -49,8 +128,19 @@ app.run([
     // -- Global auth state (used by navbar) --
     function syncAuthState() {
       var AuthService = $injector.get("AuthService");
+      var currentUser = AuthService.getCurrentUser();
+      var storedRole = localStorage.getItem("sb_user_role");
+      var derivedRole = null;
+
+      if (currentUser) {
+        derivedRole =
+          currentUser.email === ADMIN_EMAIL ? "admin" : storedRole || "user";
+      }
+
       $rootScope.isLoggedIn = AuthService.isLoggedIn();
-      $rootScope.currentUser = AuthService.getCurrentUser();
+      $rootScope.currentUser = currentUser;
+      $rootScope.userRole = derivedRole;
+      $rootScope.isAdmin = derivedRole === "admin";
     }
 
     syncAuthState();
@@ -69,28 +159,30 @@ app.run([
     $rootScope.$on("$routeChangeStart", function (event, next) {
       syncAuthState();
 
-      var access = next.$$route && next.$$route.access;
-      if (!access || access === "guest") return;
+      var access = (next && next.$$route && next.$$route.access) || "guest";
 
       var token = localStorage.getItem("sb_access_token");
-      var userRole = localStorage.getItem("sb_user_role");
+      var userRole =
+        $rootScope.userRole || localStorage.getItem("sb_user_role");
 
       if (access === "user" && !token) {
         event.preventDefault();
         window.location.hash = "#!/login";
+        return;
       }
 
       if (access === "admin" && userRole !== "admin") {
         event.preventDefault();
         window.location.hash = "#!/";
+        return;
       }
+
+      beginViewTransition();
     });
 
-    // Reset page scroll after SPA navigation so new views start at the top
-    $rootScope.$on("$routeChangeSuccess", function () {
-      setTimeout(function () {
-        window.scrollTo(0, 0);
-      }, 0);
+    $rootScope.$on("$routeChangeError", function () {
+      clearViewTransitionTimers();
+      setViewTransitionState(null);
     });
 
     // -- Global search (called from navbar search bar) --

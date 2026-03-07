@@ -21,8 +21,69 @@
   flex: 1 0 auto;
 }
 
+.app-shell__view-stage {
+  position: relative;
+  min-height: 100%;
+}
+
+.app-shell__view {
+  position: relative;
+  z-index: 0;
+  will-change: opacity, transform;
+}
+
+.app-shell__transition-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--color-bg-page);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.app-shell__view-stage--leaving .app-shell__view {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.app-shell__view-stage--leaving .app-shell__transition-veil {
+  opacity: 1;
+}
+
+.app-shell__view-stage--entering .app-shell__view {
+  animation: appShellFadeIn 220ms ease-out both;
+}
+
+.app-shell__view-stage--entering .app-shell__transition-veil {
+  opacity: 0;
+  transition-duration: 220ms;
+}
+
 .app-shell__footer {
   margin-top: auto;
+}
+
+@keyframes appShellFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell__view,
+  .app-shell__transition-veil {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 /* -- Main content area -- */

@@ -108,7 +108,10 @@
 
     <!-- Main SPA content -->
     <main class="app-shell__main">
-      <div ng-view></div>
+      <div class="app-shell__view-stage">
+        <div ng-view class="app-shell__view"></div>
+        <div class="app-shell__transition-veil" aria-hidden="true"></div>
+      </div>
     </main>
 
     <!-- Footer (shared partial) -->

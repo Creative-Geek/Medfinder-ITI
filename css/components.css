@@ -367,6 +367,16 @@
   font-family: var(--font-family);
 }
 
+.account-dropdown__trigger-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.account-dropdown__chevron {
+  transition: transform var(--transition-fast);
+}
+
 .account-dropdown__menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -392,6 +402,11 @@
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
+}
+
+.account-dropdown:hover .account-dropdown__chevron,
+.account-dropdown:focus-within .account-dropdown__chevron {
+  transform: rotate(180deg);
 }
 
 .account-dropdown__email {
