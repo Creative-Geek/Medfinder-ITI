@@ -45,25 +45,36 @@
     </p>
   </div>
 
-  <!-- Add to Cart -->
+  <!-- Add to Cart / Qty Stepper -->
   <div class="px-3 pb-3">
+    <!-- "Add to Cart" button (shown when NOT in cart) -->
     <button
-      ng-click="onAddToCart({ product: product })"
-      ng-disabled="isOutOfStock()"
-      class="w-full py-2 rounded-lg text-sm font-semibold transition-all"
-      ng-class="{
-        'bg-accent text-white hover:bg-accent/90 hover:shadow-md': !isOutOfStock(),
-        'bg-gray-200 text-gray-500 cursor-not-allowed': isOutOfStock()
-      }"
+      ng-if="!isInCart() && !isOutOfStock()"
+      ng-click="handleAddToCart()"
+      class="w-full py-2 rounded-lg text-sm font-semibold transition-all bg-accent text-white hover:bg-accent/90 hover:shadow-md"
     >
-      <span
-        ng-if="!isOutOfStock()"
-        class="flex items-center justify-center gap-1"
-      >
+      <span class="flex items-center justify-center gap-1">
         <i data-lucide="shopping-cart" class="h-3.5 w-3.5"></i>
         أضف إلى العربة
       </span>
-      <span ng-if="isOutOfStock()">غير متوفر</span>
+    </button>
+
+    <!-- Qty stepper (shown when in cart) -->
+    <quantity-stepper
+      ng-if="isInCart()"
+      qty="cartQty"
+      max="product.stock"
+      on-change="onStepperChange(qty)"
+      on-remove="onStepperRemove()"
+    ></quantity-stepper>
+
+    <!-- Out of stock -->
+    <button
+      ng-if="isOutOfStock()"
+      disabled
+      class="w-full py-2 rounded-lg text-sm font-semibold bg-gray-200 text-gray-500 cursor-not-allowed"
+    >
+      غير متوفر
     </button>
   </div>
 </div>

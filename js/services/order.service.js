@@ -51,6 +51,14 @@ angular.module("medfinderApp").factory("OrderService", [
           { headers: { Prefer: "return=representation" } },
         );
       },
+
+      // Decrement stock atomically via RPC (called after order items insertion)
+      decrementStock: function (productId, quantity) {
+        return $http.post(SUPABASE.REST_URL + "/rpc/decrement_stock", {
+          p_product_id: productId,
+          p_quantity: quantity,
+        });
+      },
     };
   },
 ]);

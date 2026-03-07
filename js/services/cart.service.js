@@ -1,16 +1,16 @@
-// Cart service -- manages cart state in sessionStorage
+// Cart service -- manages cart state in localStorage
 angular.module("medfinderApp").factory("CartService", [
   "$rootScope",
   function ($rootScope) {
     var STORAGE_KEY = "mf_cart";
 
     function getCart() {
-      var cartStr = sessionStorage.getItem(STORAGE_KEY);
+      var cartStr = localStorage.getItem(STORAGE_KEY);
       return cartStr ? JSON.parse(cartStr) : [];
     }
 
     function saveCart(cart) {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cart));
       $rootScope.cartCount = cart.reduce(function (sum, item) {
         return sum + item.qty;
       }, 0);

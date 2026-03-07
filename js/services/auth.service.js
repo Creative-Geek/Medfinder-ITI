@@ -9,7 +9,7 @@ angular.module("medfinderApp").factory("AuthService", [
     // -- Token expiry check --
     // Returns true if token is expired or expires within 5 minutes
     function isTokenExpired() {
-      var token = sessionStorage.getItem("sb_access_token");
+      var token = localStorage.getItem("sb_access_token");
       if (!token) return true;
 
       try {
@@ -24,7 +24,7 @@ angular.module("medfinderApp").factory("AuthService", [
     // -- Refresh token --
     // Uses the refresh token to get a new access token
     function refreshToken() {
-      var refreshTok = sessionStorage.getItem("sb_refresh_token");
+      var refreshTok = localStorage.getItem("sb_refresh_token");
       if (!refreshTok) {
         return $q.reject("No refresh token");
       }
@@ -35,18 +35,18 @@ angular.module("medfinderApp").factory("AuthService", [
         })
         .then(function (res) {
           if (res.data && res.data.access_token) {
-            sessionStorage.setItem("sb_access_token", res.data.access_token);
-            sessionStorage.setItem("sb_refresh_token", res.data.refresh_token);
-            sessionStorage.setItem("sb_user", JSON.stringify(res.data.user));
+            localStorage.setItem("sb_access_token", res.data.access_token);
+            localStorage.setItem("sb_refresh_token", res.data.refresh_token);
+            localStorage.setItem("sb_user", JSON.stringify(res.data.user));
           }
           return res.data.access_token;
         })
         .catch(function (err) {
           // Refresh failed -- clear session, user must log in again
-          sessionStorage.removeItem("sb_access_token");
-          sessionStorage.removeItem("sb_refresh_token");
-          sessionStorage.removeItem("sb_user");
-          sessionStorage.removeItem("sb_user_role");
+          localStorage.removeItem("sb_access_token");
+          localStorage.removeItem("sb_refresh_token");
+          localStorage.removeItem("sb_user");
+          localStorage.removeItem("sb_user_role");
           return $q.reject(err);
         });
     }
@@ -71,12 +71,9 @@ angular.module("medfinderApp").factory("AuthService", [
           .then(function (res) {
             // Store tokens in session
             if (res.data && res.data.access_token) {
-              sessionStorage.setItem("sb_access_token", res.data.access_token);
-              sessionStorage.setItem(
-                "sb_refresh_token",
-                res.data.refresh_token,
-              );
-              sessionStorage.setItem("sb_user", JSON.stringify(res.data.user));
+              localStorage.setItem("sb_access_token", res.data.access_token);
+              localStorage.setItem("sb_refresh_token", res.data.refresh_token);
+              localStorage.setItem("sb_user", JSON.stringify(res.data.user));
             }
             return res;
           });
@@ -84,26 +81,26 @@ angular.module("medfinderApp").factory("AuthService", [
 
       // Logout (clear session)
       logout: function () {
-        sessionStorage.removeItem("sb_access_token");
-        sessionStorage.removeItem("sb_refresh_token");
-        sessionStorage.removeItem("sb_user");
-        sessionStorage.removeItem("sb_user_role");
+        localStorage.removeItem("sb_access_token");
+        localStorage.removeItem("sb_refresh_token");
+        localStorage.removeItem("sb_user");
+        localStorage.removeItem("sb_user_role");
       },
 
       // Get current user from session
       getCurrentUser: function () {
-        var userStr = sessionStorage.getItem("sb_user");
+        var userStr = localStorage.getItem("sb_user");
         return userStr ? JSON.parse(userStr) : null;
       },
 
       // Check if user is logged in
       isLoggedIn: function () {
-        return !!sessionStorage.getItem("sb_access_token");
+        return !!localStorage.getItem("sb_access_token");
       },
 
       // Get stored access token
       getToken: function () {
-        return sessionStorage.getItem("sb_access_token");
+        return localStorage.getItem("sb_access_token");
       },
 
       // Check if token is expired or about to expire
@@ -114,13 +111,13 @@ angular.module("medfinderApp").factory("AuthService", [
 
       // Ensure a valid token -- refresh if needed
       ensureValidToken: function () {
-        if (!sessionStorage.getItem("sb_access_token")) {
+        if (!localStorage.getItem("sb_access_token")) {
           return $q.reject("Not logged in");
         }
         if (isTokenExpired()) {
           return refreshToken();
         }
-        return $q.resolve(sessionStorage.getItem("sb_access_token"));
+        return $q.resolve(localStorage.getItem("sb_access_token"));
       },
     };
   },

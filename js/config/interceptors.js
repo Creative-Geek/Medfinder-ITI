@@ -19,7 +19,7 @@ angular.module("medfinderApp").config([
               config.headers["Content-Type"] = "application/json";
 
               // Attach bearer token if user is logged in
-              var token = sessionStorage.getItem("sb_access_token");
+              var token = localStorage.getItem("sb_access_token");
               if (token) {
                 config.headers["Authorization"] = "Bearer " + token;
               } else {

@@ -121,25 +121,14 @@
           </button>
 
           <!-- Quantity stepper (shown when in cart) -->
-          <div
+          <quantity-stepper
             ng-if="isInCart()"
-            class="product-qty-stepper product-qty-entrance"
-          >
-            <button
-              class="product-qty-stepper__btn"
-              ng-click="incrementQty()"
-              ng-disabled="quantity >= product.stock"
-            >
-              +
-            </button>
-            <div class="product-qty-stepper__value">{{ quantity }}</div>
-            <button
-              class="product-qty-stepper__btn product-qty-stepper__btn--minus"
-              ng-click="decrementQty()"
-            >
-              -
-            </button>
-          </div>
+            qty="quantity"
+            max="product.stock"
+            size="lg"
+            on-change="onStepperChange(qty)"
+            on-remove="onStepperRemove()"
+          ></quantity-stepper>
         </div>
 
         <!-- Out of stock button -->

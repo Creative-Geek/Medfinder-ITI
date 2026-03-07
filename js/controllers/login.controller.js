@@ -76,7 +76,7 @@ angular.module("medfinderApp").controller("LoginController", [
     // -- Set admin role in session --
     function setUserRole(email) {
       var role = email === ADMIN_EMAIL ? "admin" : "user";
-      sessionStorage.setItem("sb_user_role", role);
+      localStorage.setItem("sb_user_role", role);
     }
 
     // -- Submit handler --

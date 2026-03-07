@@ -15,7 +15,7 @@ app.run([
     });
 
     // Proactive token refresh on app startup
-    var token = sessionStorage.getItem("sb_access_token");
+    var token = localStorage.getItem("sb_access_token");
     if (token) {
       try {
         var AuthService = $injector.get("AuthService");
@@ -53,8 +53,8 @@ app.run([
       var access = next.$$route && next.$$route.access;
       if (!access || access === "guest") return;
 
-      var token = sessionStorage.getItem("sb_access_token");
-      var userRole = sessionStorage.getItem("sb_user_role");
+      var token = localStorage.getItem("sb_access_token");
+      var userRole = localStorage.getItem("sb_user_role");
 
       if (access === "user" && !token) {
         event.preventDefault();

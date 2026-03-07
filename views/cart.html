@@ -1,5 +1,283 @@
 <!-- Cart / Checkout page -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<div class="uk-container py-6">
+  <!-- ============ EMPTY CART STATE ============ -->
+  <div
+    ng-if="cartItems.length === 0 && step === 'cart'"
+    class="cart-empty cart-entrance"
+  >
+    <div class="cart-empty__icon-wrapper">
+      <i data-lucide="shopping-cart" class="h-10 w-10"></i>
+    </div>
+    <h2 class="cart-empty__title">عربة التسوق فارغة</h2>
+    <p class="cart-empty__subtitle">
+      يبدو انك لم تضف اى عناصر الى سلة التسوق الخاصة بك
+    </p>
+    <a href="#!/shop" class="cart-empty__browse">تصفح المنتجات</a>
+  </div>
+
+  <!-- ============ CART STEP ============ -->
+  <div ng-if="cartItems.length > 0 && step === 'cart'" class="cart-entrance">
+    <h1 class="cart-title">سلة التسوق</h1>
+
+    <!-- Stock error alert -->
+    <div ng-if="stockError" class="cart-alert">
+      <i data-lucide="alert-circle" class="h-5 w-5"></i>
+      <span>{{ stockError }}</span>
+    </div>
+
+    <div class="cart-layout">
+      <!-- Cart Items (right side in RTL) -->
+      <div class="cart-items">
+        <div ng-repeat="item in cartItems track by item.id" class="cart-item">
+          <!-- Product image -->
+          <div class="cart-item__image">
+            <img ng-src="{{ item.image_url }}" alt="{{ item.name_ar }}" />
+          </div>
+
+          <!-- Product info -->
+          <div class="cart-item__info">
+            <div class="cart-item__name">{{ item.name_ar }}</div>
+            <div ng-if="item.brand" class="cart-item__brand">
+              {{ item.brand }}
+            </div>
+          </div>
+
+          <!-- Qty stepper -->
+          <quantity-stepper
+            qty="item.qty"
+            max="item.stock"
+            on-change="onItemQtyChange(item, qty)"
+            on-remove="removeItem(item)"
+          ></quantity-stepper>
+
+          <!-- Price -->
+          <div class="cart-item__price">
+            {{ lineTotal(item) }}
+            <span class="cart-item__price-currency">جنيه</span>
+          </div>
+
+          <!-- Remove -->
+          <button
+            class="cart-item__remove"
+            ng-click="removeItem(item)"
+            title="ازالة"
+          >
+            <i data-lucide="x" class="h-4 w-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cart Summary (left side in RTL) -->
+      <div class="cart-summary">
+        <h3 class="cart-summary__title">ملخص الطلب</h3>
+
+        <div class="cart-summary__row">
+          <span class="cart-summary__label"
+            >المنتجات ({{ cartItems.length }})</span
+          >
+          <span class="cart-summary__value">{{ subtotal }} جنيه</span>
+        </div>
+
+        <div class="cart-summary__row">
+          <span class="cart-summary__label">الشحن</span>
+          <span ng-if="shippingCost > 0" class="cart-summary__value"
+            >{{ shippingCost }} جنيه</span
+          >
+          <span ng-if="shippingCost === 0" class="cart-summary__free"
+            >مجانى</span
+          >
+        </div>
+
+        <div class="cart-summary__row cart-summary__row--total">
+          <span>الاجمالى</span>
+          <span class="cart-summary__value">{{ total }} جنيه</span>
+        </div>
+
+        <div class="cart-actions">
+          <button class="cart-btn-checkout" ng-click="goToCheckout()">
+            اتمام الشراء
+            <i data-lucide="arrow-left" class="h-4 w-4"></i>
+          </button>
+          <a href="#!/shop" class="cart-btn-continue">استمر بالتسوق</a>
+        </div>
+
+        <p class="cart-disclaimer">قد تختلف الاسعار بين الصيدليات</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CHECKOUT STEP ============ -->
+  <div ng-if="step === 'checkout'" class="cart-entrance">
+    <button class="checkout-back" ng-click="goBackToCart()">
+      <i data-lucide="arrow-right" class="h-4 w-4"></i>
+      العودة للعربة
+    </button>
+
+    <h1 class="cart-title">اتمام الشراء</h1>
+
+    <!-- Stock error alert -->
+    <div ng-if="stockError" class="cart-alert">
+      <i data-lucide="alert-circle" class="h-5 w-5"></i>
+      <span>{{ stockError }}</span>
+    </div>
+
+    <div class="cart-layout">
+      <!-- Checkout Form -->
+      <div class="checkout-form">
+        <h3 class="checkout-form__title">بيانات التوصيل</h3>
+
+        <!-- Full Name -->
+        <div class="checkout-form__field">
+          <label class="checkout-form__label">الاسم بالكامل *</label>
+          <input
+            type="text"
+            class="checkout-form__input"
+            ng-class="{ 'checkout-form__input--error': formErrors.fullName }"
+            ng-model="checkout.fullName"
+            placeholder="الاسم الاول واسم العائلة"
+          />
+          <p ng-if="formErrors.fullName" class="checkout-form__error">
+            {{ formErrors.fullName }}
+          </p>
+        </div>
+
+        <!-- Phone -->
+        <div class="checkout-form__field">
+          <label class="checkout-form__label">رقم الهاتف *</label>
+          <input
+            type="tel"
+            class="checkout-form__input"
+            ng-class="{ 'checkout-form__input--error': formErrors.phone }"
+            ng-model="checkout.phone"
+            placeholder="01xxxxxxxxx"
+            maxlength="11"
+            dir="ltr"
+          />
+          <p ng-if="formErrors.phone" class="checkout-form__error">
+            {{ formErrors.phone }}
+          </p>
+        </div>
+
+        <!-- Address -->
+        <div class="checkout-form__field">
+          <label class="checkout-form__label">العنوان *</label>
+          <input
+            type="text"
+            class="checkout-form__input"
+            ng-class="{ 'checkout-form__input--error': formErrors.address }"
+            ng-model="checkout.address"
+            placeholder="الشارع والمنطقة"
+          />
+          <p ng-if="formErrors.address" class="checkout-form__error">
+            {{ formErrors.address }}
+          </p>
+        </div>
+
+        <!-- City + Governorate row -->
+        <div class="checkout-form__row">
+          <div class="checkout-form__field">
+            <label class="checkout-form__label">المدينة *</label>
+            <input
+              type="text"
+              class="checkout-form__input"
+              ng-class="{ 'checkout-form__input--error': formErrors.city }"
+              ng-model="checkout.city"
+            />
+            <p ng-if="formErrors.city" class="checkout-form__error">
+              {{ formErrors.city }}
+            </p>
+          </div>
+          <div class="checkout-form__field">
+            <label class="checkout-form__label">المحافظة</label>
+            <select
+              class="checkout-form__select"
+              ng-model="checkout.governorate"
+            >
+              <option value="">اختر المحافظة</option>
+              <option ng-repeat="gov in governorates" value="{{ gov }}">
+                {{ gov }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="checkout-form__divider" />
+
+        <!-- Payment method (UI only) -->
+        <div class="checkout-form__payment">
+          <input type="checkbox" checked disabled />
+          <span>الدفع عند الاستلام</span>
+        </div>
+
+        <!-- Place order button -->
+        <div class="cart-actions" style="margin-top: var(--space-lg)">
+          <button
+            class="cart-btn-checkout"
+            ng-click="placeOrder()"
+            ng-disabled="loading"
+          >
+            <span ng-if="!loading">
+              <i data-lucide="lock" class="h-4 w-4"></i>
+              تأكيد الطلب
+            </span>
+            <span ng-if="loading"> جارى التنفيذ... </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Order Summary Sidebar -->
+      <div class="cart-summary">
+        <h3 class="cart-summary__title">ملخص الطلب</h3>
+
+        <div class="checkout-summary-items">
+          <div
+            ng-repeat="item in cartItems track by item.id"
+            class="checkout-summary-item"
+          >
+            <span class="checkout-summary-item__name">{{ item.name_ar }}</span>
+            <span class="checkout-summary-item__qty">x{{ item.qty }}</span>
+            <span class="checkout-summary-item__total"
+              >{{ lineTotal(item) }} جنيه</span
+            >
+          </div>
+        </div>
+
+        <div class="cart-summary__row">
+          <span class="cart-summary__label">المنتجات</span>
+          <span class="cart-summary__value">{{ subtotal }} جنيه</span>
+        </div>
+
+        <div class="cart-summary__row">
+          <span class="cart-summary__label">الشحن</span>
+          <span ng-if="shippingCost > 0" class="cart-summary__value"
+            >{{ shippingCost }} جنيه</span
+          >
+          <span ng-if="shippingCost === 0" class="cart-summary__free"
+            >مجانى</span
+          >
+        </div>
+
+        <div class="cart-summary__row cart-summary__row--total">
+          <span>الاجمالى</span>
+          <span class="cart-summary__value">{{ total }} جنيه</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SUCCESS STEP ============ -->
+  <div ng-if="step === 'success'" class="cart-success">
+    <div class="cart-success__icon-wrapper">
+      <i data-lucide="check-circle" class="h-10 w-10"></i>
+    </div>
+    <h2 class="cart-success__title">تم تأكيد طلبك بنجاح</h2>
+    <p class="cart-success__subtitle">
+      شكرا لك! سيتم التواصل معك قريبا لتأكيد التوصيل
+    </p>
+    <p class="cart-success__order-id">رقم الطلب: #{{ orderId }}</p>
+    <div class="cart-success__actions">
+      <a href="#!/shop" class="cart-btn-continue">استمر بالتسوق</a>
+      <a href="#!/orders" class="cart-btn-continue">طلباتى</a>
+    </div>
+  </div>
 </div>

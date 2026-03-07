@@ -115,33 +115,18 @@ angular.module("medfinderApp").controller("ProductController", [
       }, 1500);
     };
 
-    // -- Increment quantity --
-    $scope.incrementQty = function () {
-      if (!$scope.product) return;
-      if ($scope.quantity < $scope.product.stock) {
-        $scope.quantity++;
-        // Update cart: remove and re-add with new qty
-        syncCartQty();
-      }
+    // -- Stepper callback: qty changed via directive --
+    $scope.onStepperChange = function (qty) {
+      $scope.quantity = qty;
+      CartService.updateQty($scope.product.id, qty);
     };
 
-    // -- Decrement quantity --
-    $scope.decrementQty = function () {
-      if ($scope.quantity > 1) {
-        $scope.quantity--;
-        syncCartQty();
-      } else if ($scope.quantity === 1) {
-        // Remove from cart, go back to "Add to Cart" button
-        $scope.quantity = 0;
-        CartService.removeItem($scope.product.id);
-        refreshIcons();
-      }
+    // -- Stepper callback: remove from cart (decremented past min) --
+    $scope.onStepperRemove = function () {
+      $scope.quantity = 0;
+      CartService.removeItem($scope.product.id);
+      refreshIcons();
     };
-
-    // -- Sync quantity with CartService --
-    function syncCartQty() {
-      CartService.updateQty($scope.product.id, $scope.quantity);
-    }
 
     // -- Check if product is in stock --
     $scope.isInStock = function () {
