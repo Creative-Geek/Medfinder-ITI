@@ -2,11 +2,12 @@
 
 An Arabic-language online pharmacy storefront built for the Egyptian market. Medfinder lets customers browse pharmaceutical products, get AI-powered assistance via a chatbot, and place orders — while giving admins a full dashboard for managing products, orders, and customers.
 
-**Live demo:** [Medfinder-ITI](https://github.com/Creative-Geek/Medfinder-ITI)
+**Live demo:** [Medfinder-ITI](https://medfinder-iti.vercel.app/)
 
 ## Features
 
 ### Storefront
+
 - **Product catalog** with filtering by type, category, brand, and stock status, plus sorting and pagination
 - **Live search** with debounced dropdown results and text highlighting
 - **Product detail pages** with image gallery, tabbed sections (description, use cases, usage, side effects, warnings), and user reviews
@@ -15,6 +16,7 @@ An Arabic-language online pharmacy storefront built for the Egyptian market. Med
 - **Order history** with expandable details and cancellation support (restores stock)
 
 ### AI Chatbot
+
 - Floating chat widget powered by **Google Gemini** via a Supabase Edge Function
 - Natural language product search in Arabic (Egyptian dialect)
 - Prescription image recognition — drag-and-drop, paste, or file upload
@@ -23,6 +25,7 @@ An Arabic-language online pharmacy storefront built for the Egyptian market. Med
 - Rate limiting (15 messages/min, 500/day per user/IP)
 
 ### Admin Dashboard
+
 - **KPI cards** — total sales, customer count, low stock alerts, today's orders, product count
 - **Revenue chart** — weekly bar chart with Arabic day labels (pure Canvas, no charting library)
 - **Product management** — full CRUD with image upload (drag-and-drop to Supabase Storage), category selection, and comma-separated array fields
@@ -30,6 +33,7 @@ An Arabic-language online pharmacy storefront built for the Egyptian market. Med
 - **Customer management** — customer list with expandable order history
 
 ### Technical
+
 - 3-tier route guard (guest / user / admin)
 - HTTP interceptor with automatic auth header injection and 401 token refresh with request queuing
 - CSS view transitions (fade exit/enter)
@@ -39,16 +43,16 @@ An Arabic-language online pharmacy storefront built for the Egyptian market. Med
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | AngularJS 1.8.3 |
-| UI | Tailwind CSS (CDN) + Franken UI 2.0.0 |
-| Icons | Lucide |
-| Font | Cairo (Google Fonts) |
-| Database | Supabase (PostgreSQL via PostgREST) |
-| Auth | Supabase Auth (email/password) |
-| Storage | Supabase Storage (`product-images` bucket) |
-| Chatbot | Supabase Edge Function (Deno) + Google Gemini API |
+| Layer     | Technology                                        |
+| --------- | ------------------------------------------------- |
+| Framework | AngularJS 1.8.3                                   |
+| UI        | Tailwind CSS (CDN) + Franken UI 2.0.0             |
+| Icons     | Lucide                                            |
+| Font      | Cairo (Google Fonts)                              |
+| Database  | Supabase (PostgreSQL via PostgREST)               |
+| Auth      | Supabase Auth (email/password)                    |
+| Storage   | Supabase Storage (`product-images` bucket)        |
+| Chatbot   | Supabase Edge Function (Deno) + Google Gemini API |
 
 ## Project Structure
 
@@ -82,22 +86,22 @@ An Arabic-language online pharmacy storefront built for the Egyptian market. Med
 
 ## Routes
 
-| Path | Page | Access |
-|------|------|--------|
-| `/` | Homepage | Public |
-| `/shop` | Product catalog | Public |
-| `/product/:id` | Product detail | Public |
-| `/about` | About | Public |
-| `/login` | Login / Signup | Public |
-| `/cart` | Cart & Checkout | User |
-| `/wishlist` | Wishlist | User |
-| `/orders` | Profile & Order History | User |
-| `/admin` | Dashboard | Admin |
-| `/admin/products` | Product Management | Admin |
-| `/admin/products/new` | Add Product | Admin |
-| `/admin/products/:id/edit` | Edit Product | Admin |
-| `/admin/orders` | Order Management | Admin |
-| `/admin/customers` | Customer Management | Admin |
+| Path                       | Page                    | Access |
+| -------------------------- | ----------------------- | ------ |
+| `/`                        | Homepage                | Public |
+| `/shop`                    | Product catalog         | Public |
+| `/product/:id`             | Product detail          | Public |
+| `/about`                   | About                   | Public |
+| `/login`                   | Login / Signup          | Public |
+| `/cart`                    | Cart & Checkout         | User   |
+| `/wishlist`                | Wishlist                | User   |
+| `/orders`                  | Profile & Order History | User   |
+| `/admin`                   | Dashboard               | Admin  |
+| `/admin/products`          | Product Management      | Admin  |
+| `/admin/products/new`      | Add Product             | Admin  |
+| `/admin/products/:id/edit` | Edit Product            | Admin  |
+| `/admin/orders`            | Order Management        | Admin  |
+| `/admin/customers`         | Customer Management     | Admin  |
 
 ## Database
 
@@ -116,12 +120,14 @@ RPC functions: `decrement_stock`, `restore_stock`, `check_chat_rate_limit`, `enf
 ## Getting Started
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Creative-Geek/Medfinder-ITI.git
    cd Medfinder-ITI
    ```
 
 2. **Serve the files** — any static file server will work:
+
    ```bash
    # Python
    python -m http.server 8000
@@ -138,11 +144,13 @@ No build step, no `npm install` — the app loads all dependencies from CDNs.
 The app expects a Supabase project with the schema described in `docs/schema.md`. Update `js/config/constants.js` with your own project URL and anon key.
 
 To deploy the chatbot edge function:
+
 ```bash
 supabase functions deploy chatbot
 ```
 
 Environment variables needed for the edge function:
+
 - `GEMINI_API_KEY` — Google Gemini API key
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
 
