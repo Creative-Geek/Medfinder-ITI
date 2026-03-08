@@ -41,25 +41,68 @@ angular.module("medfinderApp").directive("chatWidget", [
           }
         }
 
+        var widgetRoot = element[0].querySelector(".chat-widget-container");
+        var fabEl = element[0].querySelector(".chat-widget-fab");
+        var chatWin = element[0].querySelector(".chat-window");
+
+        function syncOpenState() {
+          if (widgetRoot) {
+            widgetRoot.classList.toggle("chat-widget--open", !!scope.isOpen);
+          }
+
+          if (fabEl) {
+            fabEl.setAttribute("aria-hidden", scope.isOpen ? "true" : "false");
+          }
+
+          if (chatWin) {
+            chatWin.setAttribute(
+              "aria-hidden",
+              scope.isOpen ? "false" : "true",
+            );
+          }
+        }
+
         // Initialize icons on first load if open or closed
+        function refreshWidgetIcons() {
+          if (typeof lucide === "undefined") return;
+
+          lucide.createIcons({ root: element[0] });
+        }
+
         $timeout(function () {
+          syncOpenState();
           if (scope.isOpen) scrollToBottom();
-          if (typeof lucide !== "undefined") lucide.createIcons();
+          refreshWidgetIcons();
         });
 
+        scope.$watch("isOpen", function () {
+          syncOpenState();
+        });
+
+        function setChatOpen(nextOpen) {
+          scope.isOpen = nextOpen;
+          scope.saveState();
+          syncOpenState();
+
+          if (scope.isOpen) {
+            scrollToBottom();
+          }
+        }
+
         scope.toggleChat = function () {
-          // Only allow logged in users
+          if (scope.isOpen) {
+            setChatOpen(false);
+            return;
+          }
+
+          // Only allow logged in users to open the chat
           if (!$rootScope.currentUser) {
             // Alternatively, could redirect to login
             alert("يرجى تسجيل الدخول أولاً لاستخدام هذه الخاصية.");
             return;
           }
-          scope.isOpen = !scope.isOpen;
-          scope.saveState();
 
-          if (scope.isOpen) {
-            scrollToBottom();
-          }
+          setChatOpen(true);
         };
 
         // Allow other parts of the app to programmatically open the chat
@@ -163,7 +206,7 @@ angular.module("medfinderApp").directive("chatWidget", [
               scope.isLoading = false;
               // Re-init icons so the X button on the preview renders
               $timeout(function () {
-                if (typeof lucide !== "undefined") lucide.createIcons();
+                refreshWidgetIcons();
               });
             })
             .catch(function (err) {
@@ -174,7 +217,6 @@ angular.module("medfinderApp").directive("chatWidget", [
           resetFileInput();
         };
 
-        var chatWin = element[0].querySelector(".chat-window");
         var dragDepth = 0;
 
         if (chatWin) {
@@ -362,7 +404,7 @@ angular.module("medfinderApp").directive("chatWidget", [
             if (msgArea) {
               msgArea.scrollTop = msgArea.scrollHeight;
             }
-            if (typeof lucide !== "undefined") lucide.createIcons();
+            refreshWidgetIcons();
           }, 50);
         }
       },

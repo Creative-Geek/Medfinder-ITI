@@ -78,9 +78,7 @@ angular.module("medfinderApp").controller("CartController", [
     // -- Reinitialize Lucide icons --
     function refreshIcons() {
       $timeout(function () {
-        if (typeof lucide !== "undefined") {
-          lucide.createIcons();
-        }
+        medfinderRefreshViewIcons();
       }, 50);
     }
 

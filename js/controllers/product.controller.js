@@ -32,9 +32,7 @@ angular.module("medfinderApp").controller("ProductController", [
     // -- Reinitialize Lucide icons after Angular renders --
     function refreshIcons() {
       $timeout(function () {
-        if (typeof lucide !== "undefined") {
-          lucide.createIcons();
-        }
+        medfinderRefreshViewIcons();
       }, 50);
     }
 

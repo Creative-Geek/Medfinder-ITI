@@ -14,7 +14,7 @@ angular.module("medfinderApp").controller("WishlistController", [
 
     function refreshIcons() {
       $timeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 50);
     }
 

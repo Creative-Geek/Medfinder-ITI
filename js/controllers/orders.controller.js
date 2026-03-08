@@ -26,7 +26,7 @@ angular.module("medfinderApp").controller("OrdersController", [
     // -- Lucide icons refresh --
     function refreshIcons() {
       $timeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 50);
     }
 

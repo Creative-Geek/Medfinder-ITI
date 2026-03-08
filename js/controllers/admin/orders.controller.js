@@ -70,7 +70,7 @@ angular.module("medfinderApp").controller("AdminOrdersController", [
         .finally(function () {
           $scope.loading = false;
           setTimeout(function () {
-            if (typeof lucide !== "undefined") lucide.createIcons();
+            medfinderRefreshViewIcons();
           }, 100);
         });
     }
@@ -161,7 +161,7 @@ angular.module("medfinderApp").controller("AdminOrdersController", [
       // Re-init icons after expand
       if (order._expanded) {
         setTimeout(function () {
-          if (typeof lucide !== "undefined") lucide.createIcons();
+          medfinderRefreshViewIcons();
         }, 50);
       }
     };

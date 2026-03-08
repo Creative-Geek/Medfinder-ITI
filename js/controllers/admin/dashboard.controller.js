@@ -185,7 +185,7 @@ angular.module("medfinderApp").controller("AdminDashboardController", [
       .finally(function () {
         $scope.loading = false;
         setTimeout(function () {
-          if (typeof lucide !== "undefined") lucide.createIcons();
+          medfinderRefreshViewIcons();
         }, 150);
       });
   },

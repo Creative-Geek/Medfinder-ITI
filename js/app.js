@@ -5,6 +5,29 @@ if (typeof document !== "undefined") {
   document.documentElement.classList.add("js-scroll-reveal");
 }
 
+function medfinderRefreshIcons(root) {
+  if (typeof lucide === "undefined") return;
+
+  lucide.createIcons({ root: root || document });
+}
+
+function medfinderRefreshViewIcons() {
+  medfinderRefreshIcons(document.querySelector(".app-shell__view") || document);
+}
+
+function medfinderRefreshShellIcons() {
+  var navbarRoot = document.querySelector(".app-shell__navbar");
+  var footerRoot = document.querySelector(".app-shell__footer");
+
+  if (navbarRoot) {
+    medfinderRefreshIcons(navbarRoot);
+  }
+
+  if (footerRoot) {
+    medfinderRefreshIcons(footerRoot);
+  }
+}
+
 // Highlight filter: wraps matched substring in <mark>
 app.filter("highlight", [
   "$sce",
@@ -210,11 +233,16 @@ app.run([
         });
       }, remainingExitTime);
 
-      if (typeof lucide !== "undefined") {
-        setTimeout(function () {
-          lucide.createIcons();
-        }, 50);
-      }
+      setTimeout(function () {
+        medfinderRefreshShellIcons();
+        medfinderRefreshViewIcons();
+      }, 50);
+    });
+
+    $rootScope.$on("$includeContentLoaded", function () {
+      setTimeout(function () {
+        medfinderRefreshShellIcons();
+      }, 0);
     });
 
     // Proactive token refresh on app startup

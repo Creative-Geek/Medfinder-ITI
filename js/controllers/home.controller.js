@@ -208,7 +208,7 @@ angular.module("medfinderApp").controller("HomeController", [
     // ── Reinit Lucide icons after dynamic content loads ──
     function reinitIcons() {
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 100);
     }
   },

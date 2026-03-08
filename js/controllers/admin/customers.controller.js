@@ -22,7 +22,7 @@ angular.module("medfinderApp").controller("AdminCustomersController", [
 
     function refreshIcons(delay) {
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, delay || 50);
     }
 

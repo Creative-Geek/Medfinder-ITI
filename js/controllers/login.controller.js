@@ -49,7 +49,7 @@ angular.module("medfinderApp").controller("LoginController", [
       };
       // Re-render Lucide icons for the toggled fields
       $timeout(function () {
-        lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 50);
     };
 
@@ -231,7 +231,7 @@ angular.module("medfinderApp").controller("LoginController", [
 
     // -- Init Lucide icons --
     $timeout(function () {
-      lucide.createIcons();
+      medfinderRefreshViewIcons();
     }, 100);
   },
 ]);

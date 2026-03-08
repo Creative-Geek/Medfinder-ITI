@@ -430,7 +430,7 @@ angular.module("medfinderApp").controller("ShopController", [
     // ── Reinit Lucide icons ──
     function reinitIcons() {
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 100);
     }
 

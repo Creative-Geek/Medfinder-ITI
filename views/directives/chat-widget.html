@@ -1,11 +1,11 @@
 <!-- Chat Widget Directive Template -->
-<div class="chat-widget-container" ng-class="{ 'chat-widget--open': isOpen }">
+<div class="chat-widget-container">
   <!-- Chat Button (Floating) -->
   <button
     class="chat-widget-fab"
     ng-click="toggleChat()"
-    ng-show="!isOpen"
     aria-label="محادثة الصيدلي"
+    aria-hidden="false"
   >
     <i data-lucide="message-circle" class="h-6 w-6"></i>
   </button>
@@ -14,7 +14,7 @@
   <div
     class="chat-window"
     ng-class="{ 'chat-window--drag-over': isDragOver }"
-    ng-attr-aria-hidden="{{ !isOpen }}"
+    aria-hidden="true"
   >
     <div class="chat-drop-overlay" ng-if="isDragOver">
       اترك الصورة هنا لإرفاقها

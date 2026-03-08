@@ -44,7 +44,7 @@ angular.module("medfinderApp").controller("AdminProductsController", [
         .finally(function () {
           $scope.loading = false;
           setTimeout(function () {
-            if (typeof lucide !== "undefined") lucide.createIcons();
+            medfinderRefreshViewIcons();
           }, 100);
         });
     }
@@ -111,7 +111,7 @@ angular.module("medfinderApp").controller("AdminProductsController", [
 
       // Re-init icons after Angular re-renders filtered rows
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 50);
     }
 
@@ -136,7 +136,7 @@ angular.module("medfinderApp").controller("AdminProductsController", [
       $scope.currentPage = page;
       paginate();
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 50);
     };
 
@@ -147,7 +147,7 @@ angular.module("medfinderApp").controller("AdminProductsController", [
       $scope.deleteTarget = product;
       $scope.showDeleteModal = true;
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, 50);
     };
 

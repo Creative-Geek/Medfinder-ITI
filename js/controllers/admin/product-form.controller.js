@@ -167,7 +167,7 @@ angular.module("medfinderApp").controller("AdminProductFormController", [
 
     function initIcons(delay) {
       setTimeout(function () {
-        if (typeof lucide !== "undefined") lucide.createIcons();
+        medfinderRefreshViewIcons();
       }, delay || 50);
     }
 
