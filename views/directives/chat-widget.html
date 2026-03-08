@@ -63,9 +63,11 @@
           ng-class="{ 'chat-bubble--user': msg.role === 'user', 'chat-bubble--assistant': msg.role === 'assistant', 'chat-bubble--error': msg.isError }"
         >
           <!-- Text content -->
-          <div ng-if="msg.content" class="whitespace-pre-wrap">
-            {{ msg.content }}
-          </div>
+          <div
+            ng-if="msg.content"
+            class="whitespace-pre-wrap"
+            ng-bind="msg.content"
+          ></div>
 
           <!-- Image content -->
           <img
