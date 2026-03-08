@@ -32,6 +32,10 @@ angular.module("medfinderApp").config([
         controller: "AboutController",
         access: "guest",
       })
+      .when("/404", {
+        templateUrl: "views/404.html",
+        access: "guest",
+      })
 
       // -- User routes --
       .when("/cart", {
@@ -72,6 +76,6 @@ angular.module("medfinderApp").config([
         access: "admin",
       })
 
-      .otherwise({ redirectTo: "/" });
+      .otherwise({ redirectTo: "/404" });
   },
 ]);
