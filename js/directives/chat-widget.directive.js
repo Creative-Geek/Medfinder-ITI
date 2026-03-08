@@ -102,6 +102,31 @@ angular.module("medfinderApp").directive("chatWidget", [
           element[0].querySelector('input[type="file"]').value = "";
         };
 
+        // Listen for Ctrl+V paste events anywhere inside the chat window
+        var chatWin = element[0].querySelector(".chat-window");
+        if (chatWin) {
+          chatWin.addEventListener("paste", function (e) {
+            var items = (
+              e.clipboardData ||
+              (e.originalEvent && e.originalEvent.clipboardData) ||
+              {}
+            ).items;
+            if (!items) return;
+            for (var i = 0; i < items.length; i++) {
+              if (items[i].type.indexOf("image") !== -1) {
+                e.preventDefault();
+                var file = items[i].getAsFile();
+                if (file) {
+                  scope.$apply(function () {
+                    scope.onFileSelect([file]);
+                  });
+                }
+                break;
+              }
+            }
+          });
+        }
+
         scope.removeImage = function () {
           scope.selectedImage = null;
         };
