@@ -2,7 +2,7 @@
 <div class="about-page">
   <section class="about-hero">
     <div class="uk-container">
-      <div class="about-hero__content">
+      <div class="about-hero__content" data-reveal>
         <div class="about-brand-lockup">
           <div class="about-brand-lockup__logo-wrap">
             <img
@@ -33,7 +33,7 @@
         </div>
       </div>
 
-      <div class="about-hero__panel">
+      <div class="about-hero__panel" data-reveal style="--reveal-delay: 0.08s">
         <div class="about-hero__brand-showcase">
           <img
             src="assets/logos/logo.svg"
@@ -71,7 +71,7 @@
   <section class="about-section">
     <div class="uk-container">
       <div class="about-story">
-        <div>
+        <div data-reveal>
           <span class="about-section__eyebrow">قصتنا</span>
           <h2 class="about-section__title">لماذا Medfinder؟</h2>
           <p class="about-section__text">
@@ -86,7 +86,11 @@
           </p>
         </div>
 
-        <div class="about-highlight-card">
+        <div
+          class="about-highlight-card"
+          data-reveal
+          style="--reveal-delay: 0.08s"
+        >
           <h3>ما الذي يميز التجربة؟</h3>
           <ul class="about-check-list">
             <li>
@@ -110,7 +114,7 @@
 
   <section class="about-section about-section--soft">
     <div class="uk-container">
-      <div class="about-section__head">
+      <div class="about-section__head" data-reveal>
         <span class="about-section__eyebrow">قيمنا</span>
         <h2 class="about-section__title">
           بنيت الصفحة على ما يهم المستخدم فعلاً
@@ -118,7 +122,7 @@
       </div>
 
       <div class="about-card-grid">
-        <article class="about-info-card">
+        <article class="about-info-card" data-reveal>
           <div class="about-info-card__icon">
             <i data-lucide="shield-check"></i>
           </div>
@@ -129,7 +133,11 @@
           </p>
         </article>
 
-        <article class="about-info-card">
+        <article
+          class="about-info-card"
+          data-reveal
+          style="--reveal-delay: 0.08s"
+        >
           <div class="about-info-card__icon">
             <i data-lucide="package-check"></i>
           </div>
@@ -140,7 +148,11 @@
           </p>
         </article>
 
-        <article class="about-info-card">
+        <article
+          class="about-info-card"
+          data-reveal
+          style="--reveal-delay: 0.16s"
+        >
           <div class="about-info-card__icon">
             <i data-lucide="sparkles"></i>
           </div>
@@ -156,19 +168,23 @@
 
   <section class="about-section">
     <div class="uk-container">
-      <div class="about-section__head">
+      <div class="about-section__head" data-reveal>
         <span class="about-section__eyebrow">كيف يعمل</span>
         <h2 class="about-section__title">رحلة قصيرة من الاكتشاف إلى الطلب</h2>
       </div>
 
       <div class="about-steps">
-        <article class="about-step-card">
+        <article class="about-step-card" data-reveal>
           <span class="about-step-card__number">01</span>
           <h3>ابحث أو تصفح</h3>
           <p>ابدأ من البحث المباشر أو من أقسام المتجر المنظمة بوضوح.</p>
         </article>
 
-        <article class="about-step-card">
+        <article
+          class="about-step-card"
+          data-reveal
+          style="--reveal-delay: 0.08s"
+        >
           <span class="about-step-card__number">02</span>
           <h3>فلتر بذكاء</h3>
           <p>
@@ -176,7 +192,11 @@
           </p>
         </article>
 
-        <article class="about-step-card">
+        <article
+          class="about-step-card"
+          data-reveal
+          style="--reveal-delay: 0.16s"
+        >
           <span class="about-step-card__number">03</span>
           <h3>أضف ما يناسبك</h3>
           <p>راجع التفاصيل ثم أضف المنتج إلى السلة أو المفضلة حسب احتياجك.</p>
@@ -187,28 +207,40 @@
 
   <section class="about-section about-section--compact">
     <div class="uk-container">
-      <div class="about-section__head">
+      <div class="about-section__head" data-reveal>
         <span class="about-section__eyebrow">تصفح سريع</span>
         <h2 class="about-section__title">أقسام رئيسية تبدأ منها مباشرة</h2>
       </div>
 
       <div class="about-category-grid">
-        <a href="#!/shop?type=الأدوية" class="about-category-card">
+        <a href="#!/shop?type=الأدوية" class="about-category-card" data-reveal>
           <strong>الأدوية</strong>
           <span>منتجات يومية وعلاجات شائعة</span>
         </a>
         <a
           href="#!/shop?type=العناية بالبشرة و الشعر"
           class="about-category-card"
+          data-reveal
+          style="--reveal-delay: 0.08s"
         >
           <strong>العناية بالبشرة و الشعر</strong>
           <span>روتينات العناية والحماية</span>
         </a>
-        <a href="#!/shop?type=الأم و الطفل" class="about-category-card">
+        <a
+          href="#!/shop?type=الأم و الطفل"
+          class="about-category-card"
+          data-reveal
+          style="--reveal-delay: 0.16s"
+        >
           <strong>الأم و الطفل</strong>
           <span>احتياجات أساسية بعرض مرتب</span>
         </a>
-        <a href="#!/shop?type=العناية بالاسنان" class="about-category-card">
+        <a
+          href="#!/shop?type=العناية بالاسنان"
+          class="about-category-card"
+          data-reveal
+          style="--reveal-delay: 0.24s"
+        >
           <strong>العناية بالاسنان</strong>
           <span>خيارات يومية للفم والأسنان</span>
         </a>
@@ -218,7 +250,7 @@
 
   <section class="about-cta">
     <div class="uk-container">
-      <div class="about-cta__box">
+      <div class="about-cta__box" data-reveal>
         <div>
           <span class="about-section__eyebrow">جاهز تبدأ؟</span>
           <h2 class="about-section__title">

@@ -4,6 +4,7 @@
   <section class="uk-container py-4">
     <div
       class="carousel-container relative overflow-hidden rounded-xl bg-gray-100"
+      data-reveal
     >
       <!-- Slides: translateX-based sliding -->
       <div
@@ -57,6 +58,7 @@
       <!-- Prescription Upload -->
       <div
         class="uk-card uk-card-body flex items-center gap-4 p-6 group hover:shadow-md transition-shadow cursor-pointer"
+        data-reveal
       >
         <div
           class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors"
@@ -81,6 +83,8 @@
       <a
         href="#!/wishlist"
         class="uk-card uk-card-body flex items-center gap-4 p-6 group hover:shadow-md transition-shadow cursor-pointer no-underline text-foreground"
+        data-reveal
+        style="--reveal-delay: 0.08s"
       >
         <div
           class="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center shrink-0 group-hover:bg-accent/20 transition-colors"
@@ -105,7 +109,7 @@
 
   <!-- ===================== SHELF 1: MOST POPULAR ===================== -->
   <section class="uk-container py-6">
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center justify-between mb-5" data-reveal>
       <h2 class="text-xl font-bold text-dark">الأكثر طلبا</h2>
       <a
         href="#!/shop"
@@ -156,7 +160,7 @@
 
   <!-- ===================== SHELF 2: VITAMINS ===================== -->
   <section class="uk-container py-6">
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center justify-between mb-5" data-reveal>
       <h2 class="text-xl font-bold text-dark">الفيتامينات و المكملات</h2>
       <a
         ng-href="#!/shop?category=الفيتامينات و المكملات الغذائية"
@@ -208,7 +212,7 @@
 
   <!-- ===================== CATEGORY SHORTCUTS GRID ===================== -->
   <section class="uk-container py-10">
-    <h2 class="text-xl font-bold text-dark text-center mb-8">
+    <h2 class="text-xl font-bold text-dark text-center mb-8" data-reveal>
       تسوق حسب احتياجك
     </h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
@@ -216,6 +220,7 @@
         ng-repeat="cat in categoryShortcuts track by cat.category"
         ng-href="#!/shop?category={{ cat.category }}"
         class="uk-card uk-card-body text-center p-4 group hover:shadow-md transition-all hover:-translate-y-0.5 no-underline text-foreground cursor-pointer cat-theme-card cat-theme-{{ cat.theme }}"
+        data-reveal
       >
         <div
           class="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center cat-icon-wrapper"
@@ -229,7 +234,7 @@
 
   <!-- ===================== SHELF 3: SUGAR SUBSTITUTES ===================== -->
   <section class="uk-container py-6">
-    <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center justify-between mb-5" data-reveal>
       <h2 class="text-xl font-bold text-dark">بديل للسكر</h2>
       <a
         ng-href="#!/shop?category=بديل للسكر"
@@ -278,7 +283,7 @@
 
   <!-- ===================== BRAND STRIP ===================== -->
   <section class="uk-container py-10">
-    <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center justify-between mb-6" data-reveal>
       <h2 class="text-xl font-bold text-dark">تصفح الماركات</h2>
       <a
         href="#!/shop"
@@ -303,6 +308,7 @@
           ng-repeat="brand in brands track by brand.name"
           ng-href="#!/shop?brand={{ brand.name }}"
           class="shrink-0 uk-card uk-card-body flex items-center justify-center px-8 py-5 hover:shadow-md transition-all hover:-translate-y-0.5 no-underline min-w-[140px]"
+          data-reveal
         >
           <img
             ng-if="brand.logo"

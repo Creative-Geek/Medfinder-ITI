@@ -38,9 +38,9 @@
   </div>
 
   <!-- ============ PRODUCT CONTENT ============ -->
-  <div ng-if="product && !loading" class="product-entrance">
+  <div ng-if="product && !loading">
     <!-- Breadcrumb -->
-    <nav class="product-breadcrumb">
+    <nav class="product-breadcrumb" data-reveal>
       <span ng-repeat="crumb in breadcrumb track by $index">
         <a
           ng-if="crumb.href"
@@ -60,7 +60,7 @@
     <!-- Hero: info + gallery -->
     <div class="product-hero">
       <!-- Info column (right in RTL, first in DOM) -->
-      <div class="product-info">
+      <div class="product-info" data-reveal>
         <div class="product-info__header">
           <h1 class="product-info__name">{{ product.name_ar }}</h1>
           <button
@@ -165,7 +165,7 @@
       </div>
 
       <!-- Gallery column (left in RTL, second in DOM) -->
-      <div class="product-gallery">
+      <div class="product-gallery" data-reveal style="--reveal-delay: 0.08s">
         <!-- Main image -->
         <div class="product-gallery__main">
           <img
@@ -195,7 +195,8 @@
     <!-- Active ingredients (badges) -->
     <div
       ng-if="product.active_ingredient && product.active_ingredient.length > 0"
-      class="product-ingredients-block product-section-entrance"
+      class="product-ingredients-block"
+      data-reveal
     >
       <h3 class="text-sm font-bold text-dark mb-2">المادة الفعالة</h3>
       <div class="product-ingredients">
@@ -215,8 +216,9 @@
     <div class="product-sections">
       <div
         ng-repeat="section in getSections() track by section.key"
-        class="product-section product-section-entrance"
-        ng-style="{ 'animation-delay': (($index * 80) + 'ms') }"
+        class="product-section"
+        data-reveal
+        ng-style="{ '--reveal-delay': (($index * 80) + 'ms') }"
       >
         <h2 class="product-section__title">{{ section.title }}</h2>
 
@@ -235,7 +237,9 @@
     <!-- ============ REVIEWS SECTION ============ -->
     <div
       ng-if="!reviewsLoading && reviews.length > 0"
-      class="product-reviews product-section-entrance"
+      class="product-reviews"
+      data-reveal
+      style="--reveal-delay: 0.08s"
     >
       <h2 class="product-reviews__heading">
         <i data-lucide="message-square" class="h-5 w-5"></i>
@@ -320,7 +324,9 @@
     <!-- No reviews state -->
     <div
       ng-if="!reviewsLoading && reviews.length === 0"
-      class="product-reviews product-section-entrance"
+      class="product-reviews"
+      data-reveal
+      style="--reveal-delay: 0.08s"
     >
       <h2 class="product-reviews__heading">
         <i data-lucide="message-square" class="h-5 w-5"></i>

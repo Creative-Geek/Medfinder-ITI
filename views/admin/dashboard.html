@@ -1,5 +1,166 @@
-<!-- Admin Dashboard -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<!-- Admin Dashboard Overview -->
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div
+    ng-include="'views/admin/sidebar.html'"
+    ng-init="activePage='dashboard'"
+  ></div>
+
+  <!-- Content -->
+  <div class="admin-content">
+    <!-- Header -->
+    <div class="admin-page-header">
+      <h1 class="admin-page-header__title">نظرة عامة</h1>
+      <p class="admin-page-header__subtitle">
+        مرحبا بك في لوحة التحكم. هنا ملخص سريع لما يحدث اليوم.
+      </p>
+    </div>
+
+    <!-- Loading -->
+    <div ng-if="loading" class="admin-loading">
+      <i
+        data-lucide="loader-2"
+        class="admin-spin"
+        style="width: 20px; height: 20px"
+      ></i>
+      جاري التحميل...
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="admin-stats-row" ng-if="!loading">
+      <!-- Total Sales -->
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon admin-stat-icon--blue">
+          <i data-lucide="banknote" style="width: 24px; height: 24px"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value">
+            {{ stats.totalSales | currency:'':0 }} ج.م
+          </div>
+          <div class="admin-stat-label">اجمالي المبيعات</div>
+        </div>
+      </div>
+
+      <!-- Active Customers -->
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon admin-stat-icon--green">
+          <i data-lucide="users" style="width: 24px; height: 24px"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value">{{ stats.customerCount }}</div>
+          <div class="admin-stat-label">العملاء النشطين</div>
+        </div>
+      </div>
+
+      <!-- Low Stock -->
+      <div class="admin-stat-card">
+        <div
+          class="admin-stat-icon"
+          ng-class="stats.lowStockCount > 0 ? 'admin-stat-icon--amber' : 'admin-stat-icon--green'"
+        >
+          <i data-lucide="alert-triangle" style="width: 24px; height: 24px"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value">{{ stats.lowStockCount }}</div>
+          <div class="admin-stat-label">منتجات قليلة المخزون</div>
+        </div>
+      </div>
+
+      <!-- Orders Today -->
+      <div class="admin-stat-card">
+        <div class="admin-stat-icon admin-stat-icon--blue">
+          <i data-lucide="shopping-bag" style="width: 24px; height: 24px"></i>
+        </div>
+        <div>
+          <div class="admin-stat-value">{{ stats.todayOrderCount }}</div>
+          <div class="admin-stat-label">طلبات اليوم</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders Table -->
+    <div class="admin-table-card" ng-if="!loading">
+      <div class="admin-table-card__header">
+        <div class="admin-table-card__title">اخر الطلبات</div>
+        <a
+          href="#!/admin/orders"
+          class="admin-btn admin-btn--ghost admin-btn--sm"
+        >
+          عرض الكل
+          <i data-lucide="arrow-left" style="width: 14px; height: 14px"></i>
+        </a>
+      </div>
+
+      <div style="overflow-x: auto">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="admin-th">رقم الطلب</th>
+              <th class="admin-th">العميل</th>
+              <th class="admin-th">التاريخ</th>
+              <th class="admin-th">المبلغ</th>
+              <th class="admin-th">الحالة</th>
+              <th class="admin-th" style="width: 60px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="admin-table-row" ng-repeat="order in recentOrders">
+              <td class="admin-td">
+                <span style="font-weight: 600">#{{ order.id }}</span>
+              </td>
+              <td class="admin-td">
+                <div style="font-weight: 500">
+                  {{ order.profiles.full_name || 'غير معروف' }}
+                </div>
+                <div style="font-size: 12px; color: var(--color-text-muted)">
+                  {{ order.profiles.email }}
+                </div>
+              </td>
+              <td class="admin-td" style="white-space: nowrap">
+                {{ order.created_at | date:'yyyy/MM/dd' }}
+              </td>
+              <td class="admin-td" style="font-weight: 600">
+                {{ order.total | currency:'':0 }} ج.م
+              </td>
+              <td class="admin-td">
+                <span
+                  class="admin-badge"
+                  ng-class="{
+                        'admin-badge--pending': order.status === 'pending',
+                        'admin-badge--processing': order.status === 'processing',
+                        'admin-badge--delivered': order.status === 'delivered',
+                        'admin-badge--cancelled': order.status === 'cancelled'
+                      }"
+                >
+                  {{ statusLabels[order.status] || order.status }}
+                </span>
+              </td>
+              <td class="admin-td">
+                <a
+                  href="#!/admin/orders?id={{order.id}}"
+                  class="admin-btn admin-btn--ghost admin-btn--sm"
+                  title="عرض"
+                >
+                  <i data-lucide="eye" style="width: 16px; height: 16px"></i>
+                </a>
+              </td>
+            </tr>
+            <tr ng-if="!recentOrders.length">
+              <td
+                colspan="6"
+                class="admin-td"
+                style="
+                  text-align: center;
+                  padding: 32px;
+                  color: var(--color-text-muted);
+                "
+              >
+                لا توجد طلبات حتى الان
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,6 +1,10 @@
 // Medfinder AngularJS Application
 var app = angular.module("medfinderApp", ["ngRoute"]);
 
+if (typeof document !== "undefined") {
+  document.documentElement.classList.add("js-scroll-reveal");
+}
+
 // Highlight filter: wraps matched substring in <mark>
 app.filter("highlight", [
   "$sce",
@@ -32,6 +36,8 @@ app.run([
     var hasRenderedInitialView = false;
     var viewEnterTimer = null;
     var viewCleanupTimer = null;
+    var scrollRevealObserver = null;
+    var scrollRevealMutationObserver = null;
 
     function getViewStageEl() {
       return document.querySelector(".app-shell__view-stage");
@@ -42,6 +48,106 @@ app.run([
       clearTimeout(viewCleanupTimer);
       viewEnterTimer = null;
       viewCleanupTimer = null;
+    }
+
+    function disconnectScrollReveal() {
+      if (scrollRevealObserver) {
+        scrollRevealObserver.disconnect();
+        scrollRevealObserver = null;
+      }
+
+      if (scrollRevealMutationObserver) {
+        scrollRevealMutationObserver.disconnect();
+        scrollRevealMutationObserver = null;
+      }
+    }
+
+    function visitRevealTargets(root, callback) {
+      if (!root || root.nodeType !== 1) return;
+
+      if (root.hasAttribute("data-reveal")) {
+        callback(root);
+      }
+
+      Array.prototype.forEach.call(
+        root.querySelectorAll("[data-reveal]"),
+        callback,
+      );
+    }
+
+    function observeRevealTarget(node, prefersReducedMotion) {
+      if (
+        !node ||
+        node.nodeType !== 1 ||
+        node.getAttribute("data-reveal-observed") === "true"
+      ) {
+        return;
+      }
+
+      node.setAttribute("data-reveal-observed", "true");
+
+      if (!scrollRevealObserver || prefersReducedMotion) {
+        node.classList.add("is-visible");
+        return;
+      }
+
+      node.classList.remove("is-visible");
+      scrollRevealObserver.observe(node);
+    }
+
+    function initScrollReveal() {
+      var viewRoot = document.querySelector(".app-shell__view");
+      var prefersReducedMotion =
+        typeof window.matchMedia === "function" &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      disconnectScrollReveal();
+
+      if (!viewRoot) return;
+
+      if (
+        !prefersReducedMotion &&
+        typeof window.IntersectionObserver !== "undefined"
+      ) {
+        scrollRevealObserver = new window.IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("is-visible");
+              if (scrollRevealObserver) {
+                scrollRevealObserver.unobserve(entry.target);
+              }
+            });
+          },
+          {
+            threshold: 0.18,
+            rootMargin: "0px 0px -10% 0px",
+          },
+        );
+      }
+
+      visitRevealTargets(viewRoot, function (node) {
+        observeRevealTarget(node, prefersReducedMotion);
+      });
+
+      if (typeof window.MutationObserver === "undefined") return;
+
+      scrollRevealMutationObserver = new window.MutationObserver(function (
+        mutations,
+      ) {
+        mutations.forEach(function (mutation) {
+          Array.prototype.forEach.call(mutation.addedNodes, function (node) {
+            visitRevealTargets(node, function (target) {
+              observeRevealTarget(target, prefersReducedMotion);
+            });
+          });
+        });
+      });
+
+      scrollRevealMutationObserver.observe(viewRoot, {
+        childList: true,
+        subtree: true,
+      });
     }
 
     function setViewTransitionState(state) {
@@ -98,6 +204,7 @@ app.run([
         window.requestAnimationFrame(function () {
           window.requestAnimationFrame(function () {
             enterViewTransition(transitionId);
+            initScrollReveal();
             hasRenderedInitialView = true;
           });
         });
@@ -158,6 +265,7 @@ app.run([
     // Route guard: check access levels + keep auth state fresh
     $rootScope.$on("$routeChangeStart", function (event, next) {
       syncAuthState();
+      disconnectScrollReveal();
 
       var access = (next && next.$$route && next.$$route.access) || "guest";
 

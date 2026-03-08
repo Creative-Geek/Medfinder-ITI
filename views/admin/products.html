@@ -1,5 +1,646 @@
 <!-- Admin Products CRUD -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div
+    ng-include="'views/admin/sidebar.html'"
+    ng-init="activePage='products'"
+  ></div>
+
+  <!-- Content -->
+  <div class="admin-content">
+    <!-- Header -->
+    <div
+      class="admin-page-header"
+      style="
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+      "
+    >
+      <div>
+        <h1 class="admin-page-header__title">ادارة المنتجات</h1>
+        <p class="admin-page-header__subtitle">
+          عرض وادارة جميع المنتجات في المتجر
+        </p>
+      </div>
+      <button class="admin-btn admin-btn--primary" ng-click="openModal()">
+        <i data-lucide="plus" style="width: 16px; height: 16px"></i>
+        اضافة منتج
+      </button>
+    </div>
+
+    <!-- Toolbar: Search + filter tabs -->
+    <div class="admin-toolbar">
+      <div class="admin-search-bar" style="flex: 1; max-width: 400px">
+        <i data-lucide="search"></i>
+        <input
+          type="text"
+          ng-model="searchQuery"
+          ng-change="applyFilters()"
+          placeholder="البحث بالاسم او الماركة..."
+        />
+      </div>
+    </div>
+
+    <!-- Tab Filters -->
+    <div class="admin-tabs">
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'all'}"
+        ng-click="setTab('all')"
+      >
+        الكل
+        <span class="admin-tab__count">{{ allProducts.length }}</span>
+      </button>
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'low'}"
+        ng-click="setTab('low')"
+      >
+        مخزون قليل
+        <span class="admin-tab__count">{{ lowStockCount }}</span>
+      </button>
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'out'}"
+        ng-click="setTab('out')"
+      >
+        نفد المخزون
+        <span class="admin-tab__count">{{ outOfStockCount }}</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div ng-if="loading" class="admin-loading">
+      <i
+        data-lucide="loader-2"
+        class="admin-spin"
+        style="width: 20px; height: 20px"
+      ></i>
+      جاري التحميل...
+    </div>
+
+    <!-- Products Table -->
+    <div class="admin-table-card" ng-if="!loading">
+      <div style="overflow-x: auto">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="admin-th" style="width: 56px"></th>
+              <th class="admin-th">المنتج</th>
+              <th class="admin-th" style="width: 120px">الفئة</th>
+              <th class="admin-th" style="width: 100px">المخزون</th>
+              <th class="admin-th" style="width: 110px">السعر</th>
+              <th class="admin-th" style="width: 90px">اجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              class="admin-table-row"
+              ng-repeat="product in paginatedProducts"
+            >
+              <td class="admin-td">
+                <img
+                  ng-src="{{ product.image_url || 'https://placehold.co/44x44/f5f5f5/999?text=?' }}"
+                  alt="{{ product.name_ar }}"
+                  class="admin-thumb"
+                  onerror="
+                    this.src = 'https://placehold.co/44x44/f5f5f5/999?text=?'
+                  "
+                />
+              </td>
+              <td class="admin-td">
+                <div style="font-weight: 600; font-size: 14px">
+                  {{ product.name_ar }}
+                </div>
+                <div
+                  style="font-size: 12px; color: var(--color-text-muted)"
+                  ng-if="product.brand"
+                >
+                  {{ product.brand }}
+                </div>
+              </td>
+              <td class="admin-td">
+                <span class="admin-cat-badge" ng-if="product.category.length">
+                  {{ product.category[0] }}
+                </span>
+              </td>
+              <td class="admin-td">
+                <span
+                  class="admin-stock"
+                  ng-class="{
+                        'admin-stock--ok': product.stock >= 10,
+                        'admin-stock--low': product.stock > 0 && product.stock < 10,
+                        'admin-stock--out': product.stock <= 0
+                      }"
+                >
+                  {{ product.stock }}
+                  <span
+                    style="font-size: 11px; font-weight: 400"
+                    ng-if="product.stock <= 0"
+                    >- نفد</span
+                  >
+                </span>
+              </td>
+              <td
+                class="admin-td"
+                style="font-weight: 600; color: var(--color-primary)"
+              >
+                {{ product.price | currency:'':0 }} ج.م
+              </td>
+              <td class="admin-td">
+                <div style="display: flex; gap: 4px">
+                  <button
+                    class="admin-btn admin-btn--ghost admin-btn--sm"
+                    ng-click="openModal(product)"
+                    title="تعديل"
+                  >
+                    <i
+                      data-lucide="pencil"
+                      style="width: 15px; height: 15px"
+                    ></i>
+                  </button>
+                  <button
+                    class="admin-btn admin-btn--ghost admin-btn--sm admin-btn--danger"
+                    ng-click="confirmDelete(product)"
+                    title="حذف"
+                  >
+                    <i
+                      data-lucide="trash-2"
+                      style="width: 15px; height: 15px"
+                    ></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr ng-if="!filteredProducts.length">
+              <td
+                colspan="6"
+                class="admin-td"
+                style="
+                  text-align: center;
+                  padding: 40px;
+                  color: var(--color-text-muted);
+                "
+              >
+                <i
+                  data-lucide="package-x"
+                  style="
+                    width: 32px;
+                    height: 32px;
+                    opacity: 0.3;
+                    margin-bottom: 8px;
+                    display: block;
+                    margin: 0 auto 8px;
+                  "
+                ></i>
+                لا توجد منتجات
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="admin-pagination" ng-if="totalPages > 1">
+        <button
+          class="admin-pagination__btn"
+          ng-disabled="currentPage === 1"
+          ng-click="goToPage(currentPage - 1)"
+        >
+          <i data-lucide="chevron-right" style="width: 16px; height: 16px"></i>
+        </button>
+        <button
+          class="admin-pagination__btn"
+          ng-repeat="p in pageNumbers"
+          ng-class="{'admin-pagination__btn--active': p === currentPage}"
+          ng-click="goToPage(p)"
+        >
+          {{ p }}
+        </button>
+        <button
+          class="admin-pagination__btn"
+          ng-disabled="currentPage === totalPages"
+          ng-click="goToPage(currentPage + 1)"
+        >
+          <i data-lucide="chevron-left" style="width: 16px; height: 16px"></i>
+        </button>
+      </div>
+
+      <!-- Results count -->
+      <div
+        style="
+          padding: 8px 16px 12px;
+          font-size: 13px;
+          color: var(--color-text-muted);
+          text-align: center;
+        "
+        ng-if="filteredProducts.length"
+      >
+        عرض {{ (currentPage - 1) * pageSize + 1 }} - {{ currentPage ===
+        totalPages ? filteredProducts.length : currentPage * pageSize }} من {{
+        filteredProducts.length }} منتج
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- Add / Edit Product Modal                                       -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div
+  class="admin-modal-overlay"
+  ng-show="showModal"
+  ng-click="closeModal($event)"
+>
+  <div class="admin-modal" ng-click="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="admin-modal__header">
+      <h2 class="admin-modal__title">
+        {{ editingProduct ? 'تعديل المنتج' : 'اضافة منتج جديد' }}
+      </h2>
+      <button class="admin-btn admin-btn--ghost" ng-click="showModal = false">
+        <i data-lucide="x" style="width: 20px; height: 20px"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="admin-modal__body">
+      <form ng-submit="saveProduct()">
+        <!-- Section: Basic Info -->
+        <div class="admin-modal__section">
+          <div class="admin-modal__section-title">المعلومات الاساسية</div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group">
+              <label class="admin-form-label">الاسم (عربي) *</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form.name_ar"
+                required
+                placeholder="مثال: بانادول اكسترا"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">الاسم (انجليزي) *</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form.name_en"
+                required
+                placeholder="e.g. Panadol Extra"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">السعر (ج.م) *</label>
+              <input
+                type="number"
+                class="admin-form-input"
+                ng-model="form.price"
+                required
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">المخزون *</label>
+              <input
+                type="number"
+                class="admin-form-input"
+                ng-model="form.stock"
+                required
+                min="0"
+                placeholder="0"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">النوع *</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form.type"
+                required
+                placeholder="مثال: اقراص، شراب، كريم"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">الماركة</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form.brand"
+                placeholder="مثال: فايزر"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">المصنع</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form.manufacturer"
+                placeholder="مثال: شركة ادوية القاهرة"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">الحجم</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form.volume"
+                placeholder="مثال: 500 مل"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Image -->
+        <div class="admin-modal__section">
+          <div class="admin-modal__section-title">صورة المنتج</div>
+
+          <!-- Drag & Drop Zone -->
+          <div
+            class="admin-drop-zone"
+            ng-class="{'admin-drop-zone--active': isDragging}"
+            ng-click="triggerFileInput()"
+            admin-drop-zone
+            on-file-drop="handleFileDrop(file)"
+          >
+            <div ng-if="!imagePreview">
+              <i
+                data-lucide="upload-cloud"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  display: block;
+                  margin: 0 auto 8px;
+                "
+                class="admin-drop-zone__icon"
+              ></i>
+              <div class="admin-drop-zone__text">
+                اسحب وافلت الصورة هنا او <strong>اضغط للاختيار</strong>
+              </div>
+            </div>
+            <div
+              ng-if="imagePreview"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                justify-content: center;
+              "
+            >
+              <img
+                ng-src="{{ imagePreview }}"
+                class="admin-image-preview"
+                alt="Preview"
+              />
+              <div style="text-align: right">
+                <div
+                  style="
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: var(--color-success);
+                  "
+                >
+                  تم رفع الصورة
+                </div>
+                <button
+                  type="button"
+                  class="admin-btn admin-btn--ghost admin-btn--sm"
+                  ng-click="clearImage($event)"
+                  style="margin-top: 4px"
+                >
+                  <i data-lucide="x" style="width: 14px; height: 14px"></i>
+                  ازالة
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hidden file input -->
+          <input
+            type="file"
+            id="admin-image-file"
+            accept="image/*"
+            style="display: none"
+            onchange="angular.element(this).scope().handleFileSelect(this)"
+          />
+
+          <!-- URL input + Upload button + Image Processor link -->
+          <div class="admin-upload-row">
+            <input
+              type="url"
+              class="admin-form-input"
+              style="flex: 1"
+              ng-model="form.image_url"
+              placeholder="https://... (عنوان الصورة)"
+            />
+            <a
+              href="https://product-image-processor.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="admin-btn admin-btn--ghost admin-btn--sm"
+              title="Product Image Processor"
+            >
+              <i data-lucide="zap" style="width: 15px; height: 15px"></i>
+            </a>
+          </div>
+
+          <div
+            class="admin-upload-status"
+            ng-if="uploadStatus"
+            ng-class="{'admin-upload-status--success': uploadStatus === 'success', 'admin-upload-status--error': uploadStatus === 'error'}"
+          >
+            {{ uploadMessage }}
+          </div>
+        </div>
+
+        <!-- Section: Descriptions -->
+        <div class="admin-modal__section">
+          <div class="admin-modal__section-title">الوصف</div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group admin-form-group--full">
+              <label class="admin-form-label">وصف قصير</label>
+              <textarea
+                class="admin-form-input"
+                ng-model="form.description"
+                rows="2"
+                placeholder="وصف مختصر للمنتج"
+              ></textarea>
+            </div>
+            <div class="admin-form-group admin-form-group--full">
+              <label class="admin-form-label">وصف تفصيلي</label>
+              <textarea
+                class="admin-form-input"
+                ng-model="form.long_description"
+                rows="3"
+                placeholder="وصف تفصيلي شامل"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Details (array fields) -->
+        <div class="admin-modal__section">
+          <div class="admin-modal__section-title">التفاصيل</div>
+          <div class="admin-form-grid">
+            <div class="admin-form-group">
+              <label class="admin-form-label">الفئات</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form._category"
+                placeholder="مثال: ادوية، مسكنات (مفصولة بفاصلة)"
+              />
+              <span class="admin-form-hint">افصل بين الفئات بفاصلة</span>
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">المادة الفعالة</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form._active_ingredient"
+                placeholder="مثال: باراسيتامول، كافيين"
+              />
+            </div>
+            <div class="admin-form-group admin-form-group--full">
+              <label class="admin-form-label">دواعي الاستعمال</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form._use_cases"
+                placeholder="مثال: صداع، الم اسنان، حمى"
+              />
+            </div>
+            <div class="admin-form-group admin-form-group--full">
+              <label class="admin-form-label">الاعراض الجانبية</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form._side_effects"
+                placeholder="مثال: غثيان، دوخة"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">طريقة الاستخدام</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form._usage"
+                placeholder="مثال: قرص كل 8 ساعات"
+              />
+            </div>
+            <div class="admin-form-group">
+              <label class="admin-form-label">التحذيرات</label>
+              <input
+                type="text"
+                class="admin-form-input"
+                ng-model="form._warning"
+                placeholder="مثال: لا يستخدم للحوامل"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden submit for form validation -->
+        <button
+          type="submit"
+          style="display: none"
+          id="admin-product-submit"
+        ></button>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="admin-modal__footer">
+      <button class="admin-btn admin-btn--ghost" ng-click="showModal = false">
+        الغاء
+      </button>
+      <button
+        class="admin-btn admin-btn--primary"
+        ng-click="saveProduct()"
+        ng-disabled="saving"
+      >
+        <i
+          data-lucide="loader-2"
+          style="width: 15px; height: 15px"
+          class="admin-spin"
+          ng-if="saving"
+        ></i>
+        <i
+          data-lucide="save"
+          style="width: 15px; height: 15px"
+          ng-if="!saving"
+        ></i>
+        {{ saving ? 'جاري الحفظ...' : (editingProduct ? 'تحديث' : 'حفظ') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- Delete Confirmation Modal                                       -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div
+  class="admin-modal-overlay"
+  ng-show="showDeleteModal"
+  ng-click="showDeleteModal = false"
+>
+  <div
+    class="admin-modal"
+    style="max-width: 420px"
+    ng-click="$event.stopPropagation()"
+  >
+    <div style="text-align: center; padding: 32px 24px">
+      <div
+        style="
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          background: rgba(231, 76, 60, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 16px;
+        "
+      >
+        <i
+          data-lucide="alert-triangle"
+          style="width: 28px; height: 28px; color: #e74c3c"
+        ></i>
+      </div>
+      <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 8px">
+        حذف المنتج
+      </h2>
+      <p
+        style="
+          font-size: 14px;
+          color: var(--color-text-muted);
+          margin-bottom: 24px;
+        "
+      >
+        هل انت متاكد من حذف <strong>{{ deleteTarget.name_ar }}</strong>؟ لا يمكن
+        التراجع عن هذا الاجراء.
+      </p>
+      <div style="display: flex; gap: 10px; justify-content: center">
+        <button
+          class="admin-btn admin-btn--ghost"
+          ng-click="showDeleteModal = false"
+        >
+          الغاء
+        </button>
+        <button
+          class="admin-btn"
+          style="background: #e74c3c; color: #fff"
+          ng-click="doDelete()"
+          ng-disabled="deleting"
+        >
+          {{ deleting ? 'جاري الحذف...' : 'حذف' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

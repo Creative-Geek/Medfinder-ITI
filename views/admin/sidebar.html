@@ -1,0 +1,55 @@
+<!-- Admin Sidebar (shared partial) -->
+<aside class="admin-sidebar">
+  <!-- Logo -->
+  <div class="admin-sidebar__logo">
+    <img src="assets/logos/logo.svg" alt="MedFinder" />
+    <div>
+      <div class="admin-sidebar__logo-text">MedFinder</div>
+      <div class="admin-sidebar__logo-sub">لوحة التحكم</div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="admin-sidebar__nav">
+    <a
+      href="#!/admin"
+      class="admin-sidebar__link"
+      ng-class="{'admin-sidebar__link--active': activePage === 'dashboard'}"
+    >
+      <i data-lucide="layout-dashboard"></i>
+      نظرة عامة
+    </a>
+    <a
+      href="#!/admin/products"
+      class="admin-sidebar__link"
+      ng-class="{'admin-sidebar__link--active': activePage === 'products'}"
+    >
+      <i data-lucide="package"></i>
+      المنتجات
+    </a>
+    <a
+      href="#!/admin/orders"
+      class="admin-sidebar__link"
+      ng-class="{'admin-sidebar__link--active': activePage === 'orders'}"
+    >
+      <i data-lucide="shopping-bag"></i>
+      الطلبات
+    </a>
+    <a
+      href="#!/admin/customers"
+      class="admin-sidebar__link"
+      ng-class="{'admin-sidebar__link--active': activePage === 'customers'}"
+    >
+      <i data-lucide="users"></i>
+      العملاء
+    </a>
+  </nav>
+
+  <!-- Footer -->
+  <div class="admin-sidebar__footer">
+    <a href="#!/" class="admin-sidebar__link">
+      <i data-lucide="arrow-right"></i>
+      العودة للمتجر
+    </a>
+  </div>
+</aside>

@@ -1,7 +1,7 @@
 <!-- Wishlist Page -->
 <div class="uk-container py-8">
   <!-- Header -->
-  <div class="flex items-center gap-3 mb-6">
+  <div class="flex items-center gap-3 mb-6" data-reveal>
     <i
       data-lucide="heart"
       class="h-7 w-7 text-red-500"
@@ -25,7 +25,7 @@
   </div>
 
   <!-- Empty state -->
-  <div ng-if="!loading && products.length === 0" class="shop-empty">
+  <div ng-if="!loading && products.length === 0" class="shop-empty" data-reveal>
     <i data-lucide="heart" class="h-16 w-16 mb-4" style="color: #9ca3af"></i>
     <h3 class="text-lg font-bold text-dark mb-2">لا توجد منتجات في المفضلة</h3>
     <p class="text-sm text-muted-foreground mb-4">

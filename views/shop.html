@@ -2,7 +2,7 @@
 <div class="shop-page">
   <div class="uk-container py-6">
     <!-- Page header with title + sort -->
-    <div class="shop-header">
+    <div class="shop-header" data-reveal>
       <div class="shop-header__title">
         <h1 class="text-xl font-bold text-dark">{{ getPageTitle() }}</h1>
         <span ng-if="!loading" class="text-sm text-muted-foreground">
@@ -73,11 +73,7 @@
           }"
           ng-show="products.length > 0 || loading"
         >
-          <div
-            ng-repeat="product in products track by product.id"
-            class="shop-card-entrance"
-            ng-style="{ 'animation-delay': loading ? '0ms' : (($index * 40) + 'ms') }"
-          >
+          <div ng-repeat="product in products track by product.id">
             <product-card
               product="product"
               on-add-to-cart="addToCart(product)"
@@ -86,7 +82,11 @@
         </div>
 
         <!-- Empty state -->
-        <div ng-if="!loading && products.length === 0" class="shop-empty">
+        <div
+          ng-if="!loading && products.length === 0"
+          class="shop-empty"
+          data-reveal
+        >
           <i
             data-lucide="package-open"
             class="h-16 w-16 text-gray-300 mb-4"
@@ -101,7 +101,11 @@
         </div>
 
         <!-- Pagination -->
-        <div ng-if="!loading && totalPages > 1" class="shop-pagination">
+        <div
+          ng-if="!loading && totalPages > 1"
+          class="shop-pagination"
+          data-reveal
+        >
           <button
             class="shop-pagination__btn"
             ng-disabled="currentPage === 1"
@@ -130,7 +134,11 @@
       <!-- ============ FILTER SIDEBAR (right in RTL) ============ -->
       <aside class="shop-sidebar">
         <!-- Sections (Type -> Category tree) -->
-        <div class="shop-filter-block">
+        <div
+          class="shop-filter-block"
+          data-reveal
+          style="--reveal-delay: 0.08s"
+        >
           <h3 class="shop-filter-block__title">الأقسام</h3>
 
           <ul class="shop-type-list">
@@ -188,7 +196,11 @@
         </div>
 
         <!-- Stock availability -->
-        <div class="shop-filter-block">
+        <div
+          class="shop-filter-block"
+          data-reveal
+          style="--reveal-delay: 0.16s"
+        >
           <h3 class="shop-filter-block__title">التوفر</h3>
 
           <label class="shop-brand-label">
@@ -203,7 +215,12 @@
         </div>
 
         <!-- Brands -->
-        <div class="shop-filter-block" ng-if="brandList.length > 0">
+        <div
+          class="shop-filter-block"
+          ng-if="brandList.length > 0"
+          data-reveal
+          style="--reveal-delay: 0.24s"
+        >
           <h3 class="shop-filter-block__title">الماركات</h3>
 
           <ul class="shop-brand-list">

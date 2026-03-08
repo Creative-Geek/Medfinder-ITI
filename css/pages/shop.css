@@ -87,30 +87,6 @@
   transform: translateY(0);
 }
 
-/* -- Product card cascading slide-up entrance -- */
-@keyframes cardSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Only animate entrance when grid is in entering state */
-.shop-grid--entering .shop-card-entrance {
-  opacity: 0;
-  animation: cardSlideUp 0.35s ease-out forwards;
-}
-
-/* When exiting, skip entrance animation and just let the grid fade handle it */
-.shop-grid--exiting .shop-card-entrance {
-  opacity: 1;
-  animation: none;
-}
-
 /* -- Skeleton loading -- */
 .skeleton-card {
   border-radius: var(--radius-lg);

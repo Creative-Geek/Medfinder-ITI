@@ -2,11 +2,6 @@
    CART & CHECKOUT PAGE -- Cart table, summary, checkout form
    ========================================================================== */
 
-/* -- Page entrance -- */
-.cart-entrance {
-  animation: cartFadeIn 0.4s ease-out both;
-}
-
 @keyframes cartFadeIn {
   from {
     opacity: 0;

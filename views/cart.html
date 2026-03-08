@@ -3,7 +3,8 @@
   <!-- ============ EMPTY CART STATE ============ -->
   <div
     ng-if="cartItems.length === 0 && step === 'cart'"
-    class="cart-empty cart-entrance"
+    class="cart-empty"
+    data-reveal
   >
     <div class="cart-empty__icon-wrapper">
       <i data-lucide="shopping-cart" class="h-10 w-10"></i>
@@ -16,11 +17,11 @@
   </div>
 
   <!-- ============ CART STEP ============ -->
-  <div ng-if="cartItems.length > 0 && step === 'cart'" class="cart-entrance">
-    <h1 class="cart-title">سلة التسوق</h1>
+  <div ng-if="cartItems.length > 0 && step === 'cart'">
+    <h1 class="cart-title" data-reveal>سلة التسوق</h1>
 
     <!-- Stock error alert -->
-    <div ng-if="stockError" class="cart-alert">
+    <div ng-if="stockError" class="cart-alert" data-reveal>
       <i data-lucide="alert-circle" class="h-5 w-5"></i>
       <span>{{ stockError }}</span>
     </div>
@@ -28,7 +29,11 @@
     <div class="cart-layout">
       <!-- Cart Items (right side in RTL) -->
       <div class="cart-items">
-        <div ng-repeat="item in cartItems track by item.id" class="cart-item">
+        <div
+          ng-repeat="item in cartItems track by item.id"
+          class="cart-item"
+          data-reveal
+        >
           <!-- Product image -->
           <a
             ng-href="#!/product/{{ item.id }}"
@@ -74,7 +79,7 @@
       </div>
 
       <!-- Cart Summary (left side in RTL) -->
-      <div class="cart-summary">
+      <div class="cart-summary" data-reveal style="--reveal-delay: 0.08s">
         <h3 class="cart-summary__title">ملخص الطلب</h3>
 
         <div class="cart-summary__row">
@@ -113,23 +118,23 @@
   </div>
 
   <!-- ============ CHECKOUT STEP ============ -->
-  <div ng-if="step === 'checkout'" class="cart-entrance">
-    <button class="checkout-back" ng-click="goBackToCart()">
+  <div ng-if="step === 'checkout'">
+    <button class="checkout-back" ng-click="goBackToCart()" data-reveal>
       <i data-lucide="arrow-right" class="h-4 w-4"></i>
       العودة للعربة
     </button>
 
-    <h1 class="cart-title">اتمام الشراء</h1>
+    <h1 class="cart-title" data-reveal>اتمام الشراء</h1>
 
     <!-- Stock error alert -->
-    <div ng-if="stockError" class="cart-alert">
+    <div ng-if="stockError" class="cart-alert" data-reveal>
       <i data-lucide="alert-circle" class="h-5 w-5"></i>
       <span>{{ stockError }}</span>
     </div>
 
     <div class="cart-layout">
       <!-- Checkout Form -->
-      <div class="checkout-form">
+      <div class="checkout-form" data-reveal>
         <h3 class="checkout-form__title">بيانات التوصيل</h3>
 
         <!-- Full Name -->
@@ -240,7 +245,7 @@
       </div>
 
       <!-- Order Summary Sidebar -->
-      <div class="cart-summary">
+      <div class="cart-summary" data-reveal style="--reveal-delay: 0.08s">
         <h3 class="cart-summary__title">ملخص الطلب</h3>
 
         <div class="checkout-summary-items">

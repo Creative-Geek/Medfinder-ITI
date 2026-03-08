@@ -4,7 +4,8 @@ angular.module("medfinderApp").controller("HomeController", [
   "$interval",
   "$http",
   "SUPABASE",
-  function ($scope, $interval, $http, SUPABASE) {
+  "CartService",
+  function ($scope, $interval, $http, SUPABASE, CartService) {
     var REST = SUPABASE.REST_URL;
 
     // ── Carousel ──
@@ -190,8 +191,8 @@ angular.module("medfinderApp").controller("HomeController", [
 
     // ── Cart action ──
     $scope.addToCart = function (product) {
-      // Will delegate to CartService once implemented
-      console.log("Add to cart:", product.id, product.name_ar);
+      if (!product) return;
+      CartService.addItem(product, 1);
     };
 
     // ── Wishlist action ──

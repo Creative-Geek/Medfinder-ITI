@@ -1,5 +1,238 @@
 <!-- Admin Customers -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div
+    ng-include="'views/admin/sidebar.html'"
+    ng-init="activePage='customers'"
+  ></div>
+
+  <!-- Content -->
+  <div class="admin-content">
+    <!-- Header -->
+    <div class="admin-page-header">
+      <h1 class="admin-page-header__title">ادارة العملاء</h1>
+      <p class="admin-page-header__subtitle">
+        عرض جميع العملاء المسجلين وتاريخ طلباتهم
+      </p>
+    </div>
+
+    <!-- Search -->
+    <div class="admin-search-bar">
+      <i data-lucide="search"></i>
+      <input
+        type="text"
+        ng-model="searchQuery"
+        ng-change="applyFilters()"
+        placeholder="البحث بالاسم او البريد الالكتروني..."
+      />
+    </div>
+
+    <!-- Loading -->
+    <div ng-if="loading" class="admin-loading">
+      <i
+        data-lucide="loader-2"
+        class="admin-spin"
+        style="width: 20px; height: 20px"
+      ></i>
+      جاري التحميل...
+    </div>
+
+    <!-- Customers Table -->
+    <div class="admin-table-card" ng-if="!loading">
+      <div style="overflow-x: auto">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="admin-th" style="width: 40px"></th>
+              <th class="admin-th">الاسم</th>
+              <th class="admin-th">البريد الالكتروني</th>
+              <th class="admin-th">الهاتف</th>
+              <th class="admin-th" style="width: 100px">الطلبات</th>
+              <th class="admin-th" style="width: 120px">تاريخ التسجيل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Customer Row -->
+            <tr
+              ng-repeat-start="customer in filteredCustomers"
+              class="admin-table-row admin-table-row--clickable"
+              ng-click="toggleCustomer(customer)"
+            >
+              <td class="admin-td" style="text-align: center">
+                <i
+                  data-lucide="chevron-down"
+                  style="width: 16px; height: 16px; transition: transform 0.2s"
+                  ng-style="{'transform': customer._expanded ? 'rotate(180deg)' : 'rotate(0)'}"
+                ></i>
+              </td>
+              <td class="admin-td">
+                <div style="display: flex; align-items: center; gap: 10px">
+                  <div
+                    style="
+                      width: 36px;
+                      height: 36px;
+                      border-radius: 50%;
+                      background: rgba(5, 131, 242, 0.1);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      flex-shrink: 0;
+                    "
+                  >
+                    <i
+                      data-lucide="user"
+                      style="
+                        width: 18px;
+                        height: 18px;
+                        color: var(--color-primary);
+                      "
+                    ></i>
+                  </div>
+                  <span style="font-weight: 600"
+                    >{{ customer.full_name || 'بدون اسم' }}</span
+                  >
+                </div>
+              </td>
+              <td
+                class="admin-td"
+                style="font-size: 13px; color: var(--color-text-muted)"
+              >
+                {{ customer.email || '---' }}
+              </td>
+              <td class="admin-td">{{ customer.phone || '---' }}</td>
+              <td class="admin-td" style="text-align: center">
+                <span style="font-weight: 600; color: var(--color-primary)"
+                  >{{ customer.orders ? customer.orders.length : 0 }}</span
+                >
+              </td>
+              <td class="admin-td" style="white-space: nowrap; font-size: 13px">
+                {{ customer.created_at | date:'yyyy/MM/dd' }}
+              </td>
+            </tr>
+
+            <!-- Expanded: Customer Orders -->
+            <tr
+              class="admin-expand-row"
+              ng-repeat-end
+              ng-class="{'is-expanded': customer._expanded}"
+            >
+              <td colspan="6" style="padding: 0">
+                <div class="admin-expand-wrapper">
+                  <div class="admin-expand-inner">
+                    <div class="admin-expand-content">
+                      <!-- Customer Detail -->
+                      <div
+                        style="
+                          margin-bottom: 12px;
+                          font-size: 13px;
+                          color: var(--color-text-muted);
+                        "
+                        ng-if="customer.address"
+                      >
+                        <strong>العنوان:</strong> {{ customer.address }}
+                      </div>
+
+                      <!-- Loading orders -->
+                      <div
+                        ng-if="customer._loadingOrders"
+                        class="admin-loading"
+                        style="padding: 16px"
+                      >
+                        <i
+                          data-lucide="loader-2"
+                          class="admin-spin"
+                          style="width: 16px; height: 16px"
+                        ></i>
+                        جاري تحميل الطلبات...
+                      </div>
+
+                      <!-- Orders List -->
+                      <div ng-if="!customer._loadingOrders">
+                        <table
+                          class="admin-order-items-table"
+                          ng-if="customer._orders.length"
+                        >
+                          <thead>
+                            <tr>
+                              <th>رقم الطلب</th>
+                              <th>التاريخ</th>
+                              <th>المنتجات</th>
+                              <th>المبلغ</th>
+                              <th>الحالة</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr ng-repeat="order in customer._orders">
+                              <td style="font-weight: 600">#{{ order.id }}</td>
+                              <td>
+                                {{ order.created_at | date:'yyyy/MM/dd' }}
+                              </td>
+                              <td>
+                                {{ order.order_items ? order.order_items.length
+                                : 0 }} منتج
+                              </td>
+                              <td style="font-weight: 600">
+                                {{ order.total | currency:'':0 }} ج.م
+                              </td>
+                              <td>
+                                <span
+                                  class="admin-badge"
+                                  ng-class="{
+                                      'admin-badge--pending': order.status === 'pending',
+                                      'admin-badge--processing': order.status === 'processing',
+                                      'admin-badge--delivered': order.status === 'delivered',
+                                      'admin-badge--cancelled': order.status === 'cancelled'
+                                    }"
+                                >
+                                  {{ statusLabels[order.status] }}
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <div
+                          ng-if="!customer._orders.length"
+                          style="
+                            text-align: center;
+                            padding: 16px;
+                            font-size: 13px;
+                            color: var(--color-text-muted);
+                          "
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty -->
+            <tr ng-if="!filteredCustomers.length && !loading">
+              <td
+                colspan="6"
+                class="admin-td"
+                style="
+                  text-align: center;
+                  padding: 40px;
+                  color: var(--color-text-muted);
+                "
+              >
+                <i
+                  data-lucide="users"
+                  style="
+                    width: 32px;
+                    height: 32px;
+                    opacity: 0.3;
+                    display: block;
+                    margin: 0 auto 8px;
+                  "
+                ></i>
+                لا يوجد عملاء
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>

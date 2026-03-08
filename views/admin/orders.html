@@ -1,5 +1,373 @@
-<!-- Admin Orders -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<!-- Admin Orders Management & Printable Receipt -->
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div
+    ng-include="'views/admin/sidebar.html'"
+    ng-init="activePage='orders'"
+  ></div>
+
+  <!-- Content -->
+  <div class="admin-content">
+    <!-- Header -->
+    <div class="admin-page-header">
+      <h1 class="admin-page-header__title">ادارة الطلبات</h1>
+      <p class="admin-page-header__subtitle">عرض وادارة جميع طلبات العملاء</p>
+    </div>
+
+    <!-- Tab Filters -->
+    <div class="admin-tabs">
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'all'}"
+        ng-click="setTab('all')"
+      >
+        الكل <span class="admin-tab__count">{{ allOrders.length }}</span>
+      </button>
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'pending'}"
+        ng-click="setTab('pending')"
+      >
+        قيد الانتظار
+        <span class="admin-tab__count">{{ countByStatus('pending') }}</span>
+      </button>
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'processing'}"
+        ng-click="setTab('processing')"
+      >
+        قيد التجهيز
+        <span class="admin-tab__count">{{ countByStatus('processing') }}</span>
+      </button>
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'delivered'}"
+        ng-click="setTab('delivered')"
+      >
+        تم التوصيل
+        <span class="admin-tab__count">{{ countByStatus('delivered') }}</span>
+      </button>
+      <button
+        class="admin-tab"
+        ng-class="{'admin-tab--active': activeTab === 'cancelled'}"
+        ng-click="setTab('cancelled')"
+      >
+        ملغي
+        <span class="admin-tab__count">{{ countByStatus('cancelled') }}</span>
+      </button>
+    </div>
+
+    <!-- Search -->
+    <div class="admin-search-bar">
+      <i data-lucide="search"></i>
+      <input
+        type="text"
+        ng-model="searchQuery"
+        ng-change="applyFilters()"
+        placeholder="البحث باسم العميل..."
+      />
+    </div>
+
+    <!-- Loading -->
+    <div ng-if="loading" class="admin-loading">
+      <i
+        data-lucide="loader-2"
+        class="admin-spin"
+        style="width: 20px; height: 20px"
+      ></i>
+      جاري التحميل...
+    </div>
+
+    <!-- Orders Table -->
+    <div class="admin-table-card" ng-if="!loading">
+      <div style="overflow-x: auto">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="admin-th" style="width: 40px"></th>
+              <th class="admin-th">رقم الطلب</th>
+              <th class="admin-th">العميل</th>
+              <th class="admin-th">التاريخ</th>
+              <th class="admin-th">المنتجات</th>
+              <th class="admin-th">المبلغ</th>
+              <th class="admin-th">الحالة</th>
+              <th class="admin-th" style="width: 100px">اجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Order Row -->
+            <tr
+              ng-repeat-start="order in filteredOrders"
+              id="order-row-{{order.id}}"
+              class="admin-table-row admin-table-row--clickable"
+              ng-click="toggleDetails(order)"
+            >
+              <td class="admin-td" style="text-align: center">
+                <i
+                  data-lucide="chevron-down"
+                  style="width: 16px; height: 16px; transition: transform 0.2s"
+                  ng-style="{'transform': order._expanded ? 'rotate(180deg)' : 'rotate(0)'}"
+                ></i>
+              </td>
+              <td class="admin-td">
+                <span style="font-weight: 600">#{{ order.id }}</span>
+              </td>
+              <td class="admin-td">
+                <div style="font-weight: 500">
+                  {{ order.profiles.full_name || 'غير معروف' }}
+                </div>
+                <div style="font-size: 12px; color: var(--color-text-muted)">
+                  {{ order.profiles.email }}
+                </div>
+              </td>
+              <td class="admin-td" style="white-space: nowrap">
+                {{ order.created_at | date:'yyyy/MM/dd - HH:mm' }}
+              </td>
+              <td class="admin-td">{{ order.order_items.length }} منتج</td>
+              <td class="admin-td" style="font-weight: 600">
+                {{ order.total | currency:'':0 }} ج.م
+              </td>
+              <td class="admin-td">
+                <span
+                  class="admin-badge"
+                  ng-class="{
+                          'admin-badge--pending': order.status === 'pending',
+                          'admin-badge--processing': order.status === 'processing',
+                          'admin-badge--delivered': order.status === 'delivered',
+                          'admin-badge--cancelled': order.status === 'cancelled'
+                        }"
+                >
+                  {{ statusLabels[order.status] }}
+                </span>
+              </td>
+              <td class="admin-td" ng-click="$event.stopPropagation()">
+                <select
+                  class="admin-status-select"
+                  ng-model="order.status"
+                  ng-change="updateStatus(order)"
+                >
+                  <option value="pending">قيد الانتظار</option>
+                  <option value="processing">قيد التجهيز</option>
+                  <option value="delivered">تم التوصيل</option>
+                  <option value="cancelled">ملغي</option>
+                </select>
+              </td>
+            </tr>
+
+            <!-- Expanded Details Row -->
+            <tr
+              class="admin-expand-row"
+              ng-repeat-end
+              ng-class="{'is-expanded': order._expanded}"
+            >
+              <td colspan="8" style="padding: 0">
+                <div class="admin-expand-wrapper">
+                  <div class="admin-expand-inner">
+                    <div class="admin-expand-content">
+                      <!-- Customer Info -->
+                      <div
+                        style="
+                          display: flex;
+                          gap: 24px;
+                          margin-bottom: 16px;
+                          flex-wrap: wrap;
+                          font-size: 13px;
+                        "
+                      >
+                        <div ng-if="order.profiles.phone">
+                          <strong>الهاتف:</strong> {{ order.profiles.phone }}
+                        </div>
+                        <div ng-if="order.shipping_address">
+                          <strong>العنوان:</strong> {{ order.shipping_address }}
+                        </div>
+                      </div>
+
+                      <!-- Order Items Table -->
+                      <table class="admin-order-items-table">
+                        <thead>
+                          <tr>
+                            <th style="width: 44px"></th>
+                            <th>المنتج</th>
+                            <th style="width: 80px">الكمية</th>
+                            <th style="width: 100px">سعر الوحدة</th>
+                            <th style="width: 100px">الاجمالي</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat="item in order.order_items">
+                            <td>
+                              <img
+                                ng-src="{{ item.products.image_url || 'https://placehold.co/36x36/f5f5f5/999?text=?' }}"
+                                style="
+                                  width: 36px;
+                                  height: 36px;
+                                  object-fit: contain;
+                                  border-radius: 4px;
+                                  background: #f5f5f5;
+                                "
+                                onerror="
+                                  this.src =
+                                    'https://placehold.co/36x36/f5f5f5/999?text=?'
+                                "
+                              />
+                            </td>
+                            <td style="font-weight: 500">
+                              {{ item.products.name_ar || 'منتج محذوف' }}
+                            </td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.unit_price | currency:'':0 }} ج.م</td>
+                            <td style="font-weight: 600">
+                              {{ item.quantity * item.unit_price | currency:'':0
+                              }} ج.م
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <!-- Total + Print Receipt -->
+                      <div
+                        style="
+                          display: flex;
+                          justify-content: space-between;
+                          align-items: center;
+                          margin-top: 16px;
+                          padding-top: 12px;
+                          border-top: 1px solid var(--color-border);
+                        "
+                      >
+                        <div style="font-size: 16px; font-weight: 700">
+                          الاجمالي: {{ order.total | currency:'':0 }} ج.م
+                        </div>
+                        <button
+                          class="admin-btn admin-btn--primary admin-btn--sm"
+                          ng-click="printReceipt(order); $event.stopPropagation()"
+                        >
+                          <i
+                            data-lucide="printer"
+                            style="width: 15px; height: 15px"
+                          ></i>
+                          طباعة الفاتورة
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty -->
+            <tr ng-if="!filteredOrders.length && !loading">
+              <td
+                colspan="8"
+                class="admin-td"
+                style="
+                  text-align: center;
+                  padding: 40px;
+                  color: var(--color-text-muted);
+                "
+              >
+                <i
+                  data-lucide="shopping-bag"
+                  style="
+                    width: 32px;
+                    height: 32px;
+                    opacity: 0.3;
+                    display: block;
+                    margin: 0 auto 8px;
+                  "
+                ></i>
+                لا توجد طلبات
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- Printable Receipt (hidden, shown only on print)                 -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div class="admin-print-receipt" ng-if="printOrder">
+  <div class="admin-print-receipt__inner">
+    <!-- Header -->
+    <div class="admin-print-receipt__header">
+      <div>
+        <div class="admin-print-receipt__logo">MedFinder</div>
+        <div style="font-size: 13px; color: #777">صيدليتك اونلاين</div>
+      </div>
+      <div class="admin-print-receipt__meta">
+        <div><strong>فاتورة رقم:</strong> #{{ printOrder.id }}</div>
+        <div>
+          <strong>التاريخ:</strong> {{ printOrder.created_at | date:'yyyy/MM/dd'
+          }}
+        </div>
+        <div>
+          <strong>الحالة:</strong> {{ statusLabels[printOrder.status] }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="admin-print-receipt__title">فاتورة</div>
+
+    <!-- Customer Info -->
+    <div class="admin-print-receipt__info">
+      <div>
+        <dt>اسم العميل</dt>
+        <dd>{{ printOrder.profiles.full_name || 'غير معروف' }}</dd>
+        <dt>البريد الالكتروني</dt>
+        <dd>{{ printOrder.profiles.email }}</dd>
+      </div>
+      <div>
+        <dt ng-if="printOrder.profiles.phone">الهاتف</dt>
+        <dd ng-if="printOrder.profiles.phone">
+          {{ printOrder.profiles.phone }}
+        </dd>
+        <dt ng-if="printOrder.shipping_address">عنوان الشحن</dt>
+        <dd ng-if="printOrder.shipping_address">
+          {{ printOrder.shipping_address }}
+        </dd>
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>المنتج</th>
+          <th>الكمية</th>
+          <th>سعر الوحدة</th>
+          <th>الاجمالي</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="item in printOrder.order_items">
+          <td>{{ $index + 1 }}</td>
+          <td>{{ item.products.name_ar || 'منتج' }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.unit_price | currency:'':0 }} ج.م</td>
+          <td>{{ item.quantity * item.unit_price | currency:'':0 }} ج.م</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="admin-print-receipt__totals">
+      <div class="total-line total-line--grand">
+        <span>الاجمالي الكلي</span>
+        <span>{{ printOrder.total | currency:'':0 }} ج.م</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="admin-print-receipt__footer">
+      <p>شكرا لطلبك من MedFinder</p>
+      <p style="font-size: 11px; margin-top: 4px">
+        تم الطباعة بتاريخ {{ today | date:'yyyy/MM/dd HH:mm' }}
+      </p>
+    </div>
+  </div>
 </div>

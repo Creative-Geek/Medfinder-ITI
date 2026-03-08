@@ -1,7 +1,7 @@
 <!-- Orders / Profile page -->
 <div class="orders-page uk-container py-8">
   <!-- ==================== PROFILE SECTION ==================== -->
-  <section class="orders-profile-card">
+  <section class="orders-profile-card" data-reveal>
     <div class="orders-profile-card__header">
       <h2 class="orders-profile-card__title">
         <i data-lucide="user-circle" class="h-5 w-5"></i>
@@ -109,7 +109,7 @@
   </section>
 
   <!-- ==================== ORDERS SECTION ==================== -->
-  <section class="orders-history">
+  <section class="orders-history" data-reveal style="--reveal-delay: 0.08s">
     <h2 class="orders-history__title">
       <i data-lucide="package" class="h-5 w-5"></i>
       طلباتي
@@ -138,6 +138,7 @@
       <div
         ng-repeat="order in orders track by order.id"
         class="orders-order-card"
+        data-reveal
         ng-class="{ 'orders-order-card--expanded': expandedOrderId === order.id }"
       >
         <!-- Order header (clickable) -->
