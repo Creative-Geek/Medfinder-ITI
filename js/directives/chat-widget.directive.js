@@ -16,6 +16,17 @@ angular.module("medfinderApp").directive("chatWidget", [
         scope.sessionId = null;
         scope.errorMessage = null;
 
+        scope.saveState = function () {
+          sessionStorage.setItem(
+            "mf_chat_state",
+            JSON.stringify({
+              sessionId: scope.sessionId,
+              messages: scope.messages,
+              isOpen: scope.isOpen,
+            }),
+          );
+        };
+
         // Try to load state from session storage for persistence
         var savedChat = sessionStorage.getItem("mf_chat_state");
         if (savedChat) {
@@ -23,20 +34,17 @@ angular.module("medfinderApp").directive("chatWidget", [
             var state = JSON.parse(savedChat);
             scope.messages = state.messages || [];
             scope.sessionId = state.sessionId;
+            scope.isOpen = !!state.isOpen;
           } catch (e) {
             console.error("Failed to parse saved chat state");
           }
         }
 
-        scope.saveState = function () {
-          sessionStorage.setItem(
-            "mf_chat_state",
-            JSON.stringify({
-              sessionId: scope.sessionId,
-              messages: scope.messages,
-            }),
-          );
-        };
+        // Initialize icons on first load if open or closed
+        $timeout(function () {
+          if (scope.isOpen) scrollToBottom();
+          if (typeof lucide !== "undefined") lucide.createIcons();
+        });
 
         scope.toggleChat = function () {
           // Only allow logged in users
@@ -46,6 +54,8 @@ angular.module("medfinderApp").directive("chatWidget", [
             return;
           }
           scope.isOpen = !scope.isOpen;
+          scope.saveState();
+
           if (scope.isOpen) {
             scrollToBottom();
           }
@@ -54,6 +64,13 @@ angular.module("medfinderApp").directive("chatWidget", [
             if (typeof lucide !== "undefined") lucide.createIcons();
           });
         };
+
+        // Allow other parts of the app to programmatically open the chat
+        $rootScope.$on("chatbot:open", function () {
+          if (!scope.isOpen) {
+            scope.toggleChat();
+          }
+        });
 
         scope.clearSession = function () {
           scope.messages = [];
@@ -71,6 +88,10 @@ angular.module("medfinderApp").directive("chatWidget", [
             .then(function (base64) {
               scope.selectedImage = base64;
               scope.isLoading = false;
+              // Re-init icons so the X button on the preview renders
+              $timeout(function () {
+                if (typeof lucide !== "undefined") lucide.createIcons();
+              });
             })
             .catch(function (err) {
               scope.errorMessage = err;

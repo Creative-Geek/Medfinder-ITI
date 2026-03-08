@@ -189,6 +189,11 @@ angular.module("medfinderApp").controller("HomeController", [
       }
     };
 
+    // ── Trigger Global Chatbot ──
+    $scope.openChatbot = function () {
+      $scope.$emit("chatbot:open");
+    };
+
     // ── Cart action ──
     $scope.addToCart = function (product) {
       if (!product) return;

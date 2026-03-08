@@ -107,37 +107,98 @@ async function geminiChat(payload: any) {
     throw new Error(lastErr || "Failed to contact Gemini.");
 }
 
-// Basic product tools mapping
+// Advanced product search with weighted relevance scoring
 async function execSearchProducts(adminClient: any, args: any) {
     const rawQuery = args?.query ? sanitizeQuery(String(args.query)) : "";
     const minPrice = typeof args?.min_price === "number" ? args.min_price : null;
     const maxPrice = typeof args?.max_price === "number" ? args.max_price : null;
     const sort = args?.sort ? String(args.sort) : null;
 
+    if (!rawQuery) {
+        return { products: [], error: "Query cannot be empty" };
+    }
+
+    const keywords = rawQuery.trim().split(/\s+/).filter(Boolean);
+    if (keywords.length === 0) {
+        return { products: [], error: "Query cannot be empty" };
+    }
+
+    // Fetch all potentially matching products
     let q = adminClient
         .from("products")
-        .select("id,name_ar,name_en,price,brand,image_url,type,active_ingredient")
-        .limit(5);
+        .select("id,name_ar,name_en,price,brand,image_url,type,active_ingredient,description,use_cases,category");
 
     if (minPrice !== null) q = q.gte("price", minPrice);
     if (maxPrice !== null) q = q.lte("price", maxPrice);
-    if (rawQuery) {
-        const keywords = rawQuery.trim().split(/\s+/).filter(Boolean);
-        if (keywords.length === 1) {
-            const kw = keywords[0];
-            q = q.or(`name_ar.ilike.%${kw}%,name_en.ilike.%${kw}%,brand.ilike.%${kw}%,description.ilike.%${kw}%`);
-        } else {
-            const conditions = keywords.map(kw => `name_ar.ilike.%${kw}%,name_en.ilike.%${kw}%,brand.ilike.%${kw}%`).join(",");
-            q = q.or(conditions);
+
+    const { data: allProducts, error } = await q;
+    if (error) return { products: [], error: error.message };
+    if (!allProducts || allProducts.length === 0) return { products: [] };
+
+    // Calculate relevance score for each product
+    const scored = allProducts.map((product: any) => {
+        let score = 0;
+
+        for (const keyword of keywords) {
+            const lowerKeyword = keyword.toLowerCase();
+
+            // Exact name match: weight 100
+            if (product.name_ar?.toLowerCase().includes(lowerKeyword) ||
+                product.name_en?.toLowerCase().includes(lowerKeyword)) {
+                score += 100;
+            }
+            // Active ingredient: weight 75
+            else if (Array.isArray(product.active_ingredient) &&
+                product.active_ingredient.some((ing: string) => ing?.toLowerCase().includes(lowerKeyword))) {
+                score += 75;
+            }
+            // Brand: weight 60
+            else if (product.brand?.toLowerCase().includes(lowerKeyword)) {
+                score += 60;
+            }
+            // Use cases (primary indication): weight 50
+            else if (Array.isArray(product.use_cases) &&
+                product.use_cases.some((u: string) => u?.toLowerCase().includes(lowerKeyword))) {
+                score += 50;
+            }
+            // Type: weight 40
+            else if (product.type?.toLowerCase().includes(lowerKeyword)) {
+                score += 40;
+            }
+            // Description: weight 25
+            else if (product.description?.toLowerCase().includes(lowerKeyword)) {
+                score += 25;
+            }
+            // Category: weight 20
+            else if (Array.isArray(product.category) &&
+                product.category.some((c: string) => c?.toLowerCase().includes(lowerKeyword))) {
+                score += 20;
+            }
         }
+
+        return { ...product, _score: score };
+    });
+
+    // Filter products with non-zero score
+    const filtered = scored.filter((p: any) => p._score > 0);
+
+    // Sort by relevance score, then by price
+    if (sort === "price_asc") {
+        filtered.sort((a: any, b: any) => a.price - b.price || b._score - a._score);
+    } else if (sort === "price_desc") {
+        filtered.sort((a: any, b: any) => b.price - a.price || b._score - a._score);
+    } else {
+        // Default: sort by relevance score descending, then price ascending
+        filtered.sort((a: any, b: any) => b._score - a._score || a.price - b.price);
     }
 
-    if (sort === "price_asc") q = q.order("price", { ascending: true });
-    else if (sort === "price_desc") q = q.order("price", { ascending: false });
+    // Return top 5
+    const result = filtered.slice(0, 5).map((p: any) => {
+        const { _score, ...rest } = p;
+        return rest;
+    });
 
-    const { data: products, error } = await q;
-    if (error) return { products: [], error: error.message };
-    return { products: products || [] };
+    return { products: result };
 }
 
 serve(async (req: Request) => {
@@ -230,37 +291,67 @@ serve(async (req: Request) => {
                 type: "function",
                 function: {
                     name: "search_products",
-                    description: "ابحث عن الأدوية أو المنتجات في قاعدة البيانات باسمها أو المادة الفعالة أو براند الشركة.",
+                    description: "Search the product database. Returns a list of candidates for you to evaluate — results are NOT shown to the user yet. You must explicitly call show_products to display anything.",
                     parameters: {
                         type: "object",
                         properties: {
-                            query: { type: "string", description: "اسم الدواء أو جزء منه باللغة العربية أو الإنجليزية" },
+                            query: { type: "string", description: "Product name, brand, active ingredient, or symptom in Arabic or English" },
                             min_price: { type: "number" },
                             max_price: { type: "number" },
-                        }
+                        },
+                        required: ["query"]
+                    }
+                }
+            },
+            {
+                type: "function",
+                function: {
+                    name: "show_products",
+                    description: "Display specific products to the user. Only call this when you have confirmed the right products. Pass only the IDs you want shown — nothing else will appear.",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            product_ids: {
+                                type: "array",
+                                items: { type: "number" },
+                                description: "List of product IDs to show the user"
+                            }
+                        },
+                        required: ["product_ids"]
                     }
                 }
             }
         ];
 
-        const systemPrompt = `You are a smart search assistant for Medfinder, an Egyptian online pharmacy. Your job is to help users find and order medications available in the store.
+        const systemPrompt = `You are a task-oriented search agent for Medfinder, an Egyptian online pharmacy. You have two tools: search_products (internal lookup) and show_products (commits results to the user).
 
-CORE BEHAVIOR:
-- When a user describes a common symptom or condition (headache, fever, cold, stomach pain, etc.), immediately use search_products to find relevant OTC medications for it. Do NOT lecture them or refuse.
-- When a user mentions a drug name, brand, or active ingredient, search for it directly.
-- When a user uploads a prescription image, read it and search for each medication listed.
-- You are a search tool, not a doctor. You do not diagnose. But you CAN help people find common, well-known OTC remedies without treating that as a medical consultation.
+AGENT LOOP:
+1. Search using search_products — results are private, the user cannot see them.
+2. Evaluate the candidates. Ask: does each result actually match what was requested?
+3. If the right product is not in the results, refine and search again with a better query.
+4. Once you are confident you have the correct matches, call show_products with ONLY those IDs.
+5. Then reply with a short confirmation message.
+
+SEARCH STRATEGY:
+- For a named product (e.g. "Signal Toothpaste Cavity Protection"): search by brand + product name. If not found, try the active ingredient or category.
+- For a symptom (e.g. "صداع"): search by symptom, then show the top relevant OTC results. Do not show products that only mention the symptom as a side effect.
+- For a prescription image: identify each item, then search for each one separately. Do not bundle multiple items into one query.
+- If a search returns no good match, try an alternative query before giving up.
 
 STRICT RULES:
-1. Never write drug names, prices, or product details in your text reply. The UI renders product cards automatically from the products array — trust it.
-2. Only refuse and recommend a doctor when: the described condition is serious/urgent (chest pain, difficulty breathing, high fever in infants, etc.), OR the user is asking you to prescribe for a complex chronic condition (diabetes management, cancer, psychiatric meds).
-3. Keep all replies short, friendly, and in Egyptian Arabic dialect.
-4. Never recommend a specific drug by name in your text — just trigger the search tool and let the results speak.
+1. NEVER call show_products with products that don't match the request — filter out irrelevant candidates even if they appeared in search results.
+2. Never write product names, prices, or details in your text reply. The UI renders cards from show_products — trust it.
+3. Only refuse and refer to a doctor for serious/urgent symptoms (chest pain, difficulty breathing, high fever in infants) or complex chronic conditions (diabetes, cancer, psychiatric meds).
+4. Keep all replies short, friendly, in Egyptian Arabic dialect.
 
-RESPONSE EXAMPLES:
-- User: "عندي صداع" → call search_products({query: "صداع"}) then reply: "تمام، دي أشهر الأدوية المتاحة للصداع 👇"
-- User: "ابحث عن brufen" → call search_products({query: "brufen"}) then reply: "لقيت الأدوية دي:"
-- User: "عندي ألم في الصدر وضيق تنفس" → NO search, reply: "ده محتاج تشوف دكتور على طول، متأخرش."`;
+EXAMPLES:
+- User: "عندي صداع" → search_products({query:"صداع"}) → evaluate → show_products only the relevant pain relief IDs → reply: "دي أشهر الأدوية للصداع 👇"
+- User uploads prescription with Signal Toothpaste + Signal Toothbrush:
+  → search_products({query:"Signal toothpaste cavity"}), find id 84, confirm it matches
+  → search_products({query:"Signal toothbrush"}), find id 90, confirm it matches
+  → show_products({product_ids:[84,90]})
+  → reply: "تمام، لقيت المنتجات المطلوبة في الروشتة، تقدر تطلبها من هنا:"
+- User: "عندي ألم في الصدر وضيق تنفس" → NO tools, reply: "ده محتاج تشوف دكتور على طول."`;
 
         // Format history for Gemini
         const formattedHistory = history.map((msg: any) => ({
@@ -274,9 +365,11 @@ RESPONSE EXAMPLES:
             { role: "user", content: userContent }
         ];
 
+        // productCache holds all candidates seen during the agentic loop, keyed by id
+        const productCache = new Map<number, any>();
         let lastProducts: any[] = [];
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < 8; i++) {
             const completion = await geminiChat({
                 messages: agentMessages,
                 tools,
@@ -291,18 +384,32 @@ RESPONSE EXAMPLES:
                 agentMessages.push(assistantMsg);
                 for (const tc of assistantMsg.tool_calls) {
                     const toolName = tc.function?.name;
-                    let args = {};
+                    let args: any = {};
                     try { args = JSON.parse(tc.function.arguments || "{}"); } catch (_) { }
 
                     let toolResult: any;
+
                     if (toolName === "search_products") {
+                        // Internal search — results go to the LLM, not the user
                         toolResult = await execSearchProducts(adminClient, args);
-                        if (toolResult.products && toolResult.products.length > 0) {
-                            lastProducts = toolResult.products;
+                        if (toolResult.products) {
+                            for (const p of toolResult.products) {
+                                productCache.set(p.id, p);
+                            }
                         }
+
+                    } else if (toolName === "show_products") {
+                        // Explicit commit — only these IDs get shown to the user
+                        const ids: number[] = Array.isArray(args?.product_ids) ? args.product_ids : [];
+                        lastProducts = ids
+                            .map((id: number) => productCache.get(id))
+                            .filter(Boolean);
+                        toolResult = { shown: lastProducts.length };
+
                     } else {
                         toolResult = { error: "Unknown tool" };
                     }
+
                     agentMessages.push({ role: "tool", tool_call_id: tc.id, name: toolName, content: JSON.stringify(toolResult) });
                 }
                 continue;
