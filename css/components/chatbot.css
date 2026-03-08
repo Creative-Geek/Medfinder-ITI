@@ -335,3 +335,10 @@
     transform: scale(1);
   }
 }
+
+/* Hide chat widget when printing */
+@media print {
+  .chat-widget-container {
+    display: none !important;
+  }
+}
