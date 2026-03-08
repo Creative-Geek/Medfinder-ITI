@@ -125,7 +125,7 @@ All 4 admin controllers are stubs too. byteStore has a single-page `admin.html` 
 | 7        | [x] **K. Qty vs stock validation**                       | Medium  | Done. UI cap + fresh stock check at checkout.                                                       |
 | 8        | **H. Admin dashboard**                                   | High    | 4 views + 4 controllers. Biggest chunk.                                                             |
 | 9        | [x] **D. Wishlist**                                      | Low-Med | Done. DB persistence + Wishlist page.                                                               |
-| 10       | **G. About Us page**                                     | Low     | Static content, do last.                                                                            |
+| 10       | [x] **G. About Us page**                                 | Low     | Static content, do last.                                                                            |
 | 11       | [x] **L. Stale cart handling**                           | Medium  | Done. Re-validates at checkout time.                                                                |
 | 12       | [x] **M. Product description rewrite**                   | Medium  | Done. `long_description` column wired as "عن المنتج" section.                                       |
 | 13       | [x] **N. Page Transition Animation (fade)**              | Low     | Done. Shell-level transition stage + veil now smooth route swaps with covered exit/enter timing.    |

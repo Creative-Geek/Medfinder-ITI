@@ -1,5 +1,221 @@
 <!-- Orders / Profile page -->
-<div class="uk-container py-8">
-  <h1 class="text-xl font-bold mb-4">{{ pageTitle }}</h1>
-  <p class="text-muted-foreground">قريبا...</p>
+<div class="orders-page uk-container py-8">
+  <!-- ==================== PROFILE SECTION ==================== -->
+  <section class="orders-profile-card">
+    <div class="orders-profile-card__header">
+      <h2 class="orders-profile-card__title">
+        <i data-lucide="user-circle" class="h-5 w-5"></i>
+        معلومات الحساب
+      </h2>
+      <button
+        ng-if="!profileEditing && !profileLoading"
+        ng-click="startEdit()"
+        class="orders-btn orders-btn--outline"
+      >
+        <i data-lucide="pencil" class="h-4 w-4"></i>
+        تعديل
+      </button>
+    </div>
+
+    <!-- Loading state -->
+    <div ng-if="profileLoading" class="orders-profile-card__skeleton">
+      <div class="skeleton-line skeleton-line--lg"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+    </div>
+
+    <!-- View mode -->
+    <div ng-if="!profileLoading && !profileEditing" class="orders-profile-grid">
+      <div class="orders-profile-field">
+        <span class="orders-profile-field__label">البريد الإلكترونى</span>
+        <span class="orders-profile-field__value"
+          >{{ profile.email || '—' }}</span
+        >
+      </div>
+      <div class="orders-profile-field">
+        <span class="orders-profile-field__label">الاسم</span>
+        <span class="orders-profile-field__value"
+          >{{ profile.full_name || '—' }}</span
+        >
+      </div>
+      <div class="orders-profile-field">
+        <span class="orders-profile-field__label">رقم الهاتف</span>
+        <span class="orders-profile-field__value" dir="ltr"
+          >{{ profile.phone || '—' }}</span
+        >
+      </div>
+      <div class="orders-profile-field">
+        <span class="orders-profile-field__label">العنوان</span>
+        <span class="orders-profile-field__value"
+          >{{ profile.address || '—' }}</span
+        >
+      </div>
+    </div>
+
+    <!-- Edit mode -->
+    <div ng-if="!profileLoading && profileEditing" class="orders-profile-edit">
+      <div class="orders-profile-edit__row">
+        <label class="orders-profile-edit__label">الاسم</label>
+        <input
+          type="text"
+          ng-model="profileForm.full_name"
+          class="orders-profile-edit__input"
+          placeholder="الاسم بالكامل"
+        />
+      </div>
+      <div class="orders-profile-edit__row">
+        <label class="orders-profile-edit__label">رقم الهاتف</label>
+        <input
+          type="tel"
+          ng-model="profileForm.phone"
+          class="orders-profile-edit__input"
+          placeholder="01XXXXXXXXX"
+          dir="ltr"
+        />
+      </div>
+      <div class="orders-profile-edit__row">
+        <label class="orders-profile-edit__label">العنوان</label>
+        <input
+          type="text"
+          ng-model="profileForm.address"
+          class="orders-profile-edit__input"
+          placeholder="العنوان بالتفصيل"
+        />
+      </div>
+      <div class="orders-profile-edit__actions">
+        <button
+          ng-click="saveProfile()"
+          ng-disabled="profileSaving"
+          class="orders-btn orders-btn--primary"
+        >
+          <i data-lucide="check" class="h-4 w-4" ng-if="!profileSaving"></i>
+          <span ng-if="profileSaving">جاري الحفظ...</span>
+          <span ng-if="!profileSaving">حفظ</span>
+        </button>
+        <button
+          ng-click="cancelEdit()"
+          ng-disabled="profileSaving"
+          class="orders-btn orders-btn--outline"
+        >
+          الغاء
+        </button>
+      </div>
+    </div>
+
+    <!-- Save feedback -->
+    <p ng-if="profileSaveMsg" class="orders-profile-save-msg">
+      {{ profileSaveMsg }}
+    </p>
+  </section>
+
+  <!-- ==================== ORDERS SECTION ==================== -->
+  <section class="orders-history">
+    <h2 class="orders-history__title">
+      <i data-lucide="package" class="h-5 w-5"></i>
+      طلباتي
+    </h2>
+
+    <!-- Loading -->
+    <div ng-if="ordersLoading" class="orders-history__skeleton">
+      <div ng-repeat="i in [1,2,3]" class="orders-order-skeleton">
+        <div class="skeleton-line skeleton-line--lg"></div>
+        <div class="skeleton-line"></div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div ng-if="!ordersLoading && orders.length === 0" class="orders-empty">
+      <i data-lucide="shopping-bag" class="h-12 w-12 orders-empty__icon"></i>
+      <p class="orders-empty__text">لا توجد طلبات بعد</p>
+      <a href="#!/shop" class="orders-btn orders-btn--primary">
+        <i data-lucide="store" class="h-4 w-4"></i>
+        تصفح المنتجات
+      </a>
+    </div>
+
+    <!-- Orders list -->
+    <div ng-if="!ordersLoading && orders.length > 0" class="orders-list">
+      <div
+        ng-repeat="order in orders track by order.id"
+        class="orders-order-card"
+        ng-class="{ 'orders-order-card--expanded': expandedOrderId === order.id }"
+      >
+        <!-- Order header (clickable) -->
+        <div class="orders-order-card__header" ng-click="toggleOrder(order.id)">
+          <div class="orders-order-card__info">
+            <span class="orders-order-card__id">طلب #{{ order.id }}</span>
+            <span class="orders-order-card__date"
+              >{{ formatDate(order.created_at) }}</span
+            >
+          </div>
+          <div class="orders-order-card__meta">
+            <span class="order-status" ng-class="statusClass(order.status)">
+              {{ statusLabel(order.status) }}
+            </span>
+            <span class="orders-order-card__total"
+              >{{ order.total | number:2 }} جنيه</span
+            >
+            <i
+              data-lucide="chevron-down"
+              class="h-4 w-4 orders-order-card__chevron"
+              ng-class="{ 'orders-order-card__chevron--open': expandedOrderId === order.id }"
+            ></i>
+          </div>
+        </div>
+
+        <!-- Order details (expanded) -->
+        <div
+          ng-if="expandedOrderId === order.id"
+          class="orders-order-card__body"
+        >
+          <!-- Address -->
+          <div
+            ng-if="order.shipping_address"
+            class="orders-order-card__address"
+          >
+            <i data-lucide="map-pin" class="h-4 w-4"></i>
+            <span>{{ order.shipping_address }}</span>
+          </div>
+
+          <!-- Loading items -->
+          <div ng-if="order._itemsLoading" class="orders-order-items-loading">
+            <div class="skeleton-line"></div>
+            <div class="skeleton-line"></div>
+          </div>
+
+          <!-- Items table -->
+          <table
+            ng-if="!order._itemsLoading && order._items.length > 0"
+            class="orders-items-table"
+          >
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>الكمية</th>
+                <th>سعر الوحدة</th>
+                <th>الإجمالى</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="item in order._items track by item.id">
+                <td>
+                  <a
+                    ng-href="#!/product/{{ item.product_id }}"
+                    class="orders-items-table__link"
+                  >
+                    منتج #{{ item.product_id }}
+                  </a>
+                </td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit_price | number:2 }} جنيه</td>
+                <td class="orders-items-table__line-total">
+                  {{ (item.quantity * item.unit_price) | number:2 }} جنيه
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
