@@ -11,7 +11,14 @@
   </button>
 
   <!-- Chat Window -->
-  <div class="chat-window" ng-show="isOpen">
+  <div
+    class="chat-window"
+    ng-class="{ 'chat-window--drag-over': isDragOver }"
+    ng-attr-aria-hidden="{{ !isOpen }}"
+  >
+    <div class="chat-drop-overlay" ng-if="isDragOver">
+      اترك الصورة هنا لإرفاقها
+    </div>
     <!-- Header -->
     <div class="chat-header">
       <div class="flex items-center gap-2">

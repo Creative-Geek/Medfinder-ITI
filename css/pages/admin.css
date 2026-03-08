@@ -95,8 +95,63 @@
 }
 
 .admin-sidebar__footer {
-  padding: 12px 10px;
+  padding: 16px 14px;
   border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.admin-sidebar__user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0583f2, #0568c8);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-sidebar__user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.admin-sidebar__user-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-sidebar__user-role {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.admin-sidebar__link--exit {
+  color: #e74c3c;
+  padding: 8px 10px;
+}
+.admin-sidebar__link--exit:hover {
+  background: rgba(231, 76, 60, 0.08);
+  color: #c0392b;
 }
 
 /* -- Page Header -- */
@@ -115,6 +170,296 @@
   font-size: 14px;
   color: var(--color-text-muted);
   margin-top: 4px;
+}
+
+/* -- Welcome Banner -- */
+.admin-welcome-banner {
+  background: linear-gradient(135deg, #0583f2 0%, #0568c8 55%, #034a99 100%);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 8px 30px -8px rgba(5, 131, 242, 0.45);
+}
+
+.admin-welcome-banner::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: -40px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.admin-welcome-banner__greeting {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 4px;
+}
+
+.admin-welcome-banner__name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.admin-welcome-banner__date {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.admin-welcome-banner__icon {
+  flex-shrink: 0;
+}
+
+/* -- KPI Cards with Accent Variants -- */
+.admin-stat-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-stat-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+}
+
+.admin-stat-card--accent-blue::before {
+  background: #0583f2;
+}
+.admin-stat-card--accent-green::before {
+  background: #27ae60;
+}
+.admin-stat-card--accent-purple::before {
+  background: #8b5cf6;
+}
+.admin-stat-card--accent-teal::before {
+  background: #0694a2;
+}
+
+.admin-stat-card__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-stat-icon--purple {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
+.admin-stat-icon--teal {
+  background: rgba(6, 148, 162, 0.1);
+  color: #0694a2;
+}
+
+/* Trend indicator */
+.admin-stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-top: 6px;
+  padding: 2px 7px;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+.admin-stat-trend--up {
+  background: rgba(39, 174, 96, 0.1);
+  color: #1e8a4d;
+}
+
+.admin-stat-trend--warn {
+  background: rgba(249, 157, 28, 0.1);
+  color: #c67e00;
+}
+
+.admin-stat-trend--neutral {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text-muted);
+}
+
+/* -- Dashboard Grid (chart + low-stock side by side) -- */
+.admin-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) {
+  .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -- Revenue Chart -- */
+
+.admin-chart-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.admin-chart-total__label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.admin-chart-total__value {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.admin-chart-container {
+  padding: 12px 16px 8px;
+  position: relative;
+}
+
+.admin-chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  gap: 4px;
+}
+
+/* -- Low Stock Panel -- */
+
+.admin-low-stock-list {
+  padding: 8px 0;
+}
+
+.admin-low-stock-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  transition: background var(--transition-fast);
+}
+
+.admin-low-stock-item:last-child {
+  border-bottom: none;
+}
+
+.admin-low-stock-item:hover {
+  background: rgba(5, 131, 242, 0.03);
+}
+
+.admin-low-stock-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: #f5f5f5;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.admin-low-stock-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-low-stock-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-low-stock-meta {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.admin-low-stock-qty {
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.admin-stock--low .admin-low-stock-qty,
+.admin-low-stock-qty.admin-stock--low {
+  background: rgba(249, 157, 28, 0.1);
+  color: #c67e00;
+}
+
+.admin-stock--out .admin-low-stock-qty,
+.admin-low-stock-qty.admin-stock--out {
+  background: rgba(231, 76, 60, 0.1);
+  color: #c0392b;
+}
+
+/* -- Order ID Pill -- */
+.admin-order-id {
+  font-weight: 700;
+  font-size: 13px;
+  background: rgba(5, 131, 242, 0.08);
+  color: var(--color-primary);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* -- Customer Avatar Cell -- */
+.admin-customer-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-customer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0583f2, #0568c8);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+/* -- Badge with dot -- */
+.admin-badge--dot {
+  gap: 6px;
+}
+
+.admin-badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  opacity: 0.8;
 }
 
 /* -- KPI / Stat Cards -- */
@@ -203,6 +548,8 @@
   font-size: 16px;
   font-weight: 700;
   color: var(--color-dark);
+  display: flex;
+  align-items: center;
 }
 
 /* -- Admin Table -- */

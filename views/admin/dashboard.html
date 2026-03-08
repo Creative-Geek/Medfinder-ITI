@@ -8,12 +8,21 @@
 
   <!-- Content -->
   <div class="admin-content">
-    <!-- Header -->
-    <div class="admin-page-header">
-      <h1 class="admin-page-header__title">نظرة عامة</h1>
-      <p class="admin-page-header__subtitle">
-        مرحبا بك في لوحة التحكم. هنا ملخص سريع لما يحدث اليوم.
-      </p>
+    <!-- Welcome Banner -->
+    <div class="admin-welcome-banner" ng-if="!loading">
+      <div class="admin-welcome-banner__text">
+        <div class="admin-welcome-banner__greeting">{{ greeting }}،</div>
+        <div class="admin-welcome-banner__name">{{ adminName }}</div>
+        <div class="admin-welcome-banner__date">
+          {{ today | date:'EEEE، d MMMM y' }}
+        </div>
+      </div>
+      <div class="admin-welcome-banner__icon">
+        <i
+          data-lucide="stethoscope"
+          style="width: 56px; height: 56px; opacity: 0.18; color: #fff"
+        ></i>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -29,51 +38,191 @@
     <!-- KPI Cards -->
     <div class="admin-stats-row" ng-if="!loading">
       <!-- Total Sales -->
-      <div class="admin-stat-card">
+      <div class="admin-stat-card admin-stat-card--accent-blue">
         <div class="admin-stat-icon admin-stat-icon--blue">
-          <i data-lucide="banknote" style="width: 24px; height: 24px"></i>
+          <i data-lucide="banknote" style="width: 22px; height: 22px"></i>
         </div>
-        <div>
-          <div class="admin-stat-value">
+        <div class="admin-stat-card__body">
+          <div class="admin-stat-value" id="kpi-sales">
             {{ stats.totalSales | currency:'':0 }} ج.م
           </div>
           <div class="admin-stat-label">اجمالي المبيعات</div>
+          <div
+            class="admin-stat-trend admin-stat-trend--up"
+            ng-if="stats.todayOrderCount > 0"
+          >
+            <i data-lucide="trending-up" style="width: 12px; height: 12px"></i>
+            {{ stats.todayOrderCount }} طلب اليوم
+          </div>
         </div>
       </div>
 
       <!-- Active Customers -->
-      <div class="admin-stat-card">
+      <div class="admin-stat-card admin-stat-card--accent-green">
         <div class="admin-stat-icon admin-stat-icon--green">
-          <i data-lucide="users" style="width: 24px; height: 24px"></i>
+          <i data-lucide="users" style="width: 22px; height: 22px"></i>
         </div>
-        <div>
+        <div class="admin-stat-card__body">
           <div class="admin-stat-value">{{ stats.customerCount }}</div>
-          <div class="admin-stat-label">العملاء النشطين</div>
-        </div>
-      </div>
-
-      <!-- Low Stock -->
-      <div class="admin-stat-card">
-        <div
-          class="admin-stat-icon"
-          ng-class="stats.lowStockCount > 0 ? 'admin-stat-icon--amber' : 'admin-stat-icon--green'"
-        >
-          <i data-lucide="alert-triangle" style="width: 24px; height: 24px"></i>
-        </div>
-        <div>
-          <div class="admin-stat-value">{{ stats.lowStockCount }}</div>
-          <div class="admin-stat-label">منتجات قليلة المخزون</div>
+          <div class="admin-stat-label">العملاء المسجلين</div>
+          <div class="admin-stat-trend admin-stat-trend--neutral">
+            <i data-lucide="user-check" style="width: 12px; height: 12px"></i>
+            عميل نشط
+          </div>
         </div>
       </div>
 
       <!-- Orders Today -->
-      <div class="admin-stat-card">
-        <div class="admin-stat-icon admin-stat-icon--blue">
-          <i data-lucide="shopping-bag" style="width: 24px; height: 24px"></i>
+      <div class="admin-stat-card admin-stat-card--accent-purple">
+        <div class="admin-stat-icon admin-stat-icon--purple">
+          <i data-lucide="shopping-bag" style="width: 22px; height: 22px"></i>
         </div>
-        <div>
+        <div class="admin-stat-card__body">
           <div class="admin-stat-value">{{ stats.todayOrderCount }}</div>
           <div class="admin-stat-label">طلبات اليوم</div>
+          <div class="admin-stat-trend admin-stat-trend--neutral">
+            <i data-lucide="clock" style="width: 12px; height: 12px"></i>
+            اخر تحديث الان
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Products -->
+      <div class="admin-stat-card admin-stat-card--accent-teal">
+        <div class="admin-stat-icon admin-stat-icon--teal">
+          <i data-lucide="pill" style="width: 22px; height: 22px"></i>
+        </div>
+        <div class="admin-stat-card__body">
+          <div class="admin-stat-value">{{ stats.productCount }}</div>
+          <div class="admin-stat-label">اجمالي المنتجات</div>
+          <div
+            class="admin-stat-trend"
+            ng-class="stats.lowStockCount > 0 ? 'admin-stat-trend--warn' : 'admin-stat-trend--up'"
+          >
+            <i
+              data-lucide="alert-triangle"
+              style="width: 12px; height: 12px"
+              ng-if="stats.lowStockCount > 0"
+            ></i>
+            <i
+              data-lucide="check-circle"
+              style="width: 12px; height: 12px"
+              ng-if="stats.lowStockCount == 0"
+            ></i>
+            {{ stats.lowStockCount > 0 ? stats.lowStockCount + ' منتج قليل
+            المخزون' : 'المخزون جيد' }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart + Low Stock Row -->
+    <div class="admin-dashboard-grid" ng-if="!loading">
+      <!-- Weekly Revenue Chart -->
+      <div class="admin-table-card admin-chart-card">
+        <div class="admin-table-card__header">
+          <div class="admin-table-card__title">
+            <i
+              data-lucide="bar-chart-2"
+              style="
+                width: 16px;
+                height: 16px;
+                color: var(--color-primary);
+                vertical-align: middle;
+                margin-left: 6px;
+              "
+            ></i>
+            ايرادات اخر 7 ايام
+          </div>
+          <div class="admin-chart-total">
+            <span class="admin-chart-total__label">الاجمالي</span>
+            <span class="admin-chart-total__value"
+              >{{ weeklyTotal | currency:'':0 }} ج.م</span
+            >
+          </div>
+        </div>
+        <div class="admin-chart-container">
+          <canvas id="revenueChart" height="160"></canvas>
+          <div class="admin-chart-empty" ng-if="weeklyTotal == 0">
+            <i
+              data-lucide="bar-chart-2"
+              style="width: 32px; height: 32px; opacity: 0.2"
+            ></i>
+            <p>لا توجد بيانات كافية</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock Alert Panel -->
+      <div class="admin-table-card admin-low-stock-card">
+        <div class="admin-table-card__header">
+          <div class="admin-table-card__title">
+            <i
+              data-lucide="alert-triangle"
+              style="
+                width: 16px;
+                height: 16px;
+                color: #f99d1c;
+                vertical-align: middle;
+                margin-left: 6px;
+              "
+            ></i>
+            تنبيهات المخزون
+          </div>
+          <a
+            href="#!/admin/products"
+            class="admin-btn admin-btn--ghost admin-btn--sm"
+          >
+            ادارة المنتجات
+            <i data-lucide="arrow-left" style="width: 13px; height: 13px"></i>
+          </a>
+        </div>
+        <div class="admin-low-stock-list">
+          <div
+            class="admin-low-stock-item"
+            ng-repeat="p in lowStockProducts | limitTo:6"
+          >
+            <img
+              ng-src="{{ p.image_url || 'https://placehold.co/36x36/f5f5f5/999?text=?' }}"
+              class="admin-low-stock-img"
+              onerror="
+                this.src = 'https://placehold.co/36x36/f5f5f5/999?text=?'
+              "
+            />
+            <div class="admin-low-stock-info">
+              <div class="admin-low-stock-name">{{ p.name_ar }}</div>
+              <div class="admin-low-stock-meta">
+                {{ p.manufacturer_ar || p.manufacturer }}
+              </div>
+            </div>
+            <div
+              class="admin-stock admin-low-stock-qty"
+              ng-class="{
+                'admin-stock--out': p.stock === 0,
+                'admin-stock--low': p.stock > 0 && p.stock < 10
+              }"
+            >
+              {{ p.stock === 0 ? 'نفد' : p.stock + ' متبقي' }}
+            </div>
+          </div>
+          <div
+            class="admin-empty"
+            ng-if="!lowStockProducts.length"
+            style="padding: 24px"
+          >
+            <i
+              data-lucide="check-circle"
+              style="
+                width: 28px;
+                height: 28px;
+                opacity: 0.3;
+                margin-bottom: 8px;
+              "
+            ></i>
+            <div class="admin-empty__text" style="font-size: 13px">
+              المخزون بحالة جيدة
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -81,7 +230,19 @@
     <!-- Recent Orders Table -->
     <div class="admin-table-card" ng-if="!loading">
       <div class="admin-table-card__header">
-        <div class="admin-table-card__title">اخر الطلبات</div>
+        <div class="admin-table-card__title">
+          <i
+            data-lucide="clock"
+            style="
+              width: 16px;
+              height: 16px;
+              color: var(--color-primary);
+              vertical-align: middle;
+              margin-left: 6px;
+            "
+          ></i>
+          اخر الطلبات
+        </div>
         <a
           href="#!/admin/orders"
           class="admin-btn admin-btn--ghost admin-btn--sm"
@@ -106,14 +267,23 @@
           <tbody>
             <tr class="admin-table-row" ng-repeat="order in recentOrders">
               <td class="admin-td">
-                <span style="font-weight: 600">#{{ order.id }}</span>
+                <span class="admin-order-id">#{{ order.id }}</span>
               </td>
               <td class="admin-td">
-                <div style="font-weight: 500">
-                  {{ order.profiles.full_name || 'غير معروف' }}
-                </div>
-                <div style="font-size: 12px; color: var(--color-text-muted)">
-                  {{ order.profiles.email }}
+                <div class="admin-customer-cell">
+                  <div class="admin-customer-avatar">
+                    {{ (order.profiles.full_name || 'U')[0] }}
+                  </div>
+                  <div>
+                    <div style="font-weight: 500">
+                      {{ order.profiles.full_name || 'غير معروف' }}
+                    </div>
+                    <div
+                      style="font-size: 12px; color: var(--color-text-muted)"
+                    >
+                      {{ order.profiles.email }}
+                    </div>
+                  </div>
                 </div>
               </td>
               <td class="admin-td" style="white-space: nowrap">
@@ -124,7 +294,7 @@
               </td>
               <td class="admin-td">
                 <span
-                  class="admin-badge"
+                  class="admin-badge admin-badge--dot"
                   ng-class="{
                         'admin-badge--pending': order.status === 'pending',
                         'admin-badge--processing': order.status === 'processing',
@@ -132,6 +302,7 @@
                         'admin-badge--cancelled': order.status === 'cancelled'
                       }"
                 >
+                  <span class="admin-badge__dot"></span>
                   {{ statusLabels[order.status] || order.status }}
                 </span>
               </td>

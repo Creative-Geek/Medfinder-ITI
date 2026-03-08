@@ -31,6 +31,10 @@ angular.module("medfinderApp").factory("AdminService", [
                 new Date().toISOString().split("T")[0],
               { headers: { Prefer: "count=exact" } },
             ),
+            // Total products
+            products: $http.get(rest + "/products?select=id", {
+              headers: { Prefer: "count=exact" },
+            }),
           })
           .then(function (results) {
             // Sum up total sales
@@ -57,6 +61,7 @@ angular.module("medfinderApp").factory("AdminService", [
               customerCount: extractCount(results.customers),
               lowStockCount: extractCount(results.lowStock),
               todayOrderCount: extractCount(results.todayOrders),
+              productCount: extractCount(results.products),
             };
           });
       },
@@ -95,14 +100,65 @@ angular.module("medfinderApp").factory("AdminService", [
         );
       },
 
+      // Low-stock products (stock < 10), sorted ascending
+      getLowStockProducts: function () {
+        return $http.get(
+          rest +
+            "/products?select=id,name_ar,manufacturer,manufacturer_ar,image_url,stock&stock=lt.10&order=stock.asc&limit=10",
+        );
+      },
+
+      // Last 7 days revenue per calendar day
+      getWeeklyRevenue: function () {
+        var days = [];
+        var labels = [];
+        var now = new Date();
+        for (var i = 6; i >= 0; i--) {
+          var d = new Date(now);
+          d.setDate(d.getDate() - i);
+          var iso = d.toISOString().split("T")[0];
+          days.push(iso);
+          // Short Arabic weekday abbrs
+          var dayNames = ["أحد", "اثن", "ثلا", "أرب", "خمس", "جمع", "سبت"];
+          labels.push(dayNames[d.getDay()]);
+        }
+
+        var weekStart = days[0];
+        return $http
+          .get(
+            rest +
+              "/orders?select=total,created_at&created_at=gte." +
+              weekStart +
+              "T00:00:00&status=neq.cancelled&order=created_at.asc",
+          )
+          .then(function (res) {
+            var orders = res.data || [];
+            var buckets = {};
+            days.forEach(function (d) {
+              buckets[d] = 0;
+            });
+            orders.forEach(function (o) {
+              var day = o.created_at ? o.created_at.split("T")[0] : null;
+              if (day && buckets[day] !== undefined) {
+                buckets[day] += Number(o.total || 0);
+              }
+            });
+            var values = days.map(function (d) {
+              return buckets[d];
+            });
+            var total = values.reduce(function (s, v) {
+              return s + v;
+            }, 0);
+            return { labels: labels, values: values, total: total };
+          });
+      },
+
       // Upload product image to Supabase storage
       uploadImage: function (file) {
         var ext = file.name.split(".").pop();
         var filename =
           Date.now() + "-" + Math.random().toString(36).slice(2) + "." + ext;
         var bucket = "product-images";
-
-        var token = localStorage.getItem("sb_access_token");
 
         return $http({
           method: "POST",

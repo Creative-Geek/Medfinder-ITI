@@ -57,15 +57,52 @@
       </button>
     </div>
 
-    <!-- Search -->
-    <div class="admin-search-bar">
-      <i data-lucide="search"></i>
-      <input
-        type="text"
-        ng-model="searchQuery"
-        ng-change="applyFilters()"
-        placeholder="البحث باسم العميل..."
-      />
+    <!-- Search & Date Filter Toolbar -->
+    <div class="admin-toolbar">
+      <div
+        class="admin-search-bar"
+        style="margin-bottom: 0; flex: 1; max-width: 400px"
+      >
+        <i data-lucide="search"></i>
+        <input
+          type="text"
+          ng-model="searchQuery"
+          ng-change="applyFilters()"
+          placeholder="البحث باسم العميل..."
+        />
+      </div>
+
+      <div class="admin-toolbar__actions">
+        <!-- Date Quick Filters -->
+        <button
+          class="admin-btn admin-btn--ghost admin-btn--sm"
+          ng-click="setDateFilter('today')"
+          ng-class="{'admin-btn--primary': dateFilter === 'today', 'admin-btn--ghost': dateFilter !== 'today'}"
+        >
+          <i data-lucide="calendar" style="width: 14px; height: 14px"></i> اليوم
+        </button>
+        <button
+          class="admin-btn admin-btn--ghost admin-btn--sm"
+          ng-click="setDateFilter('week')"
+          ng-class="{'admin-btn--primary': dateFilter === 'week', 'admin-btn--ghost': dateFilter !== 'week'}"
+        >
+          هذا الاسبوع
+        </button>
+        <button
+          class="admin-btn admin-btn--ghost admin-btn--sm"
+          ng-click="setDateFilter('month')"
+          ng-class="{'admin-btn--primary': dateFilter === 'month', 'admin-btn--ghost': dateFilter !== 'month'}"
+        >
+          هذا الشهر
+        </button>
+        <button
+          class="admin-btn admin-btn--ghost admin-btn--sm"
+          ng-click="setDateFilter('all')"
+          ng-if="dateFilter !== 'all'"
+        >
+          <i data-lucide="x" style="width: 14px; height: 14px"></i>
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -110,14 +147,23 @@
                 ></i>
               </td>
               <td class="admin-td">
-                <span style="font-weight: 600">#{{ order.id }}</span>
+                <span class="admin-order-id">#{{ order.id }}</span>
               </td>
               <td class="admin-td">
-                <div style="font-weight: 500">
-                  {{ order.profiles.full_name || 'غير معروف' }}
-                </div>
-                <div style="font-size: 12px; color: var(--color-text-muted)">
-                  {{ order.profiles.email }}
+                <div class="admin-customer-cell">
+                  <div class="admin-customer-avatar">
+                    {{ (order.profiles.full_name || 'U')[0] }}
+                  </div>
+                  <div>
+                    <div style="font-weight: 500">
+                      {{ order.profiles.full_name || 'غير معروف' }}
+                    </div>
+                    <div
+                      style="font-size: 12px; color: var(--color-text-muted)"
+                    >
+                      {{ order.profiles.email }}
+                    </div>
+                  </div>
                 </div>
               </td>
               <td class="admin-td" style="white-space: nowrap">
@@ -129,7 +175,7 @@
               </td>
               <td class="admin-td">
                 <span
-                  class="admin-badge"
+                  class="admin-badge admin-badge--dot"
                   ng-class="{
                           'admin-badge--pending': order.status === 'pending',
                           'admin-badge--processing': order.status === 'processing',
@@ -137,6 +183,7 @@
                           'admin-badge--cancelled': order.status === 'cancelled'
                         }"
                 >
+                  <span class="admin-badge__dot"></span>
                   {{ statusLabels[order.status] }}
                 </span>
               </td>

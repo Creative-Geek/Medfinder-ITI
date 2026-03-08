@@ -16,7 +16,11 @@ angular.module("medfinderApp").config([
             if (config.url && config.url.indexOf(SUPABASE.URL) === 0) {
               config.headers = config.headers || {};
               config.headers["apikey"] = SUPABASE.KEY;
-              config.headers["Content-Type"] = "application/json";
+              if (config.transformRequest === angular.identity) {
+                // Raw upload (e.g. file/image) -- keep the original Content-Type
+              } else {
+                config.headers["Content-Type"] = "application/json";
+              }
 
               // Attach bearer token if user is logged in
               var token = localStorage.getItem("sb_access_token");

@@ -14,6 +14,7 @@ angular.module("medfinderApp").controller("AdminOrdersController", [
     $scope.loading = true;
     $scope.searchQuery = "";
     $scope.activeTab = "all";
+    $scope.dateFilter = "all"; // 'all', 'today', 'week', 'month'
     $scope.printOrder = null;
     $scope.today = new Date();
 
@@ -43,6 +44,7 @@ angular.module("medfinderApp").controller("AdminOrdersController", [
 
             if (found) {
               $scope.activeTab = "all";
+              $scope.dateFilter = "all";
               found._expanded = true;
 
               // Optionally scroll to it
@@ -87,6 +89,11 @@ angular.module("medfinderApp").controller("AdminOrdersController", [
       applyFilters();
     };
 
+    $scope.setDateFilter = function (filter) {
+      $scope.dateFilter = filter;
+      applyFilters();
+    };
+
     $scope.applyFilters = applyFilters;
 
     function applyFilters() {
@@ -96,6 +103,36 @@ angular.module("medfinderApp").controller("AdminOrdersController", [
       if ($scope.activeTab !== "all") {
         orders = orders.filter(function (o) {
           return o.status === $scope.activeTab;
+        });
+      }
+
+      // Date Filter
+      if ($scope.dateFilter !== "all" && orders.length > 0) {
+        var now = new Date();
+        var todayStart = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+        ).getTime();
+
+        var weekStart = new Date(now);
+        weekStart.setDate(now.getDate() - 7);
+        weekStart.setHours(0, 0, 0, 0);
+        var weekTime = weekStart.getTime();
+
+        var monthStart = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+        ).getTime();
+
+        orders = orders.filter(function (o) {
+          if (!o.created_at) return false;
+          var t = new Date(o.created_at).getTime();
+          if ($scope.dateFilter === "today") return t >= todayStart;
+          if ($scope.dateFilter === "week") return t >= weekTime;
+          if ($scope.dateFilter === "month") return t >= monthStart;
+          return true;
         });
       }
 

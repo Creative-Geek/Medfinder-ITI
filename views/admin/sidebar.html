@@ -47,9 +47,31 @@
 
   <!-- Footer -->
   <div class="admin-sidebar__footer">
-    <a href="#!/" class="admin-sidebar__link">
+    <div class="admin-sidebar__user">
+      <div class="admin-sidebar__user-avatar" id="sidebar-admin-avatar">A</div>
+      <div class="admin-sidebar__user-info">
+        <div class="admin-sidebar__user-name" id="sidebar-admin-name">
+          المدير
+        </div>
+        <div class="admin-sidebar__user-role">مسؤول النظام</div>
+      </div>
+    </div>
+    <a href="#!/" class="admin-sidebar__link admin-sidebar__link--exit">
       <i data-lucide="arrow-right"></i>
       العودة للمتجر
     </a>
   </div>
 </aside>
+
+<script>
+  setTimeout(function () {
+    try {
+      var userStr = localStorage.getItem("sb_user");
+      var user = userStr ? JSON.parse(userStr) : null;
+      var name = (user && (user.full_name || user.email)) || "المدير";
+      var letter = name.charAt(0).toUpperCase();
+      document.getElementById("sidebar-admin-name").textContent = name;
+      document.getElementById("sidebar-admin-avatar").textContent = letter;
+    } catch (e) {}
+  }, 100);
+</script>

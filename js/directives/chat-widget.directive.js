@@ -10,6 +10,7 @@ angular.module("medfinderApp").directive("chatWidget", [
       link: function (scope, element) {
         scope.isOpen = false;
         scope.isLoading = false;
+        scope.isDragOver = false;
         scope.inputText = "";
         scope.selectedImage = null; // raw base64 after resize
         scope.messages = [];
@@ -75,6 +76,82 @@ angular.module("medfinderApp").directive("chatWidget", [
           scope.saveState();
         };
 
+        function resetFileInput() {
+          var fileInput = element[0].querySelector('input[type="file"]');
+          if (fileInput) fileInput.value = "";
+        }
+
+        function hasImageData(dataTransfer) {
+          if (!dataTransfer) return false;
+
+          var files = dataTransfer.files;
+          if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].type && files[i].type.indexOf("image/") === 0) {
+                return true;
+              }
+            }
+          }
+
+          var items = dataTransfer.items;
+          if (items && items.length) {
+            for (var j = 0; j < items.length; j++) {
+              if (
+                items[j].kind === "file" &&
+                items[j].type &&
+                items[j].type.indexOf("image/") === 0
+              ) {
+                return true;
+              }
+            }
+          }
+
+          return false;
+        }
+
+        function hasFileData(dataTransfer) {
+          if (!dataTransfer) return false;
+
+          if (dataTransfer.files && dataTransfer.files.length) return true;
+
+          var items = dataTransfer.items;
+          if (items && items.length) {
+            for (var i = 0; i < items.length; i++) {
+              if (items[i].kind === "file") return true;
+            }
+          }
+
+          return false;
+        }
+
+        function getImageFile(dataTransfer) {
+          if (!dataTransfer) return null;
+
+          var files = dataTransfer.files;
+          if (files && files.length) {
+            for (var i = 0; i < files.length; i++) {
+              if (files[i].type && files[i].type.indexOf("image/") === 0) {
+                return files[i];
+              }
+            }
+          }
+
+          var items = dataTransfer.items;
+          if (items && items.length) {
+            for (var j = 0; j < items.length; j++) {
+              if (
+                items[j].kind === "file" &&
+                items[j].type &&
+                items[j].type.indexOf("image/") === 0
+              ) {
+                return items[j].getAsFile();
+              }
+            }
+          }
+
+          return null;
+        }
+
         scope.onFileSelect = function (files) {
           if (!files || files.length === 0) return;
           scope.errorMessage = null;
@@ -94,14 +171,14 @@ angular.module("medfinderApp").directive("chatWidget", [
               scope.isLoading = false;
             });
 
-          // Reset file input
-          element[0].querySelector('input[type="file"]').value = "";
+          resetFileInput();
         };
 
-        // Listen for Ctrl+V paste events anywhere inside the chat window
         var chatWin = element[0].querySelector(".chat-window");
+        var dragDepth = 0;
+
         if (chatWin) {
-          chatWin.addEventListener("paste", function (e) {
+          var handlePaste = function (e) {
             var items = (
               e.clipboardData ||
               (e.originalEvent && e.originalEvent.clipboardData) ||
@@ -113,13 +190,91 @@ angular.module("medfinderApp").directive("chatWidget", [
                 e.preventDefault();
                 var file = items[i].getAsFile();
                 if (file) {
-                  scope.$apply(function () {
+                  scope.$applyAsync(function () {
                     scope.onFileSelect([file]);
                   });
                 }
                 break;
               }
             }
+          };
+
+          var handleDragEnter = function (e) {
+            if (!hasFileData(e.dataTransfer)) return;
+            e.preventDefault();
+
+            if (scope.isLoading || !hasImageData(e.dataTransfer)) return;
+
+            dragDepth += 1;
+            scope.$applyAsync(function () {
+              scope.isDragOver = true;
+              scope.errorMessage = null;
+            });
+          };
+
+          var handleDragOver = function (e) {
+            if (!hasFileData(e.dataTransfer)) return;
+            e.preventDefault();
+
+            if (scope.isLoading || !hasImageData(e.dataTransfer)) return;
+
+            if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+            if (!scope.isDragOver) {
+              scope.$applyAsync(function () {
+                scope.isDragOver = true;
+                scope.errorMessage = null;
+              });
+            }
+          };
+
+          var handleDragLeave = function () {
+            if (!scope.isDragOver) return;
+            dragDepth = Math.max(dragDepth - 1, 0);
+            if (dragDepth === 0) {
+              scope.$applyAsync(function () {
+                scope.isDragOver = false;
+              });
+            }
+          };
+
+          var handleDrop = function (e) {
+            var imageFile = getImageFile(e.dataTransfer);
+            var hasDroppedFiles = !!(
+              e.dataTransfer &&
+              e.dataTransfer.files &&
+              e.dataTransfer.files.length
+            );
+
+            if (!imageFile && !hasDroppedFiles) return;
+
+            e.preventDefault();
+            dragDepth = 0;
+            scope.$applyAsync(function () {
+              scope.isDragOver = false;
+
+              if (scope.isLoading) return;
+
+              if (imageFile) {
+                scope.onFileSelect([imageFile]);
+                return;
+              }
+
+              scope.errorMessage = "يرجى سحب صورة فقط.";
+            });
+          };
+
+          chatWin.addEventListener("paste", handlePaste);
+          chatWin.addEventListener("dragenter", handleDragEnter);
+          chatWin.addEventListener("dragover", handleDragOver);
+          chatWin.addEventListener("dragleave", handleDragLeave);
+          chatWin.addEventListener("drop", handleDrop);
+
+          scope.$on("$destroy", function () {
+            chatWin.removeEventListener("paste", handlePaste);
+            chatWin.removeEventListener("dragenter", handleDragEnter);
+            chatWin.removeEventListener("dragover", handleDragOver);
+            chatWin.removeEventListener("dragleave", handleDragLeave);
+            chatWin.removeEventListener("drop", handleDrop);
           });
         }
 
