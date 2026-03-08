@@ -4,8 +4,16 @@ angular.module("medfinderApp").controller("ShopController", [
   "$location",
   "$http",
   "SUPABASE",
+  "SHOP_CATEGORY_TREE",
   "CartService",
-  function ($scope, $location, $http, SUPABASE, CartService) {
+  function (
+    $scope,
+    $location,
+    $http,
+    SUPABASE,
+    SHOP_CATEGORY_TREE,
+    CartService,
+  ) {
     var REST = SUPABASE.REST_URL;
     var PAGE_SIZE = 12;
 
@@ -24,90 +32,11 @@ angular.module("medfinderApp").controller("ShopController", [
     $scope.searchQuery = "";
     $scope.sortBy = "name_ar.asc";
 
-    // ── Type -> Category tree (from actual DB data) ──
-    $scope.categoryTree = [
-      {
-        type: "الأدوية",
-        label: "الأدوية",
-        open: false,
-        categories: [
-          { name: "الفيتامينات و المكملات الغذائية", count: 10 },
-          { name: "الحموضة وسوء الهضم", count: 8 },
-          { name: "الكحة", count: 7 },
-          { name: "بديل للسكر", count: 7 },
-          { name: "مسكنات", count: 6 },
-          { name: "مضادات حيوية", count: 6 },
-          { name: "المغص", count: 5 },
-          { name: "امساك", count: 5 },
-          { name: "البرد و السعال", count: 3 },
-          { name: "مضادات حيوية موضعية", count: 3 },
-          { name: "الحروق البسيطة", count: 1 },
-        ],
-      },
-      {
-        type: "الحماية من الفيروسات",
-        label: "الحماية من الفيروسات",
-        open: false,
-        categories: [{ name: "تقوية المناعة", count: 5 }],
-      },
-      {
-        type: "منتجات المرأة",
-        label: "منتجات المرأة",
-        open: false,
-        categories: [
-          { name: "فوط صحية", count: 4 },
-          { name: "إزالة الشعر", count: 4 },
-          { name: "مزيل العرق للسيدات", count: 4 },
-          { name: "صحة المرأة", count: 1 },
-        ],
-      },
-      {
-        type: "الأم و الطفل",
-        label: "الأم و الطفل",
-        open: false,
-        categories: [
-          { name: "الحفاضات و الكريمات", count: 4 },
-          { name: "لبن الاطفال", count: 4 },
-          { name: "العناية بالأم", count: 3 },
-        ],
-      },
-      {
-        type: "العناية بالبشرة و الشعر",
-        label: "العناية بالبشرة و الشعر",
-        open: false,
-        categories: [
-          { name: "الحماية من الشمس", count: 8 },
-          { name: "العناية باليد و القدم", count: 6 },
-          { name: "غسول الوجه", count: 6 },
-          { name: "بلسم الشعر", count: 5 },
-          { name: "شامبو", count: 4 },
-          { name: "ماسكات الوجه", count: 3 },
-          { name: "تفتيح البشرة", count: 3 },
-          { name: "مزيل المكياج", count: 3 },
-        ],
-      },
-      {
-        type: "العناية بالاسنان",
-        label: "العناية بالاسنان",
-        open: false,
-        categories: [
-          { name: "عناية الفم", count: 8 },
-          { name: "معجون الأسنان", count: 4 },
-          { name: "العناية بالفم", count: 4 },
-          { name: "فرشاة الأسنان", count: 4 },
-        ],
-      },
-      {
-        type: "منتجات الرجال",
-        label: "منتجات الرجال",
-        open: false,
-        categories: [
-          { name: "مزيل العرق للرجال", count: 4 },
-          { name: "جل الحلاقة", count: 4 },
-          { name: "مستلزمات الحلاقة", count: 3 },
-        ],
-      },
-    ];
+    // ── Type -> Category tree (shared with admin form) ──
+    $scope.categoryTree = angular.copy(SHOP_CATEGORY_TREE).map(function (node) {
+      node.open = false;
+      return node;
+    });
 
     // Brand list (populated from current results)
     $scope.brandList = [];

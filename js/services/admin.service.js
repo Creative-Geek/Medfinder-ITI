@@ -104,7 +104,7 @@ angular.module("medfinderApp").factory("AdminService", [
       getLowStockProducts: function () {
         return $http.get(
           rest +
-            "/products?select=id,name_ar,manufacturer,manufacturer_ar,image_url,stock&stock=lt.10&order=stock.asc&limit=10",
+            "/products?select=id,name_ar,manufacturer,image_url,stock&stock=lt.10&order=stock.asc&limit=10",
         );
       },
 

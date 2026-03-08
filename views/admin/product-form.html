@@ -1,0 +1,466 @@
+<!-- Admin Product Form -->
+<div class="admin-layout">
+  <div
+    ng-include="'views/admin/sidebar.html'"
+    ng-init="activePage='products'"
+  ></div>
+
+  <div class="admin-content">
+    <div class="admin-form-page">
+      <div
+        class="admin-page-header"
+        style="
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 12px;
+        "
+      >
+        <div>
+          <h1 class="admin-page-header__title">{{ pageTitle }}</h1>
+          <p class="admin-page-header__subtitle">{{ pageSubtitle }}</p>
+        </div>
+
+        <div class="admin-page-header__actions">
+          <button class="admin-btn admin-btn--ghost" ng-click="goBack()">
+            <i data-lucide="arrow-right" style="width: 16px; height: 16px"></i>
+            العودة للمنتجات
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-form-card" ng-if="loadingProduct">
+        <div
+          class="admin-form-card__body"
+          style="text-align: center; padding: 40px 24px"
+        >
+          جاري تحميل بيانات المنتج...
+        </div>
+      </div>
+
+      <div class="admin-form-card" ng-if="!loadingProduct">
+        <form ng-submit="saveProduct()">
+          <div class="admin-form-card__body">
+            <div class="admin-modal__section">
+              <div class="admin-modal__section-title">المعلومات الاساسية</div>
+              <div class="admin-form-grid">
+                <div class="admin-form-group">
+                  <label class="admin-form-label">الاسم (عربي) *</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form.name_ar"
+                    required
+                    placeholder="الاسم الظاهر للعميل بالعربي، مثال: بانادول اكسترا"
+                  />
+                  <span class="admin-form-hint"
+                    >استخدم نفس الصياغة التي ستظهر في بطاقة المنتج وصفحته</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">الاسم (انجليزي) *</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form.name_en"
+                    required
+                    placeholder="Official English name, e.g. Panadol Extra"
+                  />
+                  <span class="admin-form-hint"
+                    >يفضل مطابقته للاسم الموجود على العبوة او المصدر</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">السعر (ج.م) *</label>
+                  <input
+                    type="number"
+                    class="admin-form-input"
+                    ng-model="form.price"
+                    required
+                    min="0"
+                    step="0.01"
+                    placeholder="رقم فقط بدون ج.م، مثال: 85.50"
+                  />
+                  <span class="admin-form-hint"
+                    >سيتم حفظه كرقم، لذلك لا تضف نصوصا او رموز عملة</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">المخزون *</label>
+                  <input
+                    type="number"
+                    class="admin-form-input"
+                    ng-model="form.stock"
+                    required
+                    min="0"
+                    placeholder="عدد الوحدات المتاحة حاليا، مثال: 120"
+                  />
+                  <span class="admin-form-hint"
+                    >اكتب قيمة صحيحة فقط، والصفر يعني غير متوفر</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">النوع *</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form.type"
+                    required
+                    placeholder="صيغة ثابتة مثل: اقراص، شراب، كريم، نقط"
+                  />
+                  <span class="admin-form-hint"
+                    >ثبت نفس القيم بين المنتجات المتشابهة لتسهيل التصنيف
+                    والفلترة</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">الماركة</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form.brand"
+                    placeholder="اسم العلامة التجارية، مثال: Panadol او Pfizer"
+                  />
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">المصنع</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form.manufacturer"
+                    placeholder="اسم الشركة المصنعة كما في المصدر، مثال: GlaxoSmithKline"
+                  />
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">الحجم / التركيز</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form.volume"
+                    placeholder="مثال: 24 قرص، 120 مل، 500 مجم"
+                  />
+                  <span class="admin-form-hint"
+                    >يمكنك دمج الحجم او التركيز او عدد الوحدات حسب ما سيظهر
+                    للعميل</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-modal__section">
+              <div class="admin-modal__section-title">صورة المنتج</div>
+
+              <div
+                class="admin-drop-zone"
+                ng-class="{'admin-drop-zone--active': isDragging}"
+                ng-click="triggerFileInput()"
+                admin-drop-zone
+                on-file-drop="handleFileDrop(file)"
+              >
+                <div ng-if="!imagePreview">
+                  <i
+                    data-lucide="upload-cloud"
+                    style="
+                      width: 32px;
+                      height: 32px;
+                      display: block;
+                      margin: 0 auto 8px;
+                    "
+                    class="admin-drop-zone__icon"
+                  ></i>
+                  <div class="admin-drop-zone__text">
+                    اسحب وافلت الصورة هنا او <strong>اضغط للاختيار</strong>
+                  </div>
+                </div>
+
+                <div
+                  ng-if="imagePreview"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    justify-content: center;
+                  "
+                >
+                  <img
+                    ng-src="{{ imagePreview }}"
+                    class="admin-image-preview"
+                    alt="Preview"
+                  />
+                  <div style="text-align: right">
+                    <div
+                      style="
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: var(--color-success);
+                      "
+                    >
+                      {{ uploadStatus === 'success' ? 'تم رفع الصورة' : 'معاينة
+                      الصورة الحالية' }}
+                    </div>
+                    <button
+                      type="button"
+                      class="admin-btn admin-btn--ghost admin-btn--sm"
+                      ng-click="clearImage($event)"
+                      style="margin-top: 4px"
+                    >
+                      <i data-lucide="x" style="width: 14px; height: 14px"></i>
+                      ازالة
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <input
+                type="file"
+                id="admin-product-image-file"
+                accept="image/*"
+                style="display: none"
+                onchange="angular.element(this).scope().handleFileSelect(this)"
+              />
+
+              <div class="admin-upload-row">
+                <input
+                  type="url"
+                  class="admin-form-input"
+                  style="flex: 1"
+                  ng-model="form.image_url"
+                  ng-change="syncImagePreviewFromUrl()"
+                  placeholder="رابط مباشر للصورة يبدأ بـ https://"
+                />
+                <a
+                  href="https://product-image-processor.vercel.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="admin-btn admin-btn--ghost admin-btn--sm"
+                  title="Product Image Processor"
+                >
+                  <i data-lucide="zap" style="width: 15px; height: 15px"></i>
+                </a>
+              </div>
+              <div class="admin-form-hint" style="margin-top: 8px">
+                يمكنك الرفع مباشرة او لصق رابط الصورة النهائي. لو غيرت الرابط
+                يدويا ستتحدث المعاينة تلقائيا.
+              </div>
+
+              <div
+                class="admin-upload-status"
+                ng-if="uploadStatus"
+                ng-class="{'admin-upload-status--success': uploadStatus === 'success', 'admin-upload-status--error': uploadStatus === 'error'}"
+              >
+                {{ uploadMessage }}
+              </div>
+            </div>
+
+            <div class="admin-modal__section">
+              <div class="admin-modal__section-title">الوصف</div>
+              <div class="admin-form-grid">
+                <div class="admin-form-group admin-form-group--full">
+                  <label class="admin-form-label">وصف قصير</label>
+                  <textarea
+                    class="admin-form-input"
+                    ng-model="form.description"
+                    rows="2"
+                    placeholder="سطر مختصر يظهر في واجهة المنتج، مثال: مسكن وخافض للحرارة سريع المفعول"
+                  ></textarea>
+                </div>
+
+                <div class="admin-form-group admin-form-group--full">
+                  <label class="admin-form-label">وصف تفصيلي</label>
+                  <textarea
+                    class="admin-form-input"
+                    ng-model="form.long_description"
+                    rows="4"
+                    placeholder="اكتب وصفا اوضح للمنتج وفائدته ومتى يستخدم، بدون خلطه مع الحقول القائمة مثل دواعي الاستعمال او التحذيرات"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-modal__section">
+              <div class="admin-modal__section-title">التفاصيل المنظمة</div>
+              <div class="admin-form-hint" style="margin-bottom: 12px">
+                الحقول التالية تتحول الى قوائم داخل قاعدة البيانات. اكتب عناصر
+                قصيرة وافصل بينها بفاصلة عربية (،) او انجليزية (,).
+              </div>
+
+              <div class="admin-form-grid">
+                <div class="admin-form-group admin-form-group--full">
+                  <label class="admin-form-label">الفئات</label>
+                  <span class="admin-form-hint" style="margin-bottom: 10px">
+                    اختر فقط من الفئات الموجودة في سايدبار المتجر. يمكنك تحديد
+                    اكثر من فئة عند الحاجة.
+                  </span>
+
+                  <div class="admin-category-selector">
+                    <div
+                      class="admin-category-group"
+                      ng-repeat="group in categoryGroups track by group.type"
+                    >
+                      <div class="admin-category-group__title">
+                        {{ group.label }}
+                      </div>
+
+                      <div class="admin-category-options">
+                        <label
+                          class="admin-category-option"
+                          ng-class="{'admin-category-option--selected': isCategorySelected(categoryName)}"
+                          ng-repeat="categoryName in group.categories track by categoryName"
+                        >
+                          <input
+                            type="checkbox"
+                            class="admin-category-option__checkbox"
+                            ng-checked="isCategorySelected(categoryName)"
+                            ng-click="toggleCategorySelection(categoryName)"
+                          />
+                          <span>{{ categoryName }}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="admin-form-hint" ng-if="!form._category.length">
+                    لم يتم اختيار اي فئة بعد.
+                  </div>
+
+                  <div
+                    class="admin-selected-categories"
+                    ng-if="form._category.length"
+                  >
+                    <span class="admin-selected-categories__label"
+                      >الفئات المختارة:</span
+                    >
+                    <span
+                      class="admin-selected-category"
+                      ng-repeat="categoryName in form._category track by categoryName"
+                    >
+                      {{ categoryName }}
+                    </span>
+                  </div>
+
+                  <div
+                    class="admin-form-hint"
+                    ng-if="unavailableCategoryValues.length"
+                  >
+                    توجد فئات محفوظة سابقا خارج قائمة السايدبار الحالية: {{
+                    unavailableCategoryValues.join('، ') }}. عند الحفظ سيتم
+                    الاحتفاظ فقط بالفئات المتاحة اعلاه.
+                  </div>
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">المادة الفعالة</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form._active_ingredient"
+                    placeholder="مثال: Paracetamol، Caffeine"
+                  />
+                  <span class="admin-form-hint"
+                    >اكتب اسم كل مادة مرة واحدة فقط وبصياغة ثابتة</span
+                  >
+                </div>
+
+                <div class="admin-form-group admin-form-group--full">
+                  <label class="admin-form-label">دواعي الاستعمال</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form._use_cases"
+                    placeholder="مثال: صداع، حمى، الم اسنان، اعراض البرد"
+                  />
+                  <span class="admin-form-hint"
+                    >استخدم نقاط قصيرة مفصولة بفواصل، وليس فقرة كاملة</span
+                  >
+                </div>
+
+                <div class="admin-form-group admin-form-group--full">
+                  <label class="admin-form-label">الاعراض الجانبية</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form._side_effects"
+                    placeholder="مثال: غثيان، دوخة، اضطراب معدة"
+                  />
+                  <span class="admin-form-hint"
+                    >يمكن تركه فارغا اذا لم تتوفر بيانات موثوقة</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">طريقة الاستخدام</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form._usage"
+                    placeholder="مثال: قرص بعد الاكل، 3 مرات يوميا"
+                  />
+                  <span class="admin-form-hint"
+                    >افصل التعليمات الفرعية بفواصل حتى تحفظ كعناصر منفصلة</span
+                  >
+                </div>
+
+                <div class="admin-form-group">
+                  <label class="admin-form-label">التحذيرات</label>
+                  <input
+                    type="text"
+                    class="admin-form-input"
+                    ng-model="form._warning"
+                    placeholder="مثال: لا يستخدم مع حساسية الباراسيتامول، يستشار الطبيب للحامل"
+                  />
+                  <span class="admin-form-hint"
+                    >اكتب التحذيرات كنقاط مستقلة قدر الامكان</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-form-card__footer">
+            <div class="admin-form-hint">
+              {{ isEditMode ? 'سيتم تحديث المنتج الحالي ثم الرجوع لقائمة
+              المنتجات' : 'سيتم انشاء المنتج ثم الرجوع لقائمة المنتجات' }}
+            </div>
+
+            <div class="admin-form-card__footer-actions">
+              <button
+                type="button"
+                class="admin-btn admin-btn--ghost"
+                ng-click="goBack()"
+              >
+                الغاء
+              </button>
+              <button
+                type="submit"
+                class="admin-btn admin-btn--primary"
+                ng-disabled="saving"
+              >
+                <i
+                  data-lucide="loader-2"
+                  style="width: 15px; height: 15px"
+                  class="admin-spin"
+                  ng-if="saving"
+                ></i>
+                <i
+                  data-lucide="save"
+                  style="width: 15px; height: 15px"
+                  ng-if="!saving"
+                ></i>
+                {{ saving ? 'جاري الحفظ...' : (isEditMode ? 'تحديث المنتج' :
+                'حفظ المنتج') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

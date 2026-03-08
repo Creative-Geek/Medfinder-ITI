@@ -65,6 +65,16 @@ angular.module("medfinderApp").config([
         controller: "AdminProductsController",
         access: "admin",
       })
+      .when("/admin/products/new", {
+        templateUrl: "views/admin/product-form.html",
+        controller: "AdminProductFormController",
+        access: "admin",
+      })
+      .when("/admin/products/:id/edit", {
+        templateUrl: "views/admin/product-form.html",
+        controller: "AdminProductFormController",
+        access: "admin",
+      })
       .when("/admin/orders", {
         templateUrl: "views/admin/orders.html",
         controller: "AdminOrdersController",

@@ -9,6 +9,7 @@ angular.module("medfinderApp").controller("AdminDashboardController", [
     $scope.stats = {};
     $scope.recentOrders = [];
     $scope.lowStockProducts = [];
+    $scope.lowStockLoadFailed = false;
     $scope.weeklyTotal = 0;
     $scope.today = new Date();
 
@@ -160,9 +161,12 @@ angular.module("medfinderApp").controller("AdminDashboardController", [
     // ─── Load Low Stock Products ─────────────────────────────────────────────
     AdminService.getLowStockProducts()
       .then(function (res) {
+        $scope.lowStockLoadFailed = false;
         $scope.lowStockProducts = res.data || [];
       })
-      .catch(function () {
+      .catch(function (err) {
+        console.error("Failed to load low stock products:", err);
+        $scope.lowStockLoadFailed = true;
         $scope.lowStockProducts = [];
       });
 

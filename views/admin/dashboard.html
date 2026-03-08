@@ -191,9 +191,7 @@
             />
             <div class="admin-low-stock-info">
               <div class="admin-low-stock-name">{{ p.name_ar }}</div>
-              <div class="admin-low-stock-meta">
-                {{ p.manufacturer_ar || p.manufacturer }}
-              </div>
+              <div class="admin-low-stock-meta">{{ p.manufacturer }}</div>
             </div>
             <div
               class="admin-stock admin-low-stock-qty"
@@ -207,7 +205,25 @@
           </div>
           <div
             class="admin-empty"
-            ng-if="!lowStockProducts.length"
+            ng-if="lowStockLoadFailed"
+            style="padding: 24px"
+          >
+            <i
+              data-lucide="alert-circle"
+              style="
+                width: 28px;
+                height: 28px;
+                opacity: 0.35;
+                margin-bottom: 8px;
+              "
+            ></i>
+            <div class="admin-empty__text" style="font-size: 13px">
+              تعذر تحميل تنبيهات المخزون
+            </div>
+          </div>
+          <div
+            class="admin-empty"
+            ng-if="!lowStockLoadFailed && !lowStockProducts.length"
             style="padding: 24px"
           >
             <i
