@@ -123,7 +123,7 @@ All 4 admin controllers are stubs too. byteStore has a single-page `admin.html` 
 | 5        | [x] **I. Dashboard link visibility**                     | Trivial | Done. Footer admin link now renders only for the admin user.                                        |
 | 6        | [x] **J. Profile dropdown chevron**                      | Trivial | Done. Navbar account trigger now includes a chevron indicator.                                      |
 | 7        | [x] **K. Qty vs stock validation**                       | Medium  | Done. UI cap + fresh stock check at checkout.                                                       |
-| 8        | **H. Admin dashboard**                                   | High    | 4 views + 4 controllers. Biggest chunk.                                                             |
+| 8        | [x]**H. Admin dashboard**                                | High    | 4 views + 4 controllers. Biggest chunk.                                                             |
 | 9        | [x] **D. Wishlist**                                      | Low-Med | Done. DB persistence + Wishlist page.                                                               |
 | 10       | [x] **G. About Us page**                                 | Low     | Static content, do last.                                                                            |
 | 11       | [x] **L. Stale cart handling**                           | Medium  | Done. Re-validates at checkout time.                                                                |

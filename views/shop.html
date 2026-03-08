@@ -73,7 +73,7 @@
           }"
           ng-show="products.length > 0 || loading"
         >
-          <div ng-repeat="product in products track by product.id">
+          <div ng-repeat="product in products track by product.id" data-reveal>
             <product-card
               product="product"
               on-add-to-cart="addToCart(product)"

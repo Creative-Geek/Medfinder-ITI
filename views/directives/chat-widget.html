@@ -1,0 +1,182 @@
+<!-- Chat Widget Directive Template -->
+<div class="chat-widget-container" ng-class="{ 'chat-widget--open': isOpen }">
+  <!-- Chat Button (Floating) -->
+  <button
+    class="chat-widget-fab"
+    ng-click="toggleChat()"
+    ng-if="!isOpen"
+    aria-label="محادثة الصيدلي"
+  >
+    <i data-lucide="message-circle" class="h-6 w-6"></i>
+  </button>
+
+  <!-- Chat Window -->
+  <div class="chat-window" ng-show="isOpen">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="flex items-center gap-2">
+        <div class="chat-avatar">
+          <i data-lucide="stethoscope" class="h-5 w-5 text-primary"></i>
+        </div>
+        <div>
+          <h3 class="chat-title">د. ميدفايندر</h3>
+          <span class="chat-subtitle">صيدلي مساعد</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1">
+        <button
+          class="chat-header-btn"
+          ng-click="clearSession()"
+          title="محادثة جديدة"
+          ng-if="messages.length > 0"
+        >
+          <i data-lucide="rotate-ccw" class="h-4 w-4"></i>
+        </button>
+        <button
+          class="chat-header-btn"
+          ng-click="toggleChat()"
+          aria-label="إغلاق"
+        >
+          <i data-lucide="x" class="h-5 w-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Area -->
+    <div class="chat-messages" id="chat-messages-area">
+      <!-- Empty state / Initial message -->
+      <div class="chat-message mb-4" ng-if="messages.length === 0">
+        <div class="chat-bubble chat-bubble--assistant">
+          أهلاً بك! أنا الصيدلي الآلي هنا للمساعدة. تقدر تسألني عن أي دواء، أو
+          تصورلي الروشتة وهشوفلك الأدوية المتوفرة منها.
+        </div>
+      </div>
+
+      <!-- Message History -->
+      <div
+        ng-repeat="msg in messages track by $index"
+        class="chat-message-row"
+        ng-class="{ 'chat-row--user': msg.role === 'user', 'chat-row--assistant': msg.role === 'assistant', 'chat-row--error': msg.isError }"
+      >
+        <div
+          class="chat-bubble"
+          ng-class="{ 'chat-bubble--user': msg.role === 'user', 'chat-bubble--assistant': msg.role === 'assistant', 'chat-bubble--error': msg.isError }"
+        >
+          <!-- Text content -->
+          <div ng-if="msg.content" class="whitespace-pre-wrap">
+            {{ msg.content }}
+          </div>
+
+          <!-- Image content -->
+          <img
+            ng-if="msg.image"
+            ng-src="{{ msg.image }}"
+            class="chat-img-attachment"
+            alt="مرفق"
+          />
+
+          <!-- Products Recommended -->
+          <div
+            ng-if="msg.products && msg.products.length > 0"
+            class="chat-product-list mt-2"
+          >
+            <div
+              ng-repeat="prod in msg.products track by prod.id"
+              class="chat-product-card"
+            >
+              <img
+                ng-src="{{ prod.image_url }}"
+                alt="{{ prod.name_ar }}"
+                class="h-10 w-10 object-contain rounded"
+              />
+              <div class="flex-1 min-w-0">
+                <a
+                  ng-href="#!/product/{{ prod.id }}"
+                  class="text-xs font-bold truncate block text-dark hover:text-primary no-underline"
+                  >{{ prod.name_ar }}</a
+                >
+                <span class="text-xs text-primary font-bold"
+                  >{{ prod.price }} ج.م</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="chat-message-row chat-row--assistant" ng-if="isLoading">
+        <div
+          class="chat-bubble chat-bubble--assistant flex gap-1 items-center h-8"
+        >
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+          <span class="typing-dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Preview (before send) -->
+    <div class="chat-image-preview" ng-if="selectedImage">
+      <img ng-src="{{ selectedImage }}" alt="Preview" />
+      <button class="chat-image-remove" ng-click="removeImage()">
+        <i data-lucide="x" class="h-3 w-3"></i>
+      </button>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-area">
+      <!-- Error notice -->
+      <div
+        class="text-xs text-red-500 mb-2 px-1 text-center"
+        ng-if="errorMessage"
+      >
+        {{ errorMessage }}
+      </div>
+
+      <form ng-submit="sendMessage()" class="flex items-end gap-2">
+        <!-- File attachment -->
+        <label class="chat-attach-btn" title="إرفاق روشتة أو صورة">
+          <input
+            type="file"
+            accept="image/*"
+            class="hidden"
+            onchange="angular.element(this).scope().onFileSelect(this.files)"
+            ng-disabled="isLoading"
+          />
+          <i data-lucide="paperclip" class="h-5 w-5"></i>
+        </label>
+
+        <!-- Text input -->
+        <textarea
+          class="chat-textarea form-input"
+          ng-model="inputText"
+          placeholder="اكتب رسالتك أو استفسارك هنا..."
+          rows="1"
+          ng-keydown="onKeydown($event)"
+          ng-disabled="isLoading"
+        ></textarea>
+
+        <!-- Send button -->
+        <button
+          type="submit"
+          class="chat-send-btn"
+          ng-disabled="isLoading || (!inputText.trim() && !selectedImage)"
+        >
+          <i data-lucide="send" class="h-5 w-5"></i>
+        </button>
+      </form>
+      <div class="text-center mt-2" ng-if="messages.length >= 16">
+        <span class="text-xs text-orange-500" ng-if="messages.length < 20"
+          >باقي {{ 20 - messages.length }} رسائل في هذه المحادثة</span
+        >
+        <span
+          class="text-xs text-red-500 font-bold cursor-pointer hover:underline"
+          ng-if="messages.length >= 20"
+          ng-click="clearSession()"
+          >الحد الأقصى للمحادثة وصل لك. ابدأ محادثة جديدة.</span
+        >
+      </div>
+    </div>
+  </div>
+</div>
