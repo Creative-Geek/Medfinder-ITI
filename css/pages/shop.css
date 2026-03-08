@@ -37,6 +37,66 @@
   min-width: 160px;
 }
 
+/* -- Active filter chips -- */
+.shop-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.shop-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-primary);
+  background: rgba(5, 131, 242, 0.08);
+  border: 1px solid rgba(5, 131, 242, 0.2);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.shop-filter-chip:hover {
+  background: rgba(5, 131, 242, 0.14);
+  border-color: rgba(5, 131, 242, 0.35);
+}
+
+.shop-filter-chip__label {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shop-filter-chip__x {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.shop-filter-chip:hover .shop-filter-chip__x {
+  opacity: 1;
+}
+
+.shop-filter-chip--clear {
+  color: var(--color-text-muted);
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+}
+
+.shop-filter-chip--clear:hover {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.06);
+  border-color: rgba(220, 38, 38, 0.25);
+}
+
 /* -- Two-column layout -- */
 .shop-layout {
   display: grid;

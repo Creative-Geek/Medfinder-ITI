@@ -59,10 +59,6 @@ angular.module("medfinderApp").directive("chatWidget", [
           if (scope.isOpen) {
             scrollToBottom();
           }
-          // initialize lucide icons for chat header OR the floating bubble icon
-          $timeout(function () {
-            if (typeof lucide !== "undefined") lucide.createIcons();
-          });
         };
 
         // Allow other parts of the app to programmatically open the chat

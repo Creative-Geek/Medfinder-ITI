@@ -10,15 +10,6 @@
         </span>
       </div>
       <div class="shop-header__actions">
-        <!-- Clear filters button -->
-        <button
-          ng-if="hasActiveFilters()"
-          ng-click="clearAllFilters()"
-          class="btn btn--secondary btn--sm"
-        >
-          <i data-lucide="x" class="h-3.5 w-3.5"></i>
-          مسح الفلاتر
-        </button>
         <!-- Sort dropdown -->
         <div class="shop-sort">
           <label class="text-sm text-muted-foreground ml-2">ترتيب:</label>
@@ -34,6 +25,25 @@
           </select>
         </div>
       </div>
+    </div>
+
+    <!-- Active filter chips -->
+    <div class="shop-filter-chips" ng-if="hasActiveFilters()">
+      <button
+        ng-repeat="f in activeFilterChips track by (f.type + f.label)"
+        class="shop-filter-chip"
+        ng-click="removeFilter(f)"
+      >
+        <span class="shop-filter-chip__label">{{ f.label }}</span>
+        <i data-lucide="x" class="shop-filter-chip__x"></i>
+      </button>
+      <button
+        ng-if="activeFilterChips.length > 1"
+        class="shop-filter-chip shop-filter-chip--clear"
+        ng-click="clearAllFilters()"
+      >
+        مسح الكل
+      </button>
     </div>
 
     <!-- Main two-column layout -->
@@ -181,11 +191,7 @@
                     class="shop-subcat-item"
                     ng-class="{ 'shop-subcat-item--active': activeCategory === cat.name }"
                   >
-                    <a
-                      href=""
-                      class="shop-subcat-link"
-                      ng-click="selectCategory(cat)"
-                    >
+                    <a href="" class="shop-subcat-link" ng-click="selectCategory(cat)">
                       {{ cat.name }}
                     </a>
                   </li>

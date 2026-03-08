@@ -151,6 +151,7 @@ angular.module("medfinderApp").controller("ShopController", [
     }
 
     initFromParams();
+    updateFilterChips();
 
     // ── Build page title ──
     $scope.getPageTitle = function () {
@@ -167,6 +168,7 @@ angular.module("medfinderApp").controller("ShopController", [
       $scope.currentPage = 1;
       updateUrl();
       loadProducts();
+      updateFilterChips();
     };
 
     // ── Filter actions ──
@@ -188,6 +190,7 @@ angular.module("medfinderApp").controller("ShopController", [
       updateUrl();
       loadProducts();
       loadBrands();
+      updateFilterChips();
     };
 
     $scope.selectCategory = function (cat) {
@@ -200,6 +203,7 @@ angular.module("medfinderApp").controller("ShopController", [
       updateUrl();
       loadProducts();
       loadBrands();
+      updateFilterChips();
     };
 
     $scope.selectAllForType = function (node) {
@@ -209,6 +213,7 @@ angular.module("medfinderApp").controller("ShopController", [
       updateUrl();
       loadProducts();
       loadBrands();
+      updateFilterChips();
     };
 
     $scope.toggleBrand = function (brand) {
@@ -220,6 +225,7 @@ angular.module("medfinderApp").controller("ShopController", [
       $scope.currentPage = 1;
       updateUrl();
       loadProducts();
+      updateFilterChips();
     };
 
     $scope.toggleInStockOnly = function () {
@@ -227,6 +233,7 @@ angular.module("medfinderApp").controller("ShopController", [
       updateUrl();
       loadProducts();
       loadBrands();
+      updateFilterChips();
     };
 
     $scope.changeSort = function () {
@@ -248,6 +255,7 @@ angular.module("medfinderApp").controller("ShopController", [
       updateUrl();
       loadProducts();
       loadBrands();
+      updateFilterChips();
     };
 
     $scope.hasActiveFilters = function () {
@@ -258,6 +266,58 @@ angular.module("medfinderApp").controller("ShopController", [
         $scope.searchQuery ||
         Object.keys($scope.activeBrands).length > 0
       );
+    };
+
+    // ── Active filter chips (cached to avoid infinite digest) ──
+    $scope.activeFilterChips = [];
+
+    function updateFilterChips() {
+      var chips = [];
+      if ($scope.searchQuery) {
+        chips.push({ type: "search", label: $scope.searchQuery });
+      }
+      if ($scope.activeType) {
+        chips.push({ type: "type", label: $scope.activeType });
+      }
+      if ($scope.activeCategory) {
+        chips.push({ type: "category", label: $scope.activeCategory });
+      }
+      Object.keys($scope.activeBrands).forEach(function (brand) {
+        chips.push({ type: "brand", label: brand });
+      });
+      if ($scope.inStockOnly) {
+        chips.push({ type: "stock", label: "المتوفر فقط" });
+      }
+      $scope.activeFilterChips = chips;
+    }
+
+    $scope.removeFilter = function (filter) {
+      switch (filter.type) {
+        case "search":
+          $scope.searchQuery = "";
+          break;
+        case "type":
+          $scope.activeType = null;
+          $scope.activeCategory = null;
+          $scope.categoryTree.forEach(function (n) {
+            n.open = false;
+          });
+          break;
+        case "category":
+          $scope.activeCategory = null;
+          break;
+        case "brand":
+          delete $scope.activeBrands[filter.label];
+          break;
+        case "stock":
+          $scope.inStockOnly = false;
+          break;
+      }
+      $scope.currentPage = 1;
+      updateUrl();
+      loadProducts();
+      loadBrands();
+      updateFilterChips();
     };
 
     // ── Pagination ──
@@ -460,6 +520,7 @@ angular.module("medfinderApp").controller("ShopController", [
       initFromParams();
       loadProducts();
       loadBrands();
+      updateFilterChips();
     });
 
     // ── Initial load ──
