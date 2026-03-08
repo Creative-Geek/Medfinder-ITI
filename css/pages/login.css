@@ -115,12 +115,19 @@
   box-shadow: 0 0 0 3px rgba(5, 131, 242, 0.1);
 }
 
-.login-input-group__input.input--error {
+.login-input-group__input--error {
   border-color: var(--color-danger);
 }
 
-.login-input-group__input.input--error:focus {
+.login-input-group__input--error:focus {
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.login-field-error {
+  font-size: 13px;
+  color: var(--color-danger);
+  margin: -8px 0 var(--space-md) 0;
+  padding-right: 4px;
 }
 
 /* -- Password toggle button -- */

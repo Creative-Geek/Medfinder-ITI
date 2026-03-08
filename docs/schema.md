@@ -1,214 +1,110 @@
-# Medfinder Database Schema
+# Database Schema
 
-Supabase project: `jwyylcesbwextxdmquuh` | Region: eu-central-1 (Frankfurt)
+This file reflects the database schema in Supabase for the Medfinder project.
 
-## Tables
+## `public.products`
 
-### products
+| Column              | Type                       | Nullable | Default                                | Checks / Constraints |
+| ------------------- | -------------------------- | -------- | -------------------------------------- | -------------------- |
+| `id`                | `integer`                  | No       | `nextval('products_id_seq'::regclass)` | Primary Key          |
+| `name_ar`           | `text`                     | No       |                                        |                      |
+| `name_en`           | `text`                     | No       |                                        |                      |
+| `description`       | `text`                     | Yes      |                                        |                      |
+| `price`             | `numeric`                  | No       |                                        |                      |
+| `volume`            | `text`                     | Yes      |                                        |                      |
+| `amount`            | `text`                     | Yes      |                                        |                      |
+| `type`              | `text`                     | No       |                                        |                      |
+| `brand`             | `text`                     | Yes      |                                        |                      |
+| `manufacturer`      | `text`                     | Yes      |                                        |                      |
+| `stock`             | `integer`                  | No       | `100`                                  |                      |
+| `image_url`         | `text`                     | Yes      |                                        |                      |
+| `images`            | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `use_cases`         | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `active_ingredient` | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `side_effects`      | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `category`          | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `usage`             | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `warning`           | `ARRAY`                    | Yes      | `'{}'::text[]`                         |                      |
+| `created_at`        | `timestamp with time zone` | No       | `now()`                                |                      |
+| `long_description`  | `text`                     | Yes      |                                        |                      |
 
-Public product catalog. RLS enabled. 149 rows seeded.
+## `public.profiles`
 
-| Column            | Type        | Nullable | Default        | Notes                       |
-| ----------------- | ----------- | -------- | -------------- | --------------------------- |
-| id                | integer     | no       | auto-increment | PK                          |
-| name_ar           | text        | no       |                | Arabic product name         |
-| name_en           | text        | no       |                | English product name        |
-| description       | text        | yes      |                | Product description         |
-| price             | numeric     | no       |                | Price in EGP                |
-| volume            | text        | yes      |                | e.g. "200 ml"               |
-| amount            | text        | yes      |                | e.g. "16 TAB"               |
-| type              | text        | no       |                | "medicine" or "cosmetic"    |
-| brand             | text        | yes      |                | e.g. "Pharco", "Nivea"      |
-| manufacturer      | text        | yes      |                | e.g. "L'Oreal", "GSK"       |
-| stock             | integer     | no       | 100            | Available quantity          |
-| image_url         | text        | yes      |                | Primary image URL           |
-| images            | text[]      | yes      | '{}'           | Additional image URLs       |
-| use_cases         | text[]      | yes      | '{}'           | Product use cases (Arabic)  |
-| active_ingredient | text[]      | yes      | '{}'           | Active ingredients          |
-| side_effects      | text[]      | yes      | '{}'           | Side effects (Arabic)       |
-| category          | text[]      | yes      | '{}'           | Category tags (Arabic)      |
-| usage             | text[]      | yes      | '{}'           | Usage instructions (Arabic) |
-| warning           | text[]      | yes      | '{}'           | Warnings (Arabic)           |
-| created_at        | timestamptz | no       | now()          |                             |
+| Column       | Type                       | Nullable | Default | Checks / Constraints |
+| ------------ | -------------------------- | -------- | ------- | -------------------- |
+| `id`         | `uuid`                     | No       |         | Primary Key          |
+| `email`      | `text`                     | Yes      |         |                      |
+| `full_name`  | `text`                     | Yes      |         |                      |
+| `phone`      | `text`                     | Yes      |         |                      |
+| `address`    | `text`                     | Yes      |         |                      |
+| `created_at` | `timestamp with time zone` | No       | `now()` |                      |
 
-### profiles
+## `public.orders`
 
-Real user profiles, auto-created on signup via `handle_new_user` trigger. Used for account/order tracking, not seeded demo reviews.
+| Column             | Type                       | Nullable | Default                              | Checks / Constraints         |
+| ------------------ | -------------------------- | -------- | ------------------------------------ | ---------------------------- |
+| `id`               | `integer`                  | No       | `nextval('orders_id_seq'::regclass)` | Primary Key                  |
+| `user_id`          | `uuid`                     | No       |                                      | Foreign Key to `profiles.id` |
+| `status`           | `text`                     | No       | `'pending'::text`                    |                              |
+| `total`            | `numeric`                  | No       |                                      |                              |
+| `shipping_address` | `text`                     | Yes      |                                      |                              |
+| `created_at`       | `timestamp with time zone` | No       | `now()`                              |                              |
 
-| Column     | Type        | Nullable | Default | Notes                   |
-| ---------- | ----------- | -------- | ------- | ----------------------- |
-| id         | uuid        | no       |         | PK, FK -> auth.users.id |
-| email      | text        | yes      |         |                         |
-| full_name  | text        | yes      |         |                         |
-| phone      | text        | yes      |         |                         |
-| address    | text        | yes      |         |                         |
-| created_at | timestamptz | no       | now()   |                         |
+## `public.order_items`
 
-### orders
+| Column       | Type      | Nullable | Default                                   | Checks / Constraints         |
+| ------------ | --------- | -------- | ----------------------------------------- | ---------------------------- |
+| `id`         | `integer` | No       | `nextval('order_items_id_seq'::regclass)` | Primary Key                  |
+| `order_id`   | `integer` | No       |                                           | Foreign Key to `orders.id`   |
+| `product_id` | `integer` | No       |                                           | Foreign Key to `products.id` |
+| `quantity`   | `integer` | No       |                                           | `quantity > 0`               |
+| `unit_price` | `numeric` | No       |                                           |                              |
 
-| Column           | Type        | Nullable | Default        | Notes                                             |
-| ---------------- | ----------- | -------- | -------------- | ------------------------------------------------- |
-| id               | integer     | no       | auto-increment | PK                                                |
-| user_id          | uuid        | no       |                | FK -> profiles.id                                 |
-| status           | text        | no       | 'pending'      | pending, confirmed, shipped, delivered, cancelled |
-| total            | numeric     | no       |                | Order total in EGP                                |
-| shipping_address | text        | yes      |                |                                                   |
-| created_at       | timestamptz | no       | now()          |                                                   |
+## `public.reviews`
 
-### order_items
+| Column          | Type                       | Nullable | Default                               | Checks / Constraints          |
+| --------------- | -------------------------- | -------- | ------------------------------------- | ----------------------------- |
+| `id`            | `integer`                  | No       | `nextval('reviews_id_seq'::regclass)` | Primary Key                   |
+| `product_id`    | `integer`                  | No       |                                       | Foreign Key to `products.id`  |
+| `rating`        | `integer`                  | No       |                                       | `rating >= 1 AND rating <= 5` |
+| `review_text`   | `text`                     | Yes      |                                       |                               |
+| `created_at`    | `timestamp with time zone` | No       | `now()`                               |                               |
+| `reviewer_name` | `text`                     | No       |                                       |                               |
 
-| Column     | Type    | Nullable | Default        | Notes                     |
-| ---------- | ------- | -------- | -------------- | ------------------------- |
-| id         | integer | no       | auto-increment | PK                        |
-| order_id   | integer | no       |                | FK -> orders.id           |
-| product_id | integer | no       |                | FK -> products.id         |
-| quantity   | integer | no       |                | CHECK > 0                 |
-| unit_price | numeric | no       |                | Price at time of purchase |
+## `public.chat_sessions`
 
-### reviews
+| Column       | Type                       | Nullable | Default             | Checks / Constraints           |
+| ------------ | -------------------------- | -------- | ------------------- | ------------------------------ |
+| `id`         | `uuid`                     | No       | `gen_random_uuid()` | Primary Key                    |
+| `user_id`    | `uuid`                     | No       |                     | Foreign Key to `auth.users.id` |
+| `created_at` | `timestamp with time zone` | No       | `now()`             |                                |
+| `updated_at` | `timestamp with time zone` | No       | `now()`             |                                |
 
-Seeded demo reviews shown on products. Not linked to real users or `profiles`.
+## `public.chat_messages`
 
-| Column        | Type        | Nullable | Default        | Notes              |
-| ------------- | ----------- | -------- | -------------- | ------------------ |
-| id            | integer     | no       | auto-increment | PK                 |
-| product_id    | integer     | no       |                | FK -> products.id  |
-| reviewer_name | text        | no       |                | Demo reviewer name |
-| rating        | integer     | no       |                | CHECK 1-5          |
-| review_text   | text        | yes      |                |                    |
-| created_at    | timestamptz | no       | now()          |                    |
+| Column           | Type                       | Nullable | Default             | Checks / Constraints                                  |
+| ---------------- | -------------------------- | -------- | ------------------- | ----------------------------------------------------- |
+| `id`             | `uuid`                     | No       | `gen_random_uuid()` | Primary Key                                           |
+| `session_id`     | `uuid`                     | No       |                     | Foreign Key to `chat_sessions.id`                     |
+| `role`           | `text`                     | No       |                     | `role = ANY (ARRAY['user'::text, 'assistant'::text])` |
+| `content`        | `text`                     | No       |                     |                                                       |
+| `products_shown` | `jsonb`                    | Yes      |                     |                                                       |
+| `created_at`     | `timestamp with time zone` | No       | `now()`             |                                                       |
 
-### wishlist
+## `public.wishlist`
 
-One entry per user per product (unique constraint on user_id + product_id). Cascade deletes on both FKs.
+| Column       | Type                       | Nullable | Default      | Checks / Constraints         |
+| ------------ | -------------------------- | -------- | ------------ | ---------------------------- |
+| `id`         | `integer`                  | No       | `BY DEFAULT` | Primary Key                  |
+| `user_id`    | `uuid`                     | No       |              | Foreign Key to `profiles.id` |
+| `product_id` | `integer`                  | No       |              | Foreign Key to `products.id` |
+| `created_at` | `timestamp with time zone` | No       | `now()`      |                              |
 
-| Column     | Type        | Nullable | Default        | Notes             |
-| ---------- | ----------- | -------- | -------------- | ----------------- |
-| id         | integer     | no       | auto-increment | PK                |
-| user_id    | uuid        | no       |                | FK -> profiles.id |
-| product_id | integer     | no       |                | FK -> products.id |
-| created_at | timestamptz | no       | now()          |                   |
+## `public.wishlists`
 
-### chat_sessions
-
-| Column     | Type        | Nullable | Default           | Notes               |
-| ---------- | ----------- | -------- | ----------------- | ------------------- |
-| id         | uuid        | no       | gen_random_uuid() | PK                  |
-| user_id    | uuid        | no       |                   | FK -> auth.users.id |
-| created_at | timestamptz | no       | now()             |                     |
-| updated_at | timestamptz | no       | now()             |                     |
-
-### chat_messages
-
-| Column         | Type        | Nullable | Default           | Notes                            |
-| -------------- | ----------- | -------- | ----------------- | -------------------------------- |
-| id             | uuid        | no       | gen_random_uuid() | PK                               |
-| session_id     | uuid        | no       |                   | FK -> chat_sessions.id           |
-| role           | text        | no       |                   | CHECK: 'user' or 'assistant'     |
-| content        | text        | no       |                   |                                  |
-| products_shown | jsonb       | yes      |                   | Product IDs surfaced in response |
-| created_at     | timestamptz | no       | now()             |                                  |
-
-## Row-Level Security Policies
-
-### products
-
-| Policy                                  | Command | Roles         | Rule |
-| --------------------------------------- | ------- | ------------- | ---- |
-| Products are publicly readable          | SELECT  | public        | true |
-| Authenticated users can insert products | INSERT  | authenticated | true |
-| Authenticated users can update products | UPDATE  | authenticated | true |
-| Authenticated users can delete products | DELETE  | authenticated | true |
-
-### profiles
-
-| Policy                       | Command | Roles         | Rule            |
-| ---------------------------- | ------- | ------------- | --------------- |
-| Users can view own profile   | SELECT  | authenticated | auth.uid() = id |
-| Users can update own profile | UPDATE  | authenticated | auth.uid() = id |
-
-### orders
-
-| Policy                      | Command | Roles         | Rule                 |
-| --------------------------- | ------- | ------------- | -------------------- |
-| Users can view own orders   | SELECT  | authenticated | auth.uid() = user_id |
-| Users can insert own orders | INSERT  | authenticated | auth.uid() = user_id |
-| Users can update own orders | UPDATE  | authenticated | auth.uid() = user_id |
-
-### order_items
-
-| Policy                           | Command | Roles         | Rule            |
-| -------------------------------- | ------- | ------------- | --------------- |
-| Users can view own order items   | SELECT  | authenticated | via orders join |
-| Users can insert own order items | INSERT  | authenticated | via orders join |
-
-### reviews
-
-| Policy              | Command | Roles  | Rule |
-| ------------------- | ------- | ------ | ---- |
-| Public read reviews | SELECT  | public | true |
-
-### wishlist
-
-| Policy                             | Command | Roles         | Rule                 |
-| ---------------------------------- | ------- | ------------- | -------------------- |
-| Users can view own wishlist        | SELECT  | authenticated | auth.uid() = user_id |
-| Users can add to own wishlist      | INSERT  | authenticated | auth.uid() = user_id |
-| Users can remove from own wishlist | DELETE  | authenticated | auth.uid() = user_id |
-
-### chat_sessions
-
-| Policy                             | Command | Roles         | Rule                 |
-| ---------------------------------- | ------- | ------------- | -------------------- |
-| Users can view own chat sessions   | SELECT  | authenticated | auth.uid() = user_id |
-| Users can insert own chat sessions | INSERT  | authenticated | auth.uid() = user_id |
-| Users can update own chat sessions | UPDATE  | authenticated | auth.uid() = user_id |
-
-### chat_messages
-
-| Policy                             | Command | Roles         | Rule                   |
-| ---------------------------------- | ------- | ------------- | ---------------------- |
-| Users can view own chat messages   | SELECT  | authenticated | via chat_sessions join |
-| Users can insert own chat messages | INSERT  | authenticated | via chat_sessions join |
-
-## Indexes
-
-| Table         | Index                           | Type           | Column(s)           |
-| ------------- | ------------------------------- | -------------- | ------------------- |
-| products      | idx_products_brand              | btree          | brand               |
-| products      | idx_products_category           | GIN            | category            |
-| products      | idx_products_name_ar            | btree          | name_ar             |
-| products      | idx_products_name_en            | btree          | lower(name_en)      |
-| products      | idx_products_type               | btree          | type                |
-| orders        | idx_orders_user_id              | btree          | user_id             |
-| orders        | idx_orders_status               | btree          | status              |
-| orders        | idx_orders_created_at           | btree          | created_at DESC     |
-| order_items   | idx_order_items_order_id        | btree          | order_id            |
-| order_items   | idx_order_items_product_id      | btree          | product_id          |
-| reviews       | idx_reviews_product_id          | btree          | product_id          |
-| wishlist      | idx_wishlist_user_id            | btree          | user_id             |
-| wishlist      | idx_wishlist_product_id         | btree          | product_id          |
-| wishlist      | wishlist_user_id_product_id_key | btree (unique) | user_id, product_id |
-| chat_sessions | idx_chat_sessions_user_id       | btree          | user_id             |
-| chat_messages | idx_chat_messages_session_id    | btree          | session_id          |
-
-## Functions
-
-| Name             | Type                | Description                                                       |
-| ---------------- | ------------------- | ----------------------------------------------------------------- |
-| handle_new_user  | trigger             | Auto-creates a profiles row when a new auth.users row is inserted |
-| check_rate_limit | function -> boolean | Rate-limiting helper for chat/API abuse prevention                |
-
-## Relationships
-
-```
-auth.users 1--1 profiles
-profiles   1--* orders
-profiles   1--* wishlist
-orders     1--* order_items
-products   1--* order_items
-products   1--* reviews
-products   1--* wishlist
-auth.users 1--* chat_sessions
-chat_sessions 1--* chat_messages
-```
+| Column       | Type                       | Nullable | Default  | Checks / Constraints           |
+| ------------ | -------------------------- | -------- | -------- | ------------------------------ |
+| `id`         | `bigint`                   | No       | `ALWAYS` | Primary Key                    |
+| `user_id`    | `uuid`                     | No       |          | Foreign Key to `auth.users.id` |
+| `product_id` | `bigint`                   | No       |          | Foreign Key to `products.id`   |
+| `created_at` | `timestamp with time zone` | No       | `now()`  |                                |

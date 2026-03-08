@@ -28,10 +28,13 @@ angular.module("medfinderApp").factory("OrderService", [
         );
       },
 
-      // Get a single order with its items (admin or user)
+      // Get a single order with its items + product names
       getById: function (id) {
         return $http.get(
-          ordersBase + "?id=eq." + id + "&select=*,order_items(*)",
+          ordersBase +
+            "?id=eq." +
+            id +
+            "&select=*,order_items(*,products(name_ar,image_url))",
           { headers: { Accept: "application/vnd.pgrst.object+json" } },
         );
       },
@@ -55,6 +58,14 @@ angular.module("medfinderApp").factory("OrderService", [
       // Decrement stock atomically via RPC (called after order items insertion)
       decrementStock: function (productId, quantity) {
         return $http.post(SUPABASE.REST_URL + "/rpc/decrement_stock", {
+          p_product_id: productId,
+          p_quantity: quantity,
+        });
+      },
+
+      // Restore stock atomically via RPC (called when order is cancelled)
+      restoreStock: function (productId, quantity) {
+        return $http.post(SUPABASE.REST_URL + "/rpc/restore_stock", {
           p_product_id: productId,
           p_quantity: quantity,
         });

@@ -142,6 +142,52 @@ angular.module("medfinderApp").controller("OrdersController", [
       refreshIcons();
     };
 
+    // -- Cancel a pending order (2-click confirmation) --
+    $scope.cancelOrder = function (order) {
+      if (order.status !== "pending") return;
+
+      // First click: show confirmation
+      if (!order._confirmCancel) {
+        order._confirmCancel = true;
+
+        // Auto-revert after 3 seconds
+        order._cancelTimer = $timeout(function () {
+          order._confirmCancel = false;
+          refreshIcons();
+        }, 3000);
+
+        refreshIcons();
+        return;
+      }
+
+      // Second click: execute cancel
+      $timeout.cancel(order._cancelTimer);
+      order._confirmCancel = false;
+      order._cancelling = true;
+
+      // Step 1: Update order status to cancelled
+      OrderService.updateStatus(order.id, "cancelled")
+        .then(function () {
+          order.status = "cancelled";
+
+          // Step 2: Restore stock for each item
+          var items = order._items || [];
+          var restorePromises = items.map(function (item) {
+            return OrderService.restoreStock(item.product_id, item.quantity);
+          });
+          return Promise.all(restorePromises);
+        })
+        .then(function () {
+          order._cancelling = false;
+          refreshIcons();
+        })
+        .catch(function (err) {
+          console.error("Cancel order failed:", err);
+          order._cancelling = false;
+          refreshIcons();
+        });
+    };
+
     // -- Status label mapping --
     $scope.statusLabel = function (status) {
       var map = {

@@ -140,6 +140,7 @@
             class="checkout-form__input"
             ng-class="{ 'checkout-form__input--error': formErrors.fullName }"
             ng-model="checkout.fullName"
+            ng-blur="onCheckoutBlur('fullName')"
             placeholder="الاسم الاول واسم العائلة"
           />
           <p ng-if="formErrors.fullName" class="checkout-form__error">
@@ -155,6 +156,7 @@
             class="checkout-form__input"
             ng-class="{ 'checkout-form__input--error': formErrors.phone }"
             ng-model="checkout.phone"
+            ng-blur="onCheckoutBlur('phone')"
             placeholder="01xxxxxxxxx"
             maxlength="11"
             dir="ltr"
@@ -172,6 +174,7 @@
             class="checkout-form__input"
             ng-class="{ 'checkout-form__input--error': formErrors.address }"
             ng-model="checkout.address"
+            ng-blur="onCheckoutBlur('address')"
             placeholder="الشارع والمنطقة"
           />
           <p ng-if="formErrors.address" class="checkout-form__error">
@@ -179,31 +182,33 @@
           </p>
         </div>
 
-        <!-- City + Governorate row -->
+        <!-- Governorate + City row -->
         <div class="checkout-form__row">
           <div class="checkout-form__field">
-            <label class="checkout-form__label">المدينة *</label>
-            <input
-              type="text"
-              class="checkout-form__input"
-              ng-class="{ 'checkout-form__input--error': formErrors.city }"
-              ng-model="checkout.city"
-            />
-            <p ng-if="formErrors.city" class="checkout-form__error">
-              {{ formErrors.city }}
-            </p>
-          </div>
-          <div class="checkout-form__field">
-            <label class="checkout-form__label">المحافظة</label>
+            <label class="checkout-form__label">المحافظة *</label>
             <select
               class="checkout-form__select"
+              ng-class="{ 'checkout-form__input--error': formErrors.governorate }"
               ng-model="checkout.governorate"
+              ng-blur="onCheckoutBlur('governorate')"
             >
               <option value="">اختر المحافظة</option>
               <option ng-repeat="gov in governorates" value="{{ gov }}">
                 {{ gov }}
               </option>
             </select>
+            <p ng-if="formErrors.governorate" class="checkout-form__error">
+              {{ formErrors.governorate }}
+            </p>
+          </div>
+          <div class="checkout-form__field">
+            <label class="checkout-form__label">المدينة</label>
+            <input
+              type="text"
+              class="checkout-form__input"
+              ng-model="checkout.city"
+              placeholder="اختيارى"
+            />
           </div>
         </div>
 

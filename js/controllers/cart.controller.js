@@ -145,31 +145,58 @@ angular.module("medfinderApp").controller("CartController", [
       refreshIcons();
     };
 
-    // -- Checkout form validation --
-    function validateForm() {
-      var errors = {};
+    // -- Per-field checkout validation --
+    function validateCheckoutField(field) {
       var f = $scope.checkout;
+      var errors = $scope.formErrors;
 
-      if (!f.fullName || !f.fullName.trim()) {
-        errors.fullName = "يرجى إدخال الاسم بالكامل";
+      if (field === "fullName") {
+        if (!f.fullName || !f.fullName.trim()) {
+          errors.fullName = "يرجى إدخال الاسم بالكامل";
+        } else {
+          delete errors.fullName;
+        }
       }
 
-      if (!f.phone || !f.phone.trim()) {
-        errors.phone = "يرجى إدخال رقم الهاتف";
-      } else if (!/^(010|011|012|015)\d{8}$/.test(f.phone.trim())) {
-        errors.phone = "يرجى إدخال رقم هاتف مصرى صحيح (11 رقم)";
+      if (field === "phone") {
+        if (!f.phone || !f.phone.trim()) {
+          errors.phone = "يرجى إدخال رقم الهاتف";
+        } else if (!/^(010|011|012|015)\d{8}$/.test(f.phone.trim())) {
+          errors.phone = "يرجى إدخال رقم هاتف مصرى صحيح (11 رقم)";
+        } else {
+          delete errors.phone;
+        }
       }
 
-      if (!f.address || !f.address.trim()) {
-        errors.address = "يرجى إدخال العنوان";
+      if (field === "address") {
+        if (!f.address || !f.address.trim()) {
+          errors.address = "يرجى إدخال العنوان";
+        } else {
+          delete errors.address;
+        }
       }
 
-      if (!f.city || !f.city.trim()) {
-        errors.city = "يرجى إدخال المدينة";
+      if (field === "governorate") {
+        if (!f.governorate) {
+          errors.governorate = "يرجى اختيار المحافظة";
+        } else {
+          delete errors.governorate;
+        }
       }
+    }
 
-      $scope.formErrors = errors;
-      return Object.keys(errors).length === 0;
+    $scope.onCheckoutBlur = function (field) {
+      validateCheckoutField(field);
+    };
+
+    // -- Full checkout validation (on submit) --
+    function validateForm() {
+      $scope.formErrors = {};
+      validateCheckoutField("fullName");
+      validateCheckoutField("phone");
+      validateCheckoutField("address");
+      validateCheckoutField("governorate");
+      return Object.keys($scope.formErrors).length === 0;
     }
 
     // -- Place order --

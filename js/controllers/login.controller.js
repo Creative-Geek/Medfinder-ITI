@@ -23,6 +23,7 @@ angular.module("medfinderApp").controller("LoginController", [
     $scope.showConfirmPassword = false;
     $scope.loading = false;
     $scope.error = "";
+    $scope.fieldErrors = {};
 
     // Admin email for role detection
     var ADMIN_EMAIL = "ahmedtaha1234@gmail.com";
@@ -31,6 +32,7 @@ angular.module("medfinderApp").controller("LoginController", [
     $scope.toggleMode = function () {
       $scope.isSignup = !$scope.isSignup;
       $scope.error = "";
+      $scope.fieldErrors = {};
       $scope.form = {
         fullName: "",
         email: "",
@@ -43,34 +45,72 @@ angular.module("medfinderApp").controller("LoginController", [
       }, 50);
     };
 
-    // -- Validation --
-    function validate() {
+    // -- Per-field validation --
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    function validateField(field) {
       var f = $scope.form;
+      var errors = $scope.fieldErrors;
 
-      if (!f.email || !f.email.trim()) {
-        return "يرجى إدخال البريد الالكتروني";
+      if (field === "email") {
+        if (!f.email || !f.email.trim()) {
+          errors.email = "يرجى إدخال البريد الالكتروني";
+        } else if (!emailPattern.test(f.email.trim())) {
+          errors.email =
+            "يرجى إدخال بريد الكتروني صحيح (مثال: name@example.com)";
+        } else {
+          delete errors.email;
+        }
       }
 
-      // Basic email pattern
-      var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailPattern.test(f.email.trim())) {
-        return "يرجى إدخال بريد الكتروني صحيح";
+      if (field === "password") {
+        if (!f.password || f.password.length < 6) {
+          errors.password = "كلمة المرور يجب ان تكون 6 احرف على الاقل";
+        } else {
+          delete errors.password;
+        }
+        // Re-validate confirm if it was touched
+        if ($scope.isSignup && f.confirmPassword) {
+          validateField("confirmPassword");
+        }
       }
 
-      if (!f.password || f.password.length < 6) {
-        return "كلمة المرور يجب ان تكون 6 احرف على الاقل";
-      }
-
-      if ($scope.isSignup) {
+      if (field === "fullName" && $scope.isSignup) {
         if (!f.fullName || !f.fullName.trim()) {
-          return "يرجى إدخال الاسم بالكامل";
-        }
-        if (f.password !== f.confirmPassword) {
-          return "كلمة المرور غير متطابقة";
+          errors.fullName = "يرجى إدخال الاسم بالكامل";
+        } else {
+          delete errors.fullName;
         }
       }
 
-      return null;
+      if (field === "confirmPassword" && $scope.isSignup) {
+        if (
+          f.password &&
+          f.confirmPassword &&
+          f.password !== f.confirmPassword
+        ) {
+          errors.confirmPassword = "كلمة المرور غير متطابقة";
+        } else {
+          delete errors.confirmPassword;
+        }
+      }
+    }
+
+    // -- Blur handler (called from template) --
+    $scope.onFieldBlur = function (field) {
+      validateField(field);
+    };
+
+    // -- Full validation (on submit) --
+    function validateAll() {
+      $scope.fieldErrors = {};
+      validateField("email");
+      validateField("password");
+      if ($scope.isSignup) {
+        validateField("fullName");
+        validateField("confirmPassword");
+      }
+      return Object.keys($scope.fieldErrors).length === 0;
     }
 
     // -- Set admin role in session --
@@ -81,12 +121,7 @@ angular.module("medfinderApp").controller("LoginController", [
 
     // -- Submit handler --
     $scope.submit = function () {
-      // Validate
-      var err = validate();
-      if (err) {
-        $scope.error = err;
-        return;
-      }
+      if (!validateAll()) return;
 
       $scope.loading = true;
       $scope.error = "";
@@ -96,16 +131,12 @@ angular.module("medfinderApp").controller("LoginController", [
 
       if ($scope.isSignup) {
         // -- Signup flow --
-        // Note: profile row is auto-created by DB trigger (handle_new_user)
         AuthService.signup(email, password, $scope.form.fullName.trim())
           .then(function () {
-            // Auto-login after signup
             return AuthService.login(email, password);
           })
           .then(function (res) {
-            // Set role
             setUserRole(email);
-            // Redirect to home
             $location.path("/");
           })
           .catch(function (err) {
@@ -131,9 +162,7 @@ angular.module("medfinderApp").controller("LoginController", [
         // -- Login flow --
         AuthService.login(email, password)
           .then(function (res) {
-            // Set role
             setUserRole(email);
-            // Redirect to home
             $location.path("/");
           })
           .catch(function (err) {

@@ -43,25 +43,35 @@
           <input
             type="text"
             class="login-input-group__input"
+            ng-class="{ 'login-input-group__input--error': fieldErrors.fullName }"
             ng-model="form.fullName"
+            ng-blur="onFieldBlur('fullName')"
             placeholder="الاسم بالكامل"
             autocomplete="name"
           />
         </div>
+        <p ng-if="fieldErrors.fullName" class="login-field-error">
+          {{ fieldErrors.fullName }}
+        </p>
 
         <!-- Email -->
         <div class="login-input-group">
           <i data-lucide="mail" class="login-input-group__icon"></i>
           <input
-            type="email"
+            type="text"
             class="login-input-group__input"
+            ng-class="{ 'login-input-group__input--error': fieldErrors.email }"
             ng-model="form.email"
+            ng-blur="onFieldBlur('email')"
             placeholder="البريد الالكتروني"
             autocomplete="email"
             dir="ltr"
             style="text-align: right"
           />
         </div>
+        <p ng-if="fieldErrors.email" class="login-field-error">
+          {{ fieldErrors.email }}
+        </p>
 
         <!-- Password -->
         <div class="login-input-group">
@@ -69,7 +79,9 @@
           <input
             ng-attr-type="{{ showPassword ? 'text' : 'password' }}"
             class="login-input-group__input"
+            ng-class="{ 'login-input-group__input--error': fieldErrors.password }"
             ng-model="form.password"
+            ng-blur="onFieldBlur('password')"
             placeholder="كلمة المرور"
             autocomplete="{{ isSignup ? 'new-password' : 'current-password' }}"
             dir="ltr"
@@ -84,6 +96,9 @@
             <i ng-attr-data-lucide="{{ showPassword ? 'eye-off' : 'eye' }}"></i>
           </button>
         </div>
+        <p ng-if="fieldErrors.password" class="login-field-error">
+          {{ fieldErrors.password }}
+        </p>
 
         <!-- Confirm Password (signup only) -->
         <div class="login-input-group" ng-if="isSignup">
@@ -91,7 +106,9 @@
           <input
             ng-attr-type="{{ showConfirmPassword ? 'text' : 'password' }}"
             class="login-input-group__input"
+            ng-class="{ 'login-input-group__input--error': fieldErrors.confirmPassword }"
             ng-model="form.confirmPassword"
+            ng-blur="onFieldBlur('confirmPassword')"
             placeholder="تأكيد كلمة المرور"
             autocomplete="new-password"
             dir="ltr"
@@ -108,6 +125,9 @@
             ></i>
           </button>
         </div>
+        <p ng-if="fieldErrors.confirmPassword" class="login-field-error">
+          {{ fieldErrors.confirmPassword }}
+        </p>
 
         <!-- Submit -->
         <button type="submit" class="login-form__submit" ng-disabled="loading">

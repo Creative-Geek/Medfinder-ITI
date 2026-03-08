@@ -203,7 +203,8 @@
                     ng-href="#!/product/{{ item.product_id }}"
                     class="orders-items-table__link"
                   >
-                    منتج #{{ item.product_id }}
+                    {{ item.products ? item.products.name_ar : ('منتج #' +
+                    item.product_id) }}
                   </a>
                 </td>
                 <td>{{ item.quantity }}</td>
@@ -214,6 +215,29 @@
               </tr>
             </tbody>
           </table>
+
+          <!-- Cancel button for pending orders -->
+          <div
+            ng-if="order.status === 'pending'"
+            class="orders-order-card__cancel"
+          >
+            <button
+              class="orders-btn"
+              ng-click="cancelOrder(order)"
+              ng-disabled="order._cancelling"
+              ng-class="order._confirmCancel ? 'orders-btn--danger-solid' : 'orders-btn--danger'"
+            >
+              <span ng-if="order._cancelling">جاري الالغاء...</span>
+              <span
+                ng-if="!order._cancelling && !order._confirmCancel"
+                class="flex items-center gap-2"
+              >
+                <i data-lucide="x-circle" class="h-4 w-4"></i>
+                <span>الغاء الطلب</span>
+              </span>
+              <span ng-if="order._confirmCancel">متأكد؟</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
