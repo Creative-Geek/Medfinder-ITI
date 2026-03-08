@@ -5,6 +5,68 @@ angular.module("medfinderApp").factory("AuthService", [
   "SUPABASE",
   function ($http, $q, SUPABASE) {
     var AUTH = SUPABASE.AUTH_URL;
+    var REST = SUPABASE.REST_URL;
+
+    function clearStoredSession() {
+      localStorage.removeItem("sb_access_token");
+      localStorage.removeItem("sb_refresh_token");
+      localStorage.removeItem("sb_user");
+      localStorage.removeItem("sb_user_role");
+    }
+
+    function storeAuthNotice(message) {
+      try {
+        sessionStorage.setItem("sb_auth_notice", message);
+      } catch (e) {}
+    }
+
+    function getCurrentUser() {
+      var userStr = localStorage.getItem("sb_user");
+      return userStr ? JSON.parse(userStr) : null;
+    }
+
+    function requestCurrentProfile(selectClause) {
+      var currentUser = getCurrentUser();
+
+      return $http.get(
+        REST + "/profiles?id=eq." + currentUser.id + "&select=" + selectClause,
+        {
+          headers: { Accept: "application/vnd.pgrst.object+json" },
+        },
+      );
+    }
+
+    function isMissingSuspensionFieldError(err) {
+      var message =
+        err && err.data && err.data.message ? String(err.data.message) : "";
+
+      return (
+        err && err.status === 400 && message.indexOf("is_suspended") !== -1
+      );
+    }
+
+    function fetchCurrentProfileStatus() {
+      var currentUser = getCurrentUser();
+
+      if (!currentUser || !currentUser.id) {
+        return $q.reject({ code: "NO_CURRENT_USER" });
+      }
+
+      return requestCurrentProfile("id,is_admin,is_suspended").catch(
+        function (err) {
+          if (!isMissingSuspensionFieldError(err)) {
+            return $q.reject(err);
+          }
+
+          return requestCurrentProfile("id,is_admin").then(function (res) {
+            res.data = angular.extend({}, res.data || {}, {
+              is_suspended: false,
+            });
+            return res;
+          });
+        },
+      );
+    }
 
     // -- Token expiry check --
     // Returns true if token is expired or expires within 5 minutes
@@ -43,10 +105,7 @@ angular.module("medfinderApp").factory("AuthService", [
         })
         .catch(function (err) {
           // Refresh failed -- clear session, user must log in again
-          localStorage.removeItem("sb_access_token");
-          localStorage.removeItem("sb_refresh_token");
-          localStorage.removeItem("sb_user");
-          localStorage.removeItem("sb_user_role");
+          clearStoredSession();
           return $q.reject(err);
         });
     }
@@ -81,16 +140,12 @@ angular.module("medfinderApp").factory("AuthService", [
 
       // Logout (clear session)
       logout: function () {
-        localStorage.removeItem("sb_access_token");
-        localStorage.removeItem("sb_refresh_token");
-        localStorage.removeItem("sb_user");
-        localStorage.removeItem("sb_user_role");
+        clearStoredSession();
       },
 
       // Get current user from session
       getCurrentUser: function () {
-        var userStr = localStorage.getItem("sb_user");
-        return userStr ? JSON.parse(userStr) : null;
+        return getCurrentUser();
       },
 
       // Check if user is logged in
@@ -118,6 +173,64 @@ angular.module("medfinderApp").factory("AuthService", [
           return refreshToken();
         }
         return $q.resolve(localStorage.getItem("sb_access_token"));
+      },
+
+      ensureAccountActive: function (options) {
+        var opts = angular.extend(
+          {
+            allowOnError: true,
+            redirectOnSuspended: true,
+          },
+          options || {},
+        );
+
+        if (!localStorage.getItem("sb_access_token")) {
+          return $q.resolve(null);
+        }
+
+        return fetchCurrentProfileStatus()
+          .then(function (res) {
+            var profile = res.data || null;
+
+            if (profile) {
+              localStorage.setItem(
+                "sb_user_role",
+                profile.is_admin ? "admin" : "user",
+              );
+            }
+
+            if (profile && profile.is_suspended) {
+              storeAuthNotice(
+                "تم إيقاف هذا الحساب مؤقتًا. يرجى التواصل مع الإدارة.",
+              );
+              clearStoredSession();
+
+              return $q.reject({
+                code: "SUSPENDED",
+                profile: profile,
+              });
+            }
+
+            return profile;
+          })
+          .catch(function (err) {
+            if (err && err.code === "SUSPENDED") {
+              if (opts.redirectOnSuspended && typeof window !== "undefined") {
+                window.location.hash = "#!/login";
+              }
+              return $q.reject(err);
+            }
+
+            if (err && err.status === 406) {
+              return null;
+            }
+
+            if (opts.allowOnError) {
+              return null;
+            }
+
+            return $q.reject(err);
+          });
       },
     };
   },

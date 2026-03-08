@@ -223,9 +223,22 @@ app.run([
       try {
         var AuthService = $injector.get("AuthService");
         if (AuthService.isTokenExpired()) {
-          AuthService.refreshToken().catch(function () {
-            // Silently fail -- interceptor will handle 401s
-          });
+          AuthService.refreshToken()
+            .then(function () {
+              return AuthService.ensureAccountActive({ allowOnError: true });
+            })
+            .catch(function () {
+              // Silently fail -- interceptor will handle 401s
+            })
+            .finally(function () {
+              syncAuthState();
+            });
+        } else {
+          AuthService.ensureAccountActive({ allowOnError: true }).finally(
+            function () {
+              syncAuthState();
+            },
+          );
         }
       } catch (e) {
         // Service not ready yet, interceptor will handle it
@@ -291,6 +304,7 @@ app.run([
     $rootScope.$on("$routeChangeError", function () {
       clearViewTransitionTimers();
       setViewTransitionState(null);
+      syncAuthState();
     });
 
     // -- Global search (called from navbar search bar) --

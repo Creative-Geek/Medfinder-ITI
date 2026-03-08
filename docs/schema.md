@@ -30,14 +30,17 @@ This file reflects the database schema in Supabase for the Medfinder project.
 
 ## `public.profiles`
 
-| Column       | Type                       | Nullable | Default | Checks / Constraints |
-| ------------ | -------------------------- | -------- | ------- | -------------------- |
-| `id`         | `uuid`                     | No       |         | Primary Key          |
-| `email`      | `text`                     | Yes      |         |                      |
-| `full_name`  | `text`                     | Yes      |         |                      |
-| `phone`      | `text`                     | Yes      |         |                      |
-| `address`    | `text`                     | Yes      |         |                      |
-| `created_at` | `timestamp with time zone` | No       | `now()` |                      |
+| Column         | Type                       | Nullable | Default | Checks / Constraints |
+| -------------- | -------------------------- | -------- | ------- | -------------------- |
+| `id`           | `uuid`                     | No       |         | Primary Key          |
+| `email`        | `text`                     | Yes      |         |                      |
+| `full_name`    | `text`                     | Yes      |         |                      |
+| `phone`        | `text`                     | Yes      |         |                      |
+| `address`      | `text`                     | Yes      |         |                      |
+| `created_at`   | `timestamp with time zone` | No       | `now()` |                      |
+| `is_admin`     | `boolean`                  | Yes      | `false` |                      |
+| `is_suspended` | `boolean`                  | No       | `false` |                      |
+| `suspended_at` | `timestamp with time zone` | Yes      |         |                      |
 
 ## `public.orders`
 

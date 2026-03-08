@@ -86,7 +86,7 @@ Already injects `apikey` and `Authorization: Bearer <token>` on all Supabase req
 
 ### Route Guard (`js/app.js`)
 
-Already checks `sb_access_token` and `sb_user_role` on `$routeChangeStart`. Routes with `access: "user"` redirect to `/login` if no token. Routes with `access: "admin"` redirect to `/` if not admin.
+Checks `sb_access_token` and `sb_user_role` on `$routeChangeStart`, and protected routes also call `AuthService.ensureAccountActive()` through route resolves. Suspended accounts are logged out and redirected back to `/login` with a message.
 
 ## Design Tokens
 
@@ -141,3 +141,6 @@ The `profiles` table schema:
 | phone | text (nullable) |
 | address | text (nullable) |
 | created_at | timestamptz |
+| is_admin | boolean |
+| is_suspended | boolean |
+| suspended_at | timestamptz (nullable) |

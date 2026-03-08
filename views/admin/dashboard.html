@@ -10,18 +10,33 @@
   <div class="admin-content">
     <!-- Welcome Banner -->
     <div class="admin-welcome-banner" ng-if="!loading">
-      <div class="admin-welcome-banner__text">
+      <div class="admin-welcome-banner__body">
+        <div class="admin-welcome-banner__eyebrow">نظرة عامة</div>
         <div class="admin-welcome-banner__greeting">{{ greeting }}،</div>
         <div class="admin-welcome-banner__name">{{ adminName }}</div>
-        <div class="admin-welcome-banner__date">
-          {{ today | date:'EEEE، d MMMM y' }}
+        <div class="admin-welcome-banner__meta">
+          <div class="admin-welcome-banner__meta-item">
+            <span class="admin-welcome-banner__meta-label">التاريخ</span>
+            <span class="admin-welcome-banner__meta-value">
+              {{ today | date:'EEEE، d MMMM y' }}
+            </span>
+          </div>
+          <div
+            class="admin-welcome-banner__meta-item"
+            ng-class="stats.lowStockCount > 0 ? 'admin-welcome-banner__meta-item--warn' : 'admin-welcome-banner__meta-item--ok'"
+          >
+            <span class="admin-welcome-banner__meta-label">حالة المخزون</span>
+            <span class="admin-welcome-banner__meta-value">
+              {{ stats.lowStockCount > 0 ? stats.lowStockCount + ' يحتاج متابعة'
+              : 'مستقر حاليا' }}
+            </span>
+          </div>
         </div>
       </div>
       <div class="admin-welcome-banner__icon">
-        <i
-          data-lucide="stethoscope"
-          style="width: 56px; height: 56px; opacity: 0.18; color: #fff"
-        ></i>
+        <div class="admin-welcome-banner__icon-shell">
+          <i data-lucide="stethoscope" style="width: 26px; height: 26px"></i>
+        </div>
       </div>
     </div>
 
@@ -120,19 +135,24 @@
     <div class="admin-dashboard-grid" ng-if="!loading">
       <!-- Weekly Revenue Chart -->
       <div class="admin-table-card admin-chart-card">
-        <div class="admin-table-card__header">
-          <div class="admin-table-card__title">
-            <i
-              data-lucide="bar-chart-2"
-              style="
-                width: 16px;
-                height: 16px;
-                color: var(--color-primary);
-                vertical-align: middle;
-                margin-left: 6px;
-              "
-            ></i>
-            ايرادات اخر 7 ايام
+        <div class="admin-table-card__header admin-chart-card__header">
+          <div class="admin-chart-heading">
+            <div class="admin-table-card__title">
+              <i
+                data-lucide="bar-chart-2"
+                style="
+                  width: 16px;
+                  height: 16px;
+                  color: var(--color-primary);
+                  vertical-align: middle;
+                  margin-left: 6px;
+                "
+              ></i>
+              إيرادات آخر 7 أيام
+            </div>
+            <div class="admin-chart-subtitle">
+              عرض يومي مبسط ومتوافق مع واجهة الادمن
+            </div>
           </div>
           <div class="admin-chart-total">
             <span class="admin-chart-total__label">الاجمالي</span>
@@ -142,13 +162,19 @@
           </div>
         </div>
         <div class="admin-chart-container">
-          <canvas id="revenueChart" height="160"></canvas>
-          <div class="admin-chart-empty" ng-if="weeklyTotal == 0">
-            <i
-              data-lucide="bar-chart-2"
-              style="width: 32px; height: 32px; opacity: 0.2"
-            ></i>
-            <p>لا توجد بيانات كافية</p>
+          <div class="admin-chart-surface">
+            <canvas id="revenueChart" height="160"></canvas>
+            <div class="admin-chart-empty" ng-if="weeklyTotal == 0">
+              <i
+                data-lucide="bar-chart-2"
+                style="width: 32px; height: 32px; opacity: 0.2"
+              ></i>
+              <p>لا توجد بيانات كافية</p>
+            </div>
+          </div>
+          <div class="admin-chart-caption">
+            <span class="admin-chart-caption__dot"></span>
+            <span>قراءة يومية مجمعة لإجمالي الإيرادات خلال الأسبوع</span>
           </div>
         </div>
       </div>

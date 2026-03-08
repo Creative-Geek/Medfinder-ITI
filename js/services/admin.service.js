@@ -100,6 +100,14 @@ angular.module("medfinderApp").factory("AdminService", [
         );
       },
 
+      // Suspend/reactivate a customer account through a guarded RPC
+      setCustomerSuspension: function (userId, isSuspended) {
+        return $http.post(rest + "/rpc/set_profile_suspension", {
+          p_user_id: userId,
+          p_is_suspended: !!isSuspended,
+        });
+      },
+
       // Low-stock products (stock < 10), sorted ascending
       getLowStockProducts: function () {
         return $http.get(

@@ -48,7 +48,9 @@
               <th class="admin-th">البريد الالكتروني</th>
               <th class="admin-th">الهاتف</th>
               <th class="admin-th" style="width: 100px">الطلبات</th>
+              <th class="admin-th" style="width: 120px">الحالة</th>
               <th class="admin-th" style="width: 120px">تاريخ التسجيل</th>
+              <th class="admin-th" style="width: 170px">الإجراء</th>
             </tr>
           </thead>
           <tbody>
@@ -105,8 +107,72 @@
                   >{{ customer.orders ? customer.orders.length : 0 }}</span
                 >
               </td>
+              <td class="admin-td" style="white-space: nowrap">
+                <span
+                  class="admin-badge admin-badge--dot"
+                  ng-class="getCustomerStatusClass(customer)"
+                >
+                  <span class="admin-badge__dot"></span>
+                  {{ getCustomerStatusLabel(customer) }}
+                </span>
+                <div
+                  class="admin-customer-status-note"
+                  ng-if="customer.is_suspended && customer.suspended_at"
+                >
+                  {{ customer.suspended_at | date:'yyyy/MM/dd HH:mm' }}
+                </div>
+              </td>
               <td class="admin-td" style="white-space: nowrap; font-size: 13px">
                 {{ customer.created_at | date:'yyyy/MM/dd' }}
+              </td>
+              <td class="admin-td">
+                <div
+                  class="admin-customer-actions"
+                  ng-click="$event.stopPropagation()"
+                >
+                  <button
+                    type="button"
+                    class="admin-btn admin-btn--ghost admin-btn--danger admin-btn--sm"
+                    ng-if="!customer.is_suspended"
+                    ng-click="suspendCustomer(customer, $event)"
+                    ng-disabled="customer._statusBusy"
+                  >
+                    <i ng-if="!customer._statusBusy" data-lucide="user-x"></i>
+                    <i
+                      ng-if="customer._statusBusy"
+                      data-lucide="loader-2"
+                      class="admin-spin"
+                    ></i>
+                    {{ customer._statusBusy ? 'جاري التنفيذ...' : 'إيقاف' }}
+                  </button>
+
+                  <button
+                    type="button"
+                    class="admin-btn admin-btn--success admin-btn--sm"
+                    ng-if="customer.is_suspended"
+                    ng-click="reactivateCustomer(customer, $event)"
+                    ng-disabled="customer._statusBusy"
+                  >
+                    <i
+                      ng-if="!customer._statusBusy"
+                      data-lucide="user-check"
+                    ></i>
+                    <i
+                      ng-if="customer._statusBusy"
+                      data-lucide="loader-2"
+                      class="admin-spin"
+                    ></i>
+                    {{ customer._statusBusy ? 'جاري التنفيذ...' : 'إعادة
+                    التفعيل' }}
+                  </button>
+
+                  <div
+                    class="admin-customer-action-error"
+                    ng-if="customer._actionError"
+                  >
+                    {{ customer._actionError }}
+                  </div>
+                </div>
               </td>
             </tr>
 
@@ -116,10 +182,18 @@
               ng-repeat-end
               ng-class="{'is-expanded': customer._expanded}"
             >
-              <td colspan="6" style="padding: 0">
+              <td colspan="8" style="padding: 0">
                 <div class="admin-expand-wrapper">
                   <div class="admin-expand-inner">
                     <div class="admin-expand-content">
+                      <div
+                        class="admin-customer-account-note"
+                        ng-if="customer.is_suspended"
+                      >
+                        هذا الحساب موقوف حالياً ولن يتمكن المستخدم من دخول
+                        الصفحات المحمية حتى تتم إعادة التفعيل.
+                      </div>
+
                       <!-- Customer Detail -->
                       <div
                         style="
@@ -209,7 +283,7 @@
             <!-- Empty -->
             <tr ng-if="!filteredCustomers.length && !loading">
               <td
-                colspan="6"
+                colspan="8"
                 class="admin-td"
                 style="
                   text-align: center;

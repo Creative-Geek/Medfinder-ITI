@@ -25,6 +25,14 @@ angular.module("medfinderApp").controller("LoginController", [
     $scope.error = "";
     $scope.fieldErrors = {};
 
+    try {
+      var authNotice = sessionStorage.getItem("sb_auth_notice");
+      if (authNotice) {
+        $scope.error = authNotice;
+        sessionStorage.removeItem("sb_auth_notice");
+      }
+    } catch (e) {}
+
     // Admin email for role detection
     var ADMIN_EMAIL = "ahmedtaha1234@gmail.com";
 
@@ -114,9 +122,41 @@ angular.module("medfinderApp").controller("LoginController", [
     }
 
     // -- Set admin role in session --
-    function setUserRole(email) {
-      var role = email === ADMIN_EMAIL ? "admin" : "user";
+    function setUserRole(email, profile) {
+      var role =
+        (profile && profile.is_admin) || email === ADMIN_EMAIL ?
+          "admin"
+        : "user";
       localStorage.setItem("sb_user_role", role);
+    }
+
+    function finalizeAuthenticatedSession(email) {
+      return AuthService.ensureAccountActive({
+        allowOnError: false,
+        redirectOnSuspended: false,
+      })
+        .then(function (profile) {
+          setUserRole(email, profile);
+          return profile;
+        })
+        .catch(function (err) {
+          AuthService.logout();
+          throw err;
+        });
+    }
+
+    function getAuthErrorMessage(err, fallback) {
+      if (err && err.code === "SUSPENDED") {
+        return "تم إيقاف هذا الحساب مؤقتًا. يرجى التواصل مع الإدارة.";
+      }
+
+      if (err && err.config && err.config.url) {
+        if (err.config.url.indexOf("/profiles") !== -1) {
+          return "تعذر التحقق من حالة الحساب. يرجى المحاولة مرة أخرى.";
+        }
+      }
+
+      return fallback;
     }
 
     // -- Submit handler --
@@ -135,12 +175,14 @@ angular.module("medfinderApp").controller("LoginController", [
           .then(function () {
             return AuthService.login(email, password);
           })
-          .then(function (res) {
-            setUserRole(email);
+          .then(function () {
+            return finalizeAuthenticatedSession(email);
+          })
+          .then(function () {
             $location.path("/");
           })
           .catch(function (err) {
-            var msg = "حدث خطأ اثناء إنشاء الحساب";
+            var msg = getAuthErrorMessage(err, "حدث خطأ اثناء إنشاء الحساب");
             if (err.data) {
               if (
                 err.data.msg &&
@@ -161,12 +203,17 @@ angular.module("medfinderApp").controller("LoginController", [
       } else {
         // -- Login flow --
         AuthService.login(email, password)
-          .then(function (res) {
-            setUserRole(email);
+          .then(function () {
+            return finalizeAuthenticatedSession(email);
+          })
+          .then(function () {
             $location.path("/");
           })
           .catch(function (err) {
-            var msg = "البريد الالكتروني او كلمة المرور غير صحيحة";
+            var msg = getAuthErrorMessage(
+              err,
+              "البريد الالكتروني او كلمة المرور غير صحيحة",
+            );
             if (err.data && err.data.error_description) {
               if (err.data.error_description.indexOf("Invalid login") !== -1) {
                 msg = "البريد الالكتروني او كلمة المرور غير صحيحة";

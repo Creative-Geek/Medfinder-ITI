@@ -4,6 +4,15 @@ angular.module("medfinderApp").config([
   "$routeProvider",
   "$locationProvider",
   function ($routeProvider, $locationProvider) {
+    var protectedAccountResolve = {
+      activeAccount: [
+        "AuthService",
+        function (AuthService) {
+          return AuthService.ensureAccountActive();
+        },
+      ],
+    };
+
     $routeProvider
       // -- Guest routes --
       .when("/login", {
@@ -42,16 +51,19 @@ angular.module("medfinderApp").config([
         templateUrl: "views/cart.html",
         controller: "CartController",
         access: "user",
+        resolve: protectedAccountResolve,
       })
       .when("/wishlist", {
         templateUrl: "views/wishlist.html",
         controller: "WishlistController",
         access: "user",
+        resolve: protectedAccountResolve,
       })
       .when("/orders", {
         templateUrl: "views/orders.html",
         controller: "OrdersController",
         access: "user",
+        resolve: protectedAccountResolve,
       })
 
       // -- Admin routes --
@@ -59,31 +71,37 @@ angular.module("medfinderApp").config([
         templateUrl: "views/admin/dashboard.html",
         controller: "AdminDashboardController",
         access: "admin",
+        resolve: protectedAccountResolve,
       })
       .when("/admin/products", {
         templateUrl: "views/admin/products.html",
         controller: "AdminProductsController",
         access: "admin",
+        resolve: protectedAccountResolve,
       })
       .when("/admin/products/new", {
         templateUrl: "views/admin/product-form.html",
         controller: "AdminProductFormController",
         access: "admin",
+        resolve: protectedAccountResolve,
       })
       .when("/admin/products/:id/edit", {
         templateUrl: "views/admin/product-form.html",
         controller: "AdminProductFormController",
         access: "admin",
+        resolve: protectedAccountResolve,
       })
       .when("/admin/orders", {
         templateUrl: "views/admin/orders.html",
         controller: "AdminOrdersController",
         access: "admin",
+        resolve: protectedAccountResolve,
       })
       .when("/admin/customers", {
         templateUrl: "views/admin/customers.html",
         controller: "AdminCustomersController",
         access: "admin",
+        resolve: protectedAccountResolve,
       })
 
       .otherwise({ redirectTo: "/404" });

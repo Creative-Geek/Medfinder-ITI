@@ -64,72 +64,72 @@ angular.module("medfinderApp").controller("AdminDashboardController", [
 
         var maxVal = Math.max.apply(null, values) || 1;
         var barCount = labels.length;
-        var padLeft = 8;
-        var padRight = 8;
-        var padTop = 16;
-        var padBottom = 36;
-        var barWidth = Math.floor((W - padLeft - padRight) / barCount) - 6;
+        var padLeft = 12;
+        var padRight = 12;
+        var padTop = 20;
+        var padBottom = 30;
+        var chartWidth = W - padLeft - padRight;
+        var chartHeight = H - padTop - padBottom;
+        var slotWidth = chartWidth / barCount;
+        var barWidth = Math.max(16, Math.floor(slotWidth - 14));
 
         ctx.clearRect(0, 0, W, H);
 
-        // Gridlines
-        ctx.strokeStyle = "rgba(0,0,0,0.06)";
+        // Gridlines + baseline
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.08)";
         ctx.lineWidth = 1;
-        [0, 0.25, 0.5, 0.75, 1].forEach(function (t) {
-          var y = padTop + (1 - t) * (H - padTop - padBottom);
+        [0, 0.33, 0.66, 1].forEach(function (t) {
+          var y = padTop + (1 - t) * chartHeight;
           ctx.beginPath();
           ctx.moveTo(padLeft, y);
           ctx.lineTo(W - padRight, y);
           ctx.stroke();
         });
 
-        // Bars
-        var primary = "#0583f2";
-        var accent = "#f99d1c";
-        values.forEach(function (val, i) {
-          var barH = Math.max(4, (val / maxVal) * (H - padTop - padBottom));
-          var x = padLeft + i * ((W - padLeft - padRight) / barCount) + 3;
-          var y = H - padBottom - barH;
-          var isMax = val === Math.max.apply(null, values);
+        ctx.strokeStyle = "rgba(15, 23, 42, 0.12)";
+        ctx.beginPath();
+        ctx.moveTo(padLeft, H - padBottom);
+        ctx.lineTo(W - padRight, H - padBottom);
+        ctx.stroke();
 
-          // Gradient fill
-          var grad = ctx.createLinearGradient(x, y, x, H - padBottom);
-          grad.addColorStop(0, isMax ? accent : primary);
-          grad.addColorStop(
-            1,
-            isMax ? "rgba(249,157,28,0.25)" : "rgba(5,131,242,0.25)",
+        // Bars
+        var barFill = "#8ec2f6";
+        var barAccent = "#0583f2";
+        var labelColor = "rgba(15, 23, 42, 0.84)";
+        var metaColor = "rgba(15, 23, 42, 0.55)";
+
+        values.forEach(function (val, i) {
+          var barH = val > 0 ? Math.max(8, (val / maxVal) * chartHeight) : 0;
+          var x = padLeft + i * slotWidth + (slotWidth - barWidth) / 2;
+          var y = H - padBottom - barH;
+          var valueLabel = Math.round(val).toLocaleString("ar-EG");
+
+          ctx.fillStyle = val > 0 ? barFill : "rgba(15, 23, 42, 0.08)";
+          ctx.fillRect(
+            x,
+            val > 0 ? y : H - padBottom - 2,
+            barWidth,
+            val > 0 ? barH : 2,
           );
 
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          var r = 4;
-          ctx.moveTo(x + r, y);
-          ctx.lineTo(x + barWidth - r, y);
-          ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + r);
-          ctx.lineTo(x + barWidth, H - padBottom);
-          ctx.lineTo(x, H - padBottom);
-          ctx.lineTo(x, y + r);
-          ctx.quadraticCurveTo(x, y, x + r, y);
-          ctx.closePath();
-          ctx.fill();
+          if (val > 0) {
+            ctx.fillStyle = barAccent;
+            ctx.fillRect(x, y, barWidth, Math.min(3, barH));
+          }
 
           // Value label above bar
           if (val > 0) {
-            ctx.fillStyle = isMax ? accent : primary;
+            ctx.fillStyle = labelColor;
             ctx.font = "bold 10px Cairo, sans-serif";
             ctx.textAlign = "center";
-            var label =
-              val >= 1000 ?
-                Math.round(val / 1000) + "k"
-              : String(Math.round(val));
-            ctx.fillText(label, x + barWidth / 2, y - 4);
+            ctx.fillText(valueLabel, x + barWidth / 2, y - 6);
           }
 
           // Day label below bar
-          ctx.fillStyle = "rgba(0,0,0,0.45)";
+          ctx.fillStyle = metaColor;
           ctx.font = "11px Cairo, sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(labels[i], x + barWidth / 2, H - 8);
+          ctx.fillText(labels[i], x + barWidth / 2, H - 9);
         });
       }, 120);
     }
